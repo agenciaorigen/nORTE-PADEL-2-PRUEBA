@@ -1,4 +1,4 @@
-const CACHE = "norte-padel-v68-editorial";
+const CACHE = "norte-padel-v69-circuit";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -23,7 +23,14 @@ const APP_SHELL = [
   "./editorial-net.webp",
   "./editorial-community.webp",
   "./hero-torneos.webp",
-  "./hero-ranking.webp"
+  "./hero-ranking.webp",
+  "./norte-editorial-01.webp",
+  "./norte-editorial-02.webp",
+  "./norte-editorial-03.webp",
+  "./norte-editorial-04.webp",
+  "./norte-editorial-05.webp",
+  "./norte-editorial-06.webp",
+  "./norte-editorial-03-square.webp"
 ];
 
 self.addEventListener("install", (event) => {

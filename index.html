@@ -63,159 +63,49 @@
   </div>
 </div>
 
-<header class="topbar">
-  <div class="logo-ring"><img src="icon-192.png" alt="Norte Padel" decoding="async" /></div>
-  <h1>NORTE <span>PADEL</span></h1>
-  <button id="btnNotif" title="Notificaciones" aria-label="Notificaciones">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M6 9a6 6 0 1 1 12 0c0 4 1.5 5.5 1.5 5.5H4.5S6 13 6 9z"/><path d="M10 19a2 2 0 0 0 4 0"/></svg>
-    <span id="notifCount"></span>
-  </button>
-  <button id="btnPerfil" title="Mi perfil" aria-label="Mi perfil">
-    <span id="perfilAvatarWrap" class="perfil-avatar-wrap">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><circle cx="12" cy="8" r="3.3"/><path d="M5 20c0-3.6 3.1-6.5 7-6.5s7 2.9 7 6.5"/></svg>
-    </span>
-    <span id="perfilNombreCorto"></span>
-  </button>
+<header class="topbar np-site-header">
+  <a class="np-brand" href="#/" aria-label="Norte Padel — Inicio">
+    <span class="np-brand-mark"><img src="icon-192.png" alt="" decoding="async" /></span>
+    <span class="np-brand-copy"><strong>NORTE</strong><em>PADEL</em><small>THE CIRCUIT · 2026</small></span>
+  </a>
+  <div class="np-header-center"><span class="np-live-mark"><i></i> CIRCUIT LIVE</span></div>
+  <div class="np-header-actions">
+    <button id="btnNotif" class="np-header-icon" title="Notificaciones" aria-label="Notificaciones"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M6 9a6 6 0 1 1 12 0c0 4 1.5 5.5 1.5 5.5H4.5S6 13 6 9z"/><path d="M10 19a2 2 0 0 0 4 0"/></svg><span id="notifCount"></span></button>
+    <button id="btnPerfil" class="np-profile-trigger" title="Mi perfil" aria-label="Mi perfil"><span id="perfilAvatarWrap" class="perfil-avatar-wrap"></span><span id="perfilNombreCorto"></span><span class="np-profile-chevron">↗</span></button>
+  </div>
 </header>
 
 <div class="app-body">
 <main>
 
   <!-- INICIO / Dirección visual: Padel Culture (V65) -->
-  <section id="view-inicio" class="view active">
-
-    <!-- Carrusel del hero: en mobile es una sola slide "real" (el hero de siempre);
-         en escritorio se suman 2 slides fijas más (Torneos, Ranking), ocultas/mostradas
-         por moverFlyerDestacadoSegunAncho() (app.js) según el ancho — mismo mecanismo
-         que ya usa moverBannerEnergiaSegunAncho() con #energiaBanda. El afiche del
-         torneo destacado sigue viéndose, como siempre, más abajo en "Próximos torneos". -->
-    <div class="hero-carousel" id="heroCarousel">
-      <div class="hero-carousel-track" id="heroCarouselTrack">
-        <div class="hero-carousel-slide">
-          <div class="hero-club">
-            <div class="hero-club-widget" id="heroPosicionCard" style="display:none">
-              <span class="hero-club-widget-label">Tu posición</span>
-              <strong id="heroPosicionValor">—</strong>
-              <span class="hero-club-widget-sub" id="heroPosicionSub"></span>
-            </div>
-            <h2 class="hero-club-titulo">Movimiento.<br /><span>Disciplina.</span><br />Resultado.</h2>
-            <p class="hero-club-sub">El circuito de pádel de Norte Padel: ranking en vivo, torneos todo el año.</p>
-            <button class="hero-club-cta" id="btnHeroTorneos" type="button">Ver torneos <span aria-hidden="true">→</span></button>
-          </div>
-        </div>
-        <div class="hero-carousel-slide" id="heroSlideTorneo">
-          <div class="hero-club hero-club-torneo">
-            <h2 class="hero-club-titulo">Torneos<br /><span>todo el año.</span></h2>
-            <p class="hero-club-sub">Categorías para todos los niveles, fecha a fecha.</p>
-            <button class="hero-club-cta" id="btnHeroTorneos2" type="button">Ver torneos <span aria-hidden="true">→</span></button>
-          </div>
-        </div>
-        <div class="hero-carousel-slide" id="heroSlideRanking">
-          <div class="hero-club hero-club-ranking">
-            <h2 class="hero-club-titulo">Ranking<br /><span>en vivo.</span></h2>
-            <p class="hero-club-sub">Mirá cómo vas en tu categoría, partido a partido.</p>
-            <button class="hero-club-cta" id="btnHeroRanking" type="button">Ver ranking <span aria-hidden="true">→</span></button>
-          </div>
-        </div>
-      </div>
-      <div class="hero-carousel-dots" id="heroCarouselDots"></div>
-    </div>
-
-    <div class="seccion" id="inicioProximoDestacadoWrap" style="display:none">
-      <h3>Próximo partido destacado</h3>
-      <div id="inicioProximoDestacadoContenido"></div>
-    </div>
-
-    <button type="button" class="marquee-banda" id="marqueeBanda" aria-label="Ver el próximo torneo e inscribirte">
-      <div class="marquee-track" aria-hidden="true">
-        <span>NORTE PADEL</span><span class="marquee-dot">•</span><span>RANKING EN VIVO</span><span class="marquee-dot">•</span><span>INSCRIBITE YA</span><span class="marquee-dot">•</span>
-        <span>NORTE PADEL</span><span class="marquee-dot">•</span><span>RANKING EN VIVO</span><span class="marquee-dot">•</span><span>INSCRIBITE YA</span><span class="marquee-dot">•</span>
-      </div>
-    </button>
-
-    <!-- Últimos resultados / próximos partidos del torneo destacado: tarjetas
-         quietas (misma tarjeta que ya usa Resultados/Llave, ver llavePartidoCardHtml
-         en app.js), no tiras que giran -- con la banda de arriba ya moviéndose,
-         sumarle más movimiento acá quedaba recargado. Cada bloque se oculta solo
-         (ver cargarUltimosProximos en app.js) si no hay torneo destacado o no hay
-         partidos para mostrar de ese lado. -->
-    <div class="seccion" id="inicioResultadosWrap" style="display:none">
-      <h3>Últimos resultados</h3>
-      <div class="inicio-partidos-grid" id="inicioResultadosGrid"></div>
-    </div>
-    <div class="seccion" id="inicioProximosWrap" style="display:none">
-      <h3>Próximos partidos</h3>
-      <div class="inicio-partidos-grid" id="inicioProximosGrid"></div>
-    </div>
-
-    <!-- En mobile los auspiciantes pasan a una barra que se desliza sola
-         (mismo mecanismo que la banda de arriba, "marquee-scroll"), bien
-         grande, en vez del renglón chico de logos que quedaba más abajo del
-         todo. En desktop esta barra no se ve: ahí los auspiciantes van en la
-         fila "Presentan" del contenido principal (#sponsorsInlineCard). -->
-    <div class="sponsor-marquee" id="sponsorMarqueeMobile" style="display:none">
-      <p class="sponsor-label">Auspician</p>
-      <div class="sponsor-marquee-track" id="sponsorMarqueeTrack"></div>
-    </div>
-
-    <div class="destacados-band">
-      <div class="destacados-overline"><span>⭐ Destacado del mes</span></div>
-      <div class="destacados-grid" id="jugadorDelMesContenido"></div>
-    </div>
-
-    <div class="seccion" id="ascendidosCard" style="display:none">
-      <h3>📈 Ascendieron este mes</h3>
-      <div class="ascendidos-wrap">
-        <div class="ascendidos-track" id="ascendidosContenido"></div>
-      </div>
-    </div>
-
-    <div class="seccion" id="campeonesCard" style="display:none">
-      <h3>🏆 Campeones</h3>
-      <div class="campeones-strip" id="campeonesContenido"></div>
-    </div>
-
-    <div class="seccion">
-      <h2>Próximos torneos</h2>
-      <div id="flyerDestacado"></div>
-      <div class="flyer-grid" id="flyerMini"></div>
-      <p class="empty" id="inicioSinTorneos" style="display:none">Todavía no hay torneos publicados.</p>
-    </div>
-
-    <!-- Vive siempre acá, arriba de Noticias, en mobile y en desktop (ya no
-         hay columna lateral aparte donde reubicarla). -->
-    <div class="energia-banda" id="energiaBanda">
-      <div class="energia-texto">
-        <h3>En noviembre vamos a Brasil</h3>
-        <p>Padel Tour 2026</p>
-      </div>
-    </div>
-
-    <div class="seccion" id="noticiasCard" style="display:none">
-      <div class="torneo-card-header">
-        <h3>📰 Noticias</h3>
-        <div id="noticiasInstagram"></div>
-      </div>
-      <div id="noticiasContenido"></div>
-    </div>
-
-    <div class="seccion" id="sponsorsInlineCard" style="display:none">
-      <p class="sponsor-label">Presentan</p>
-      <div class="sponsor-strip" id="sponsorsInline"></div>
-    </div>
+  <section id="view-inicio" class="view active np-home">
+  <section class="np-hero" id="npHero">
+    <div class="np-hero-bg"></div><div class="np-hero-grain"></div>
+    <div class="np-hero-side"><span>01</span><i></i><span>06</span></div><div id="heroPosicionCard" class="np-hero-position" style="display:none"><span>YOUR RANK</span><strong id="heroPosicionValor">—</strong><small id="heroPosicionSub"></small></div>
+    <div class="np-hero-copy"><p class="np-kicker">NORTE PADEL · THE CIRCUIT · 2026</p><h2 class="np-display np-hero-title">EL JUEGO<br><span>SE SIENTE.</span></h2><p class="np-hero-sub">Competencia, comunidad y pádel. Todo el circuito en un solo lugar.</p><div class="np-hero-cta-row"><button class="np-cta np-cta-main" id="btnHeroTorneos" type="button">VER TORNEOS <span>↗</span></button><button class="np-ghost-cta" id="btnHeroRanking" type="button">RANKING <span>01—</span></button></div></div>
+    <div class="np-hero-feature-image" aria-hidden="true"></div>
+    <div class="np-hero-bottom"><span>BUILT FOR THE PLAYERS</span><span>SCROLL ↓</span><span>POSICIONES · RESULTADOS · TORNEOS</span></div>
+    <div id="heroCarousel" class="np-legacy-carousel" aria-hidden="true"><div id="heroCarouselTrack"><div id="heroSlideTorneo"></div><div id="heroSlideRanking"></div></div><div id="heroCarouselDots"></div><button id="btnHeroTorneos2" type="button">Torneos</button></div>
   </section>
+  <section class="np-section np-match-section" id="inicioProximoDestacadoWrap" style="display:none"><div class="np-section-head"><div><span class="np-kicker">NEXT MATCH</span><h3>El próximo cruce</h3></div><span class="np-section-index">01 / MATCH</span></div><div id="inicioProximoDestacadoContenido"></div></section>
+  <section class="np-section np-feed-section"><div class="np-news-grid"><div class="np-results-column"><div class="np-section-head compact"><div><span class="np-kicker">LIVE ARCHIVE</span><h3>Últimos resultados</h3></div><span class="np-section-index">02</span></div><div id="inicioResultadosWrap" class="np-dynamic-wrap" style="display:none"><div id="inicioResultadosGrid" class="np-results-grid"></div></div></div><aside class="np-aside-ticker"><span class="np-kicker">CIRCUIT NOTE</span><strong>PLAY<br>EVERY<br>POINT.</strong><span>RANKING · MATCHES · CLUB</span></aside></div></section>
+  <section class="np-section np-agenda-section"><div class="np-section-head"><div><span class="np-kicker">UP NEXT</span><h3>La agenda del circuito</h3></div><span class="np-section-index">03 / NEXT</span></div><div id="inicioProximosWrap" class="np-dynamic-wrap" style="display:none"><div id="inicioProximosGrid" class="np-agenda-grid"></div></div></section>
+  <section class="np-feature-breaker"><div class="np-feature-number">04</div><div class="np-feature-image" role="img" aria-label="Acción de pádel"></div><div class="np-feature-copy"><span class="np-kicker">THE PEOPLE</span><h3>Donde cada<br><em>partido</em> cuenta.</h3><p>El circuito también vive en sus jugadores, sus historias y la gente que llena la cancha.</p></div></section>
+  <div class="destacados-band np-player-of-month-band"><div class="destacados-overline"><span>05 · PLAYER OF THE MONTH</span></div><div class="destacados-grid" id="jugadorDelMesContenido"></div></div>
+  <div class="seccion" id="ascendidosCard" style="display:none"><h3>Ascendieron este mes</h3><div class="ascendidos-wrap"><div class="ascendidos-track" id="ascendidosContenido"></div></div></div>
+  <div class="seccion" id="campeonesCard" style="display:none"><h3>Campeones</h3><div class="campeones-strip" id="campeonesContenido"></div></div>
+  <section class="np-section np-tournaments-section"><div class="np-section-head"><div><span class="np-kicker">06 / COMPETITION</span><h3>Próximos torneos</h3></div><button data-view="torneos" class="np-inline-link" type="button">VER CALENDARIO ↗</button></div><div class="np-tournament-showcase"><div id="flyerDestacado"></div><div class="flyer-grid" id="flyerMini"></div></div><p class="empty" id="inicioSinTorneos" style="display:none">Todavía no hay torneos publicados.</p></section>
+  <section class="np-split-story"><div class="np-story-copy"><span class="np-kicker">07 / CLUB LIFE</span><h3>Una comunidad.<br><em>Un circuito.</em></h3><div class="np-story-meta"><span>TORNEOS</span><span>RANKING</span><span>PLAYERS</span></div></div><div class="np-story-image"></div></section>
+  <div class="energia-banda np-brazil-band" id="energiaBanda"><div class="energia-texto"><h3>En noviembre vamos a Brasil</h3><p>Padel Tour 2026</p></div></div>
+  <div class="seccion np-news-block" id="noticiasCard" style="display:none"><div class="torneo-card-header"><h3>Noticias</h3><div id="noticiasInstagram"></div></div><div id="noticiasContenido"></div></div>
+  <div class="seccion np-sponsors-section" id="sponsorsInlineCard" style="display:none"><p class="sponsor-label">SUPPORTED BY</p><div class="sponsor-strip" id="sponsorsInline"></div></div>
+  <div class="sponsor-marquee" id="sponsorMarqueeMobile" style="display:none"><p class="sponsor-label">SUPPORTED BY</p><div class="sponsor-marquee-track" id="sponsorMarqueeTrack"></div></div>
+  <button type="button" class="marquee-banda np-hidden-legacy-ticker" id="marqueeBanda" aria-label="Ver el próximo torneo e inscribirte"><div class="marquee-track"><span>NORTE PADEL</span><span class="marquee-dot">•</span><span>RANKING EN VIVO</span><span class="marquee-dot">•</span><span>INSCRIBITE YA</span></div></button>
+</section>
 
   <!-- TORNEOS -->
-  <section id="view-torneos" class="view">
-    <div class="card">
-      <div class="torneo-card-header">
-        <h2>Torneos</h2>
-        <button type="button" class="secondary small admin-only" id="btnMostrarCrearTorneo">+ Crear torneo</button>
-      </div>
-      <div id="listaTorneos"></div>
-    </div>
-
-    <div class="card admin-only" id="crearTorneoCard" style="display:none">
+  <section id="view-torneos" class="view np-view np-torneos-view"><div class="np-page-hero np-page-hero-torneos"><div><span class="np-kicker">NORTE PADEL / 2026</span><h2 class="np-display">TORNEOS</h2><p>La temporada, fecha por fecha.</p></div><div class="np-page-number">06</div></div><div class="np-toolbar"><span>CALENDARIO DE COMPETICIÓN</span><button type="button" class="np-cta np-cta-small admin-only" id="btnMostrarCrearTorneo">+ CREAR TORNEO</button></div><div id="listaTorneos" class="np-tournament-list"></div><div class="np-admin-sheet admin-only" id="crearTorneoCard" style="display:none">
       <h2>Crear torneo</h2>
       <label>Nombre</label>
       <input id="tNombre" placeholder="Ej: Apertura Norte 2026" />
@@ -268,7 +158,7 @@
       <button class="primary" id="btnCrearTorneo">Crear torneo</button>
       <button type="button" class="secondary small" id="btnCancelarCrearTorneo" style="margin-top:8px">Cancelar</button>
     </div>
-  </section>
+</section>
 
   <!-- JUGAR (reservar cancha para entrenar / jugar con amigos, fuera de los torneos) -->
   <section id="view-jugar" class="view">
@@ -322,208 +212,15 @@
        se ve como encabezado/etiqueta adentro de cada etapa, no como pestaña
        propia. Antes eran 3 pestañas (Inicio/Calendario/Resultados) que
        mostraban casi lo mismo — ver renderResultadosPublico en app.js. -->
-  <section id="view-torneo-resultados" class="view">
-    <div class="torneo-hero">
-      <button type="button" class="hero-icon-btn admin-only" id="btnAdministrarEsteTorneo" title="Administrar este torneo" aria-label="Administrar este torneo">🔧</button>
-      <div class="torneo-hero-overlay">
-        <p id="dtEstadoHero"></p>
-        <h2 id="dtNombreHero"></h2>
-      </div>
-    </div>
-    <div class="card card-glow" id="dtInscripcionCard">
-      <p class="match-meta" id="inscripcionEstado"></p>
-      <p style="margin-top:10px;display:none" id="dtCosto"></p>
-      <button class="primary cta-hero" id="btnIrAInscribirme" style="width:100%">Anotarme</button>
-    </div>
-    <div class="card">
-      <label>Categoría</label>
-      <div class="pill-row" id="resFiltroGeneroPills"></div>
-      <select id="resFiltroCategoria"></select>
-      <div id="pubResultadosLlave" style="margin-top:10px"></div>
-    </div>
-  </section>
+  <section id="view-torneo-resultados" class="view np-view np-event-view"><div class="np-event-hero"><button type="button" class="hero-icon-btn admin-only" id="btnAdministrarEsteTorneo" title="Administrar este torneo" aria-label="Administrar este torneo">↗</button><div class="np-event-art"></div><div class="np-event-overlay"><span id="dtEstadoHero"></span><h2 id="dtNombreHero"></h2><div class="np-event-meta-line"><span>THE CIRCUIT · EVENT PAGE</span></div></div></div><div class="np-event-actionbar" id="dtInscripcionCard"><div><span class="np-kicker">ENTRY</span><p id="inscripcionEstado"></p><p id="dtCosto" style="display:none"></p></div><button class="np-cta" id="btnIrAInscribirme">ANOTARME ↗</button></div><div class="np-event-results"><div class="np-section-head compact"><div><span class="np-kicker">COMPETITION</span><h3>Partidos</h3></div></div><div class="np-filter-rail"><div class="pill-row" id="resFiltroGeneroPills"></div><select id="resFiltroCategoria"></select></div><div id="pubResultadosLlave"></div></div></section>
+<section id="view-torneo-info" class="view np-view np-event-info-view"><div class="np-section-head"><div><span class="np-kicker">EVENT / INFO</span><h3>El torneo por dentro</h3></div></div><div class="np-info-hero"><div><span class="np-kicker">VENUE</span><p id="dtInfo"></p></div><div id="dtCanchas"></div></div><div class="np-stats-strip"><div id="dtInicioStats" class="pj-stats"></div></div><div class="np-two-col"><section><span class="np-kicker">CATEGORIES</span><div id="dtCategorias"></div></section><section><span class="np-kicker">PLAYERS / PAIRS</span><div id="dtParejas"></div><div id="dtSinPareja"></div></section></div><div class="sponsor-strip np-event-sponsors" id="dtSponsors" style="display:none"></div></section>
+<section id="view-torneo-inscripcion" class="view np-view np-join-view"><div class="np-join-hero"><span class="np-kicker">JOIN THE CIRCUIT</span><h2 class="np-display">JUGÁ<br><em>CON TU PAREJA.</em></h2></div><div class="np-join-layout"><aside class="np-step-rail"><div class="np-step active"><b>01</b><span>CATEGORÍA</span></div><div class="np-step"><b>02</b><span>PAREJA</span></div><div class="np-step"><b>03</b><span>CONFIRMAR</span></div></aside><div class="np-join-content"><div class="np-join-step" id="buscarParejaWrap"><span class="np-kicker">STEP 01 / 02</span><h3>Elegí la categoría</h3><select id="anotarmeCategoria"><option value="">Elegí la categoría</option></select><div class="np-divider"></div><h3>¿Con quién vas a jugar?</h3><p class="match-meta">Buscá a tu pareja para anotarlos a los dos.</p><input id="buscarPareja" placeholder="Nombre de tu pareja" autocomplete="off" /><div id="sugerenciasPareja" class="suggest-list"></div><p class="match-meta" id="parejaSeleccionadaTxt"></p><button class="np-cta" id="btnInscribirme" disabled>CONTINUAR ↗</button></div><div class="np-join-step np-join-confirm" id="confirmarInscripcionWrap" style="display:none"><span class="np-kicker">STEP 03 / CONFIRM</span><h3>Listos para competir.</h3><div class="np-confirm-card"><p id="confirmarInscripcionResumen"></p><div id="confirmarInscripcionWhatsapp"></div></div><button class="np-cta" id="btnConfirmarInscripcion">CONFIRMAR INSCRIPCIÓN ↗</button><button class="np-inline-link" id="btnCambiarPareja">CAMBIAR PAREJA</button></div></div></div></section>
+<section id="view-mi-inscripcion" class="view np-view np-status-view"><div class="np-page-hero"><div><span class="np-kicker">PLAYER STATUS</span><h2 class="np-display">MI<br>INSCRIPCIÓN</h2></div></div><div class="np-status-panel"><span class="np-kicker">STATUS</span><div id="miInscEstado"></div><p id="miInscResumen"></p></div><div class="np-status-actions"><button type="button" class="np-cta" id="miInscBtnDisponibilidad">MODIFICAR DISPONIBILIDAD</button><button type="button" class="np-inline-link" id="miInscBtnMisPartidos">VER MIS PARTIDOS ↗</button><button type="button" class="np-danger-link" id="miInscBtnCancelar">CANCELAR INSCRIPCIÓN</button></div></section>
+<section id="view-mi-disponibilidad-torneo" class="view np-view np-availability-view"><div class="np-page-hero"><div><span class="np-kicker">MATCH AVAILABILITY</span><h2 class="np-display">CUÁNDO<br><em>PODÉS JUGAR.</em></h2></div></div><div class="np-availability-panel"><p class="match-meta">Por defecto usamos tu disponibilidad del perfil. Agregá sólo las excepciones para este torneo.</p><div id="torneoDispBloqueadaForm"></div><button type="button" class="np-cta" id="btnGuardarDispTorneo">GUARDAR CAMBIOS ↗</button></div></section>
 
-  <!-- INFO: categorías, jugadores/parejas y datos de sede — todo lo que antes
-       eran 3 pantallas separadas (Categorías/Jugadores + parte de Inicio). -->
-  <section id="view-torneo-info" class="view">
-    <div class="card">
-      <p class="match-meta" id="dtInfo"></p>
-      <div class="sponsor-strip" id="dtSponsors" style="margin-top:12px;display:none"></div>
-      <div id="dtCanchas" style="margin-top:10px"></div>
-    </div>
-    <div class="card">
-      <div class="pj-stats" id="dtInicioStats"></div>
-    </div>
-    <div class="card">
-      <h3>Categorías</h3>
-      <div id="dtCategorias"></div>
-    </div>
-    <div class="card">
-      <h3>Jugadores / Parejas</h3>
-      <div id="dtParejas"></div>
-      <div id="dtSinPareja"></div>
-    </div>
-  </section>
-
-  <!-- INSCRIPCIÓN: paso a paso, independiente del resto del torneo -->
-  <section id="view-torneo-inscripcion" class="view">
-    <div class="card">
-      <h3>Paso 1 · Categoría</h3>
-      <select id="anotarmeCategoria"><option value="">Elegí la categoría</option></select>
-    </div>
-    <div class="card" id="buscarParejaWrap">
-      <h3>Paso 2 · ¿Con quién vas a jugar?</h3>
-      <p class="match-meta">No te podés anotar solo/a: buscala/lo para anotarlos a los dos juntos.</p>
-      <input id="buscarPareja" placeholder="Escribí el nombre de tu pareja" autocomplete="off" />
-      <div id="sugerenciasPareja" class="suggest-list"></div>
-      <p class="match-meta" id="parejaSeleccionadaTxt"></p>
-      <button class="primary" id="btnInscribirme" style="margin-top:12px" disabled>Elegí tu pareja para continuar</button>
-    </div>
-    <div class="card card-glow" id="confirmarInscripcionWrap" style="display:none">
-      <h3>Paso 3 · Confirmar</h3>
-      <div class="match-card">
-        <p id="confirmarInscripcionResumen"></p>
-        <div id="confirmarInscripcionWhatsapp"></div>
-      </div>
-      <button class="primary cta-hero" id="btnConfirmarInscripcion" style="margin-top:10px">Confirmar inscripción</button>
-      <button class="secondary small" id="btnCambiarPareja" style="margin-top:8px">Cambiar pareja</button>
-    </div>
-  </section>
-
-  <!-- MI INSCRIPCIÓN: se ve una vez ya anotado — nunca vuelve a mostrar el formulario -->
-  <section id="view-mi-inscripcion" class="view">
-    <div class="card card-glow">
-      <h3>Mi inscripción</h3>
-      <p id="miInscEstado"></p>
-      <p class="match-meta" id="miInscResumen"></p>
-    </div>
-    <div class="card">
-      <button type="button" class="secondary" id="miInscBtnDisponibilidad" style="width:100%">🕒 Modificar mi disponibilidad</button>
-      <button type="button" class="secondary" id="miInscBtnMisPartidos" style="width:100%;margin-top:8px">📅 Ver mis partidos</button>
-      <button type="button" class="danger" id="miInscBtnCancelar" style="width:100%;margin-top:8px">Cancelar inscripción</button>
-    </div>
-  </section>
-
-  <!-- MI DISPONIBILIDAD (para este torneo puntual) -->
-  <section id="view-mi-disponibilidad-torneo" class="view">
-    <div class="card">
-      <h3>Mi disponibilidad para este torneo</h3>
-      <p class="match-meta">Por defecto usamos los días y horarios que configuraste en tu perfil. Si para ESTE torneo tenés algún horario puntual en el que no podés jugar, agregalo acá.</p>
-      <div id="torneoDispBloqueadaForm"></div>
-      <button type="button" class="secondary" id="btnGuardarDispTorneo" style="margin-top:12px;width:100%">Guardar</button>
-    </div>
-  </section>
-
-  <!-- RANKING -->
-  <section id="view-ranking" class="view">
-    <div class="card">
-      <h2>Ranking por categoría</h2>
-      <p class="match-meta" style="margin-bottom:6px;color:#ffd700">Los resaltados en amarillo (primeros 20 de su categoría) clasifican al Master de fin de año — los primeros 10, además, se destacan con foto grande.</p>
-      <div class="pill-row" id="generoRankingPills"></div>
-      <div class="pill-row" id="categoriaPills"></div>
-      <table id="tablaRanking">
-        <thead><tr><th>#</th><th>Jugador</th><th>Pts</th><th>PJ</th><th>PG</th></tr></thead>
-        <tbody></tbody>
-      </table>
-      <p class="empty" id="rankingVacio" style="display:none">Todavía no hay jugadores con puntos.</p>
-    </div>
-  </section>
-
-  <!-- PERFIL PÚBLICO DE UN JUGADOR (se abre desde ranking / campeones / jugador del mes) -->
-  <section id="view-perfil-jugador" class="view">
-    <div class="card">
-      <button class="secondary small" id="btnVolverPerfilJugador">← Volver</button>
-      <div class="pj-header">
-        <div id="pjFoto"></div>
-        <div>
-          <h2 id="pjNombre"></h2>
-          <span class="badge" id="pjCategoria"></span>
-          <div class="pj-trofeos" id="pjTrofeos" style="display:none"></div>
-        </div>
-      </div>
-      <div class="pj-stats">
-        <div><strong id="pjPuntos"></strong><span>Puntos</span></div>
-        <div><strong id="pjJugados"></strong><span>Jugados</span></div>
-        <div><strong id="pjGanados"></strong><span>Ganados</span></div>
-        <div><strong id="pjEfectividad"></strong><span>Efectividad</span></div>
-      </div>
-    </div>
-    <div class="card">
-      <h3>📈 Rendimiento</h3>
-      <div class="pj-stats">
-        <div><strong id="pjFinales"></strong><span>Finales jugadas</span></div>
-        <div><strong id="pjTotalTorneos"></strong><span>Torneos jugados</span></div>
-        <div><strong id="pj6m"></strong><span>Últimos 6 meses</span></div>
-      </div>
-      <p class="match-meta" id="pjPrimerUltimoTorneo" style="margin-top:10px"></p>
-    </div>
-    <div class="card">
-      <h3>🏆 Torneos ganados</h3>
-      <div id="pjTorneosGanados"></div>
-    </div>
-    <div class="card" id="pjSubcampeonatosCard" style="display:none">
-      <h3>🥈 Subcampeonatos</h3>
-      <div id="pjSubcampeonatos"></div>
-    </div>
-  </section>
-
-  <!-- MI PERFIL (login / registro / edición) -->
-  <section id="view-perfil" class="view">
-    <div class="card card-glow" id="authCard">
-      <h2 id="authTitulo">Ingresar</h2>
-      <label>Email</label>
-      <input id="authEmail" type="email" autocomplete="email" />
-      <label>Contraseña</label>
-      <input id="authPassword" type="password" autocomplete="current-password" />
-      <button class="primary" id="btnLogin">Ingresar</button>
-      <button class="secondary" id="btnSignup" style="margin-top:10px;width:100%">Crear cuenta nueva</button>
-      <p class="match-meta" id="authError"></p>
-    </div>
-
-    <div class="card" id="completarPerfilCard" style="display:none">
-      <h2>Completá tu perfil de jugador</h2>
-      <div style="text-align:center;margin-bottom:14px">
-        <img id="fotoPreview" alt="Tu foto de perfil" class="avatar avatar-grande" style="display:none;margin:0 auto" onerror="mostrarFotoPreview(null)" />
-        <div id="fotoPlaceholder" class="avatar avatar-grande avatar-placeholder" style="margin:0 auto">🎾</div>
-        <label>Foto de perfil</label>
-        <input id="jFoto" type="file" accept="image/*" />
-      </div>
-      <div class="row">
-        <div><label>Nombre</label><input id="jNombre" /></div>
-        <div><label>Apellido</label><input id="jApellido" /></div>
-      </div>
-      <div class="row">
-        <div>
-          <label>Categoría</label>
-          <select id="jCategoria"></select>
-          <p class="match-meta" id="categoriaPendienteNotice" style="display:none"></p>
-        </div>
-        <div>
-          <label>Teléfono</label>
-          <input id="jTelefono" />
-        </div>
-      </div>
-      <label>Lado preferido</label>
-      <select id="jLado">
-        <option value="indistinto" selected>Indistinto</option>
-        <option value="drive">Drive</option>
-        <option value="reves">Revés</option>
-      </select>
-
-      <label>¿Hay algún día/horario en el que NO podés jugar? (opcional — si no marcás nada, se asume que podés cualquier día)</label>
-      <div id="disponibilidadForm"></div>
-
-      <button class="primary" id="btnGuardarPerfil">Guardar perfil</button>
-    </div>
-
-    <div class="card" id="miPerfilCard" style="display:none">
-      <h2>Mi perfil</h2>
-      <p class="match-meta" id="miPerfilResumen"></p>
-      <button class="secondary" id="btnVerMiPerfilPublico" style="width:100%;margin-top:12px">📊 Ver mis estadísticas</button>
-      <button class="secondary small" id="btnEditarPerfil" style="margin-top:10px">Editar mis datos y horarios</button>
-      <button class="secondary small danger" id="btnLogout" style="margin-top:10px">Cerrar sesión</button>
-    </div>
-  </section>
+<section id="view-ranking" class="view np-view np-ranking-view"><div class="np-page-hero np-ranking-hero"><div><span class="np-kicker">07 / LEADERBOARD</span><h2 class="np-display">RANKING</h2><p>Los primeros 20 clasifican al Master de fin de año.</p></div><div class="np-page-number">01</div></div><div class="np-ranking-filters"><div class="pill-row" id="generoRankingPills"></div><div class="pill-row" id="categoriaPills"></div></div><div class="np-ranking-stage"><div class="np-ranking-title-row"><span>POS</span><span>PLAYER</span><span>PTS</span><span>PJ / PG</span></div><table id="tablaRanking"><thead><tr><th>#</th><th>Jugador</th><th>Pts</th><th>PJ</th><th>PG</th></tr></thead><tbody></tbody></table><p class="empty" id="rankingVacio" style="display:none">Todavía no hay jugadores con puntos.</p></div></section>
+<section id="view-perfil-jugador" class="view np-view np-player-view"><button class="np-back-link" id="btnVolverPerfilJugador">← VOLVER</button><div class="np-player-hero"><div class="np-player-photo" id="pjFoto"></div><div class="np-player-heading"><span class="np-kicker">PLAYER PROFILE</span><h2 id="pjNombre" class="np-display"></h2><span class="badge" id="pjCategoria"></span><div class="pj-trofeos" id="pjTrofeos" style="display:none"></div></div></div><div class="np-player-score"><div><strong id="pjPuntos"></strong><span>PUNTOS</span></div><div><strong id="pjJugados"></strong><span>JUGADOS</span></div><div><strong id="pjGanados"></strong><span>GANADOS</span></div><div><strong id="pjEfectividad"></strong><span>EFECTIVIDAD</span></div></div><div class="np-player-lower"><section><span class="np-kicker">PERFORMANCE</span><div class="pj-stats"><div><strong id="pjFinales"></strong><span>Finales</span></div><div><strong id="pjTotalTorneos"></strong><span>Torneos</span></div><div><strong id="pj6m"></strong><span>Últimos 6 meses</span></div></div><p class="match-meta" id="pjPrimerUltimoTorneo"></p></section><section><span class="np-kicker">PALMARÉS</span><div id="pjTorneosGanados"></div><div id="pjSubcampeonatosCard" style="display:none"><div id="pjSubcampeonatos"></div></div></section></div></section>
+<section id="view-perfil" class="view np-view np-profile-view"><div class="np-profile-shell"><div class="np-page-hero"><div><span class="np-kicker">PLAYER ACCESS</span><h2 class="np-display">TU<br><em>PERFIL.</em></h2></div></div><div class="card card-glow np-auth-card" id="authCard"><h2 id="authTitulo">Ingresar</h2><label>Email</label><input id="authEmail" type="email" autocomplete="email" /><label>Contraseña</label><input id="authPassword" type="password" autocomplete="current-password" /><button class="np-cta" id="btnLogin">INGRESAR ↗</button><button class="np-inline-link" id="btnSignup">CREAR CUENTA</button><p class="match-meta" id="authError"></p></div><div class="np-profile-form np-form-card" id="completarPerfilCard" style="display:none"><h2>Completá tu perfil de jugador</h2><div class="np-photo-uploader"><img id="fotoPreview" alt="Tu foto de perfil" class="avatar avatar-grande" style="display:none" onerror="mostrarFotoPreview(null)" /><div id="fotoPlaceholder" class="avatar avatar-grande avatar-placeholder">🎾</div><label>Foto de perfil</label><input id="jFoto" type="file" accept="image/*" /></div><div class="row"><div><label>Nombre</label><input id="jNombre" /></div><div><label>Apellido</label><input id="jApellido" /></div></div><div class="row"><div><label>Categoría</label><select id="jCategoria"></select><p class="match-meta" id="categoriaPendienteNotice" style="display:none"></p></div><div><label>Teléfono</label><input id="jTelefono" /></div></div><label>Lado preferido</label><select id="jLado"><option value="indistinto" selected>Indistinto</option><option value="drive">Drive</option><option value="reves">Revés</option></select><label>Disponibilidad</label><div id="disponibilidadForm"></div><button class="np-cta" id="btnGuardarPerfil">GUARDAR PERFIL ↗</button></div><div class="np-profile-status" id="miPerfilCard" style="display:none"><span class="np-kicker">MEMBER</span><h3>Tu perfil está activo.</h3><p class="match-meta" id="miPerfilResumen"></p><button class="np-cta" id="btnVerMiPerfilPublico">VER MIS ESTADÍSTICAS ↗</button><button class="np-inline-link" id="btnEditarPerfil">EDITAR PERFIL</button><button class="np-danger-link" id="btnLogout">CERRAR SESIÓN</button></div></div></section>
 
   <!-- ADMIN -->
   <section id="view-admin" class="view">
@@ -820,40 +517,7 @@
 </main>
 </div>
 
-<nav class="tabbar">
-  <button data-view="inicio" class="tab active">
-    <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11.5 12 5l8 6.5"/><path d="M6 10v9h12v-9"/></svg></span>
-    Inicio
-  </button>
-  <!-- "Jugar" (reservar cancha) queda armado pero pausado hasta cerrar el acuerdo con el
-       club — no se muestra el botón todavía. Sacar el display:none para activarlo. -->
-  <button data-view="jugar" class="tab tab-cta" style="display:none">
-    <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M10 8.5v7l6-3.5-6-3.5Z" fill="currentColor" stroke="none"/></svg></span>
-    Jugar
-  </button>
-  <!-- Calendario/Resultados ya no son atajos globales: no llevaban a una pantalla
-       real, sino que abrían el torneo destacado por detrás — un atajo "disfrazado"
-       que duplicaba abrirTorneo(). Ahora se accede desde Torneos -> el torneo en
-       cuestión, donde además están bien gateados (solo aparecen si esa categoría
-       ya tiene calendario armado). -->
-  <button data-view="torneos" class="tab">
-    <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 9.5h16"/></svg></span>
-    Torneos
-  </button>
-  <button data-view="ranking" class="tab">
-    <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20v-4"/><path d="M12 20v-9"/><path d="M19 20V7"/></svg></span>
-    Ranking
-  </button>
-  <!-- Perfil ya no se repite acá: el ícono de arriba (#btnPerfil) es el único
-       acceso, así no hay dos caminos al mismo lugar. Admin/Config se muestra acá
-       en mobile Y desktop, pero solo para admins (ver body.is-admin en style.css)
-       — antes en mobile vivía escondido adentro de "Más", que se sacó por no
-       tener nada más adentro para el resto de la gente. -->
-  <button id="btnAdminPanel" data-view="admin" class="tab" title="Panel de administrador" aria-label="Administración">
-    <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.04 1.56V21a2 2 0 1 1-4 0v-.09A1.7 1.7 0 0 0 8.96 19a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.6 14.6a1.7 1.7 0 0 0-1.56-1.04H3a2 2 0 1 1 0-4h.09A1.7 1.7 0 0 0 4.6 8.6a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1.04-1.56V3a2 2 0 1 1 4 0v.09A1.7 1.7 0 0 0 15.4 4.6a1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.4 9c.36.1.68.3.94.56"/></svg></span>
-    Config
-  </button>
-</nav>
+<nav class="tabbar np-nav"><button data-view="inicio" class="tab active"><span class="icon"><span>01</span></span><span>INICIO</span></button><button data-view="torneos" class="tab"><span class="icon"><span>02</span></span><span>TORNEOS</span></button><button data-view="ranking" class="tab"><span class="icon"><span>03</span></span><span>RANKING</span></button><button data-view="jugar" class="tab tab-cta" style="display:none"><span class="icon"><span>+</span></span><span>JUGAR</span></button><button id="btnAdminPanel" data-view="admin" class="tab"><span class="icon"><span>+</span></span><span>CONFIG</span></button></nav>
 
 <div id="toast" class="toast" style="display:none"></div>
 
