@@ -18,9 +18,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;0,900;1,700&family=Manrope:wght@400;500;600;800&display=swap" rel="stylesheet" />
-<link rel="preload" as="image" href="editorial-action-01.webp" fetchpriority="high" />
-<link rel="stylesheet" href="style-v90-base.css" />
-<link rel="stylesheet" href="v90-system.css" />
+<link rel="preload" as="image" href="norte-editorial-01.webp" fetchpriority="high" />
+<link rel="stylesheet" href="style.css" />
+<link rel="stylesheet" href="v91-system.css" />
 </head>
 <body>
 
@@ -76,6 +76,8 @@
     <button id="btnPerfil" class="np-profile-trigger" title="Mi perfil" aria-label="Mi perfil"><span id="perfilAvatarWrap" class="perfil-avatar-wrap"></span><span id="perfilNombreCorto"></span><span class="np-profile-chevron">↗</span></button>
   </div>
 </header>
+
+<nav id="mainNav" class="tabbar np-nav"><button data-view="inicio" class="tab active"><span class="icon"><span>01</span></span><span>INICIO</span></button><button data-view="torneos" class="tab"><span class="icon"><span>02</span></span><span>TORNEOS</span></button><button data-view="ranking" class="tab"><span class="icon"><span>03</span></span><span>RANKING</span></button><button data-view="jugar" class="tab tab-cta" style="display:none"><span class="icon"><span>+</span></span><span>JUGAR</span></button><button id="btnAdminPanel" data-view="admin" class="tab"><span class="icon"><span>+</span></span><span>CONFIG</span></button></nav>
 
 <div class="app-body">
 <main>
@@ -223,9 +225,9 @@
        se ve como encabezado/etiqueta adentro de cada etapa, no como pestaña
        propia. Antes eran 3 pestañas (Inicio/Calendario/Resultados) que
        mostraban casi lo mismo — ver renderResultadosPublico en app.js. -->
-  <section id="view-torneo-resultados" class="view np-view np-event-view"><div class="np-event-hero"><button type="button" class="hero-icon-btn admin-only" id="btnAdministrarEsteTorneo" title="Administrar este torneo" aria-label="Administrar este torneo">↗</button><div class="np-event-art"></div><div class="np-event-overlay"><span id="dtEstadoHero"></span><h2 id="dtNombreHero"></h2><div class="np-event-meta-line"><span>THE CIRCUIT · EVENT PAGE</span></div></div></div><div class="np-event-actionbar" id="dtInscripcionCard"><div><span class="np-kicker">ENTRY</span><p id="inscripcionEstado"></p><p id="dtCosto" style="display:none"></p></div><button class="np-cta" id="btnIrAInscribirme">ANOTARME ↗</button></div><div class="np-event-results"><div class="np-section-head compact"><div><span class="np-kicker">COMPETITION</span><h3>EL CUADRO</h3></div><span class="np-section-note">Resultados y partidos del torneo</span></div><div id="dtCompetitionState"></div><div class="np-filter-rail"><div class="pill-row" id="resFiltroGeneroPills"></div><select id="resFiltroCategoria"></select></div><div id="pubResultadosLlave"></div></div></section>
+  <section id="view-torneo-resultados" class="view np-view np-event-view"><div class="np-event-hero"><button type="button" class="hero-icon-btn admin-only" id="btnAdministrarEsteTorneo" title="Administrar este torneo" aria-label="Administrar este torneo">↗</button><div class="np-event-art"><img id="dtTorneoFlyer" src="hero-torneos.webp" alt="Imagen del torneo" loading="eager" decoding="async" /></div><div class="np-event-overlay"><span id="dtEstadoHero"></span><h2 id="dtNombreHero"></h2><div class="np-event-meta-line"><span>THE CIRCUIT · EVENT PAGE</span></div></div></div><div class="np-event-actionbar" id="dtInscripcionCard"><div><span class="np-kicker">ENTRY</span><p id="inscripcionEstado"></p><p id="dtCosto" style="display:none"></p></div><button class="np-cta" id="btnIrAInscribirme">ANOTARME ↗</button></div><div class="np-event-results"><div class="np-section-head compact"><div><span class="np-kicker">COMPETITION</span><h3>EL CUADRO</h3></div><span class="np-section-note">Resultados y partidos del torneo</span></div><div id="dtCompetitionState"></div><div class="np-filter-rail"><div class="pill-row" id="resFiltroGeneroPills"></div><select id="resFiltroCategoria"></select></div><div id="pubResultadosLlave"></div></div></section>
 <section id="view-torneo-info" class="view np-view np-event-info-view">
-  <div class="np-event-inside-hero"><div class="np-event-inside-art"></div><div class="np-event-inside-copy"><span class="np-kicker">EVENT / INFO</span><h3>EL TORNEO<br><em>POR DENTRO.</em></h3><p id="dtInfo"></p></div><div class="np-event-inside-number">EVENT<br>06</div></div>
+  <div class="np-event-inside-hero"><div class="np-event-inside-art"><img id="dtTorneoFlyerInfo" src="hero-torneos.webp" alt="Imagen del torneo" loading="lazy" decoding="async" /></div><div class="np-event-inside-copy"><span class="np-kicker">EVENT / INFO</span><h3>EL TORNEO<br><em>POR DENTRO.</em></h3><p id="dtInfo"></p></div><div class="np-event-inside-number">EVENT<br>06</div></div>
   <div class="np-event-statline"><div class="np-event-stat-main"><span class="np-kicker">VENUE / COURTS</span><div id="dtCanchas"></div></div><div id="dtInicioStats" class="pj-stats np-event-stats"></div></div>
   <div class="np-event-content-grid"><section class="np-event-content-block"><span class="np-kicker">CATEGORIES</span><h4>Quién compite.</h4><div id="dtCategorias"></div></section><section class="np-event-content-block np-pairs-block"><span class="np-kicker">PLAYERS / PAIRS</span><h4>El cuadro.</h4><div id="dtParejas"></div><div id="dtSinPareja"></div></section></div>
   <div class="np-event-sponsor-stage"><div><span class="np-kicker">SUPPORTED BY</span><h4>Con quienes hacen posible el circuito.</h4></div><div class="sponsor-strip np-event-sponsors" id="dtSponsors" style="display:none"></div></div>
@@ -537,7 +539,7 @@
 </main>
 </div>
 
-<nav class="tabbar np-nav"><button data-view="inicio" class="tab active"><span class="icon"><span>01</span></span><span>INICIO</span></button><button data-view="torneos" class="tab"><span class="icon"><span>02</span></span><span>TORNEOS</span></button><button data-view="ranking" class="tab"><span class="icon"><span>03</span></span><span>RANKING</span></button><button data-view="jugar" class="tab tab-cta" style="display:none"><span class="icon"><span>+</span></span><span>JUGAR</span></button><button id="btnAdminPanel" data-view="admin" class="tab"><span class="icon"><span>+</span></span><span>CONFIG</span></button></nav>
+
 
 <div id="toast" class="toast" style="display:none"></div>
 
@@ -549,6 +551,6 @@
 <script src="config.js" defer></script>
 <script src="matching.js" defer></script>
 <script src="app.js" defer></script>
-<script src="v90-app.js" defer></script>
+<script src="v91-app.js" defer></script>
 </body>
 </html>
