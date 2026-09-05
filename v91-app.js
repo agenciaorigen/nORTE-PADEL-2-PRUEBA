@@ -92,12 +92,15 @@
     patchViews();
     window.addEventListener('hashchange',()=>{syncShell();patchViews();setTimeout(applyTournamentMedia,50);});
     window.addEventListener('resize',()=>{syncShell();});
+    // Observe DOM insertions only. The previous version also observed class/style
+    // mutations while its callback itself changed classes/styles, causing a
+    // self-triggering MutationObserver loop that could freeze the page.
     const obs=new MutationObserver(()=>{
       patchViews();
       applyTournamentMedia();
       patchSponsorship();
     });
-    obs.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['class','style']});
+    obs.observe(document.body,{subtree:true,childList:true});
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init); else init();
 })();
