@@ -1,0 +1,200 @@
+/* ============================================================
+   NORTE PADEL V86 — FINAL PRODUCT PASS
+   Image-first visual hierarchy, deterministic app chrome,
+   tournament event clarity, professional tournament ops.
+   Data / Supabase contracts intentionally untouched.
+   ============================================================ */
+:root{
+  --np86-bg:#050706;
+  --np86-surface:#09100d;
+  --np86-surface2:#0d1511;
+  --np86-text:#f2f5f3;
+  --np86-muted:#8b9790;
+  --np86-line:rgba(255,255,255,.10);
+  --np86-green:#7cf63e;
+  --np86-gold:#e1c76f;
+  --np86-header:72px;
+  --np86-nav:50px;
+  --np86-offset:calc(var(--np86-header) + var(--np86-nav));
+  --np86-shell:min(1500px, calc(100vw - 72px));
+}
+
+html,body{overflow-x:hidden!important;background:var(--np86-bg)!important}
+body{min-height:100vh}
+
+/* ONE desktop chrome: header and nav stay at the top, never at document bottom. */
+.np-site-header{position:fixed!important;left:0!important;right:0!important;top:0!important;height:var(--np86-header)!important;min-height:var(--np86-header)!important;z-index:1200!important;background:rgba(5,7,6,.92)!important;backdrop-filter:blur(18px) saturate(1.08)!important;-webkit-backdrop-filter:blur(18px) saturate(1.08)!important;border-bottom:1px solid var(--np86-line)!important}
+.np-nav{position:fixed!important;top:var(--np86-header)!important;left:0!important;right:0!important;height:var(--np86-nav)!important;min-height:var(--np86-nav)!important;z-index:1190!important;background:rgba(5,7,6,.88)!important;backdrop-filter:blur(16px)!important;-webkit-backdrop-filter:blur(16px)!important;border-bottom:1px solid var(--np86-line)!important}
+.app-body{padding-top:var(--np86-offset)!important}
+main{padding-top:0!important}
+.view{width:100%!important;box-sizing:border-box!important}
+.view:not(.active){display:none!important;visibility:hidden!important;pointer-events:none!important}
+.view.active{display:block!important;visibility:visible!important;pointer-events:auto!important;min-height:calc(100svh - var(--np86-offset))!important;padding-bottom:84px!important;box-sizing:border-box!important}
+
+/* Brand/chrome hierarchy */
+.np-brand-copy strong{font-size:17px!important;letter-spacing:.12em!important}
+.np-brand-copy em{font-size:17px!important}
+.np-brand-copy small{font-size:7px!important;letter-spacing:.24em!important}
+.np-header-center .np-live-mark{font-size:8px!important;letter-spacing:.22em!important}
+.np-header-config{font-size:8px!important;letter-spacing:.18em!important}
+
+/* Image-first editorial scale: reduce oversized text, increase photo real estate. */
+.np-display{font-size:clamp(54px,6.2vw,112px)!important;line-height:.9!important;letter-spacing:-.065em!important}
+#view-inicio .np-hero-title{font-size:clamp(56px,7vw,118px)!important;max-width:720px!important;line-height:.86!important}
+#view-inicio .np-hero-copy{max-width:780px!important}
+#view-inicio .np-hero-feature-image{opacity:1!important;background-position:center!important}
+.np-feature-breaker h3,.np-split-story h3{font-size:clamp(48px,5vw,92px)!important;line-height:.9!important}
+
+/* Event page — strong image and complete information */
+.np-event-hero{min-height:min(74svh,760px)!important;margin:0!important;border-radius:0!important;overflow:hidden!important;position:relative!important}
+.np-event-art{inset:0!important;background-image:linear-gradient(90deg,rgba(4,7,6,.92),rgba(4,7,6,.46) 46%,rgba(4,7,6,.15) 75%,rgba(4,7,6,.48)),url('hero-torneos.webp')!important;background-size:cover!important;background-position:center 42%!important}
+.np-event-overlay{left:max(5vw,56px)!important;bottom:max(8vh,72px)!important;right:6vw!important;z-index:2!important}
+.np-event-overlay h2{font-size:clamp(54px,7vw,112px)!important;line-height:.86!important;max-width:920px!important}
+.np-event-actionbar{margin:0!important;border-radius:0!important;padding:22px var(--np86-shell)!important;background:#070a09!important;border-bottom:1px solid var(--np86-line)!important}
+.np-event-results,.np-event-info-view>div{width:var(--np86-shell)!important;margin:0 auto!important}
+.np-event-results{padding-top:56px!important}
+.np-event-inside-hero{min-height:520px!important;position:relative!important;overflow:hidden!important}
+.np-event-inside-art{position:absolute!important;inset:0!important;background-image:linear-gradient(90deg,rgba(4,7,6,.85),rgba(4,7,6,.38) 58%,rgba(4,7,6,.58)),url('editorial-action-04.webp')!important;background-size:cover!important;background-position:center 34%!important}
+.np-event-inside-copy{position:relative!important;z-index:2!important;padding:clamp(48px,7vw,104px)!important;max-width:860px!important}
+.np-event-inside-copy h3{font-size:clamp(56px,6.5vw,106px)!important;line-height:.86!important;letter-spacing:-.065em!important}
+.np-event-statline{display:grid!important;grid-template-columns:1.1fr 1fr!important;gap:28px!important;padding:34px 0!important;border-bottom:1px solid var(--np86-line)!important}
+.np-event-content-grid{display:grid!important;grid-template-columns:1fr 1fr!important;gap:28px!important;padding:28px 0!important}
+.np-event-content-block,.np-event-sponsor-stage{border-top:1px solid var(--np86-line)!important;padding-top:20px!important}
+.np-event-content-block h4,.np-event-sponsor-stage h4{font-size:28px!important;margin:9px 0 16px!important}
+.np-event-sponsor-stage{display:grid!important;grid-template-columns:320px 1fr!important;gap:28px!important;padding:34px 0 90px!important}
+.np-event-sponsors{display:flex!important;gap:14px!important;overflow:auto!important;scrollbar-width:none!important}
+.np-event-sponsors::-webkit-scrollbar{display:none}
+.np-event-sponsors .sponsor-item{flex:0 0 190px!important;min-height:120px!important;background:transparent!important;border:1px solid var(--np86-line)!important;border-radius:14px!important;display:grid!important;place-items:center!important;padding:18px!important}
+.np-event-sponsors img{max-width:160px!important;max-height:90px!important;object-fit:contain!important;filter:none!important}
+
+/* Tournament index */
+#view-torneos .np-page-hero{min-height:360px!important;position:relative!important;overflow:hidden!important;background:linear-gradient(90deg,rgba(4,7,6,.92),rgba(4,7,6,.42)),url('hero-torneos.webp') center/cover!important}
+#view-torneos .np-page-hero .np-display{font-size:clamp(56px,7vw,110px)!important}
+.np-tournament-list{width:var(--np86-shell)!important;margin:24px auto 120px!important}
+.np-tournament-list .torneo-card{min-height:280px!important;border-radius:18px!important;overflow:hidden!important}
+
+/* Ranking — image-forward athlete rows */
+#view-ranking .np-page-hero{min-height:300px!important;background:linear-gradient(90deg,rgba(4,7,6,.94),rgba(4,7,6,.70)),url('hero-ranking.webp') center/cover!important}
+#view-ranking .np-ranking-stage{width:var(--np86-shell)!important;margin:28px auto 100px!important}
+#view-ranking .np-ranking-title-row{grid-template-columns:96px minmax(0,1fr) 180px 100px 100px!important;padding:0 18px 12px!important}
+#view-ranking #tablaRanking{border-collapse:separate!important;border-spacing:0 8px!important;table-layout:fixed!important}
+#view-ranking #tablaRanking tbody tr{grid-template-columns:96px minmax(0,1fr) 180px 100px 100px!important;min-height:118px!important;background:linear-gradient(90deg,rgba(13,23,18,.86),rgba(9,14,12,.76))!important;border:1px solid var(--np86-line)!important}
+#view-ranking #tablaRanking td:nth-child(2)>div{gap:18px!important}
+#view-ranking #tablaRanking td:nth-child(2) .avatar-wrap,#view-ranking #tablaRanking td:nth-child(2) .avatar{width:84px!important;height:84px!important;flex-basis:84px!important;border:1px solid rgba(124,246,62,.26)!important}
+#view-ranking #tablaRanking td:nth-child(2)>div>span{font-size:clamp(18px,2vw,29px)!important}
+#view-ranking #tablaRanking td:nth-child(3){font-size:clamp(30px,3vw,54px)!important}
+#view-ranking #tablaRanking td:first-child{font-size:64px!important}
+
+/* Player of month — real image element support */
+#view-inicio .np-player-of-month-band{width:var(--np86-shell)!important;margin:84px auto!important;overflow:hidden!important}
+#view-inicio .np-player-of-month-band .destacado-card{position:relative!important;min-height:640px!important;background:#07100c!important;background-image:none!important;display:flex!important;align-items:flex-end!important;justify-content:space-between!important;overflow:hidden!important;padding:48px!important}
+#view-inicio .np-player-of-month-band .np-pom-img{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;object-fit:contain!important;object-position:center top!important;background:linear-gradient(90deg,#0a100e 0 20%,transparent 50%,#0a100e 100%)!important;z-index:0!important}
+#view-inicio .np-player-of-month-band .destacado-card::before{background:linear-gradient(180deg,rgba(5,7,8,.02) 20%,rgba(5,7,8,.12) 44%,rgba(5,7,8,.96) 100%)!important;z-index:1!important}
+#view-inicio .np-player-of-month-band .destacado-tag,.np-player-of-month-band .destacado-stat,.np-player-of-month-band .destacado-info{z-index:2!important;position:relative!important}
+#view-inicio .np-player-of-month-band .destacado-stat{margin-right:auto!important}
+#view-inicio .np-player-of-month-band .destacado-info{margin:0 auto!important;text-align:center!important;max-width:75%!important}
+#view-inicio .np-player-of-month-band .destacado-info strong{font-size:clamp(40px,5vw,84px)!important;line-height:.86!important}
+
+/* Upcoming rail — one entire banner per slide. */
+#inicioProximosWrap{width:var(--np86-shell)!important;margin:78px auto!important;overflow:hidden!important}
+#inicioProximosGrid.np-match-rail{display:flex!important;gap:0!important;overflow-x:auto!important;scroll-snap-type:x mandatory!important;scrollbar-width:none!important;padding:0!important}
+#inicioProximosGrid.np-match-rail::-webkit-scrollbar{display:none}
+#inicioProximosGrid.np-match-rail>.np-match-banner{flex:0 0 100%!important;min-width:100%!important;max-width:100%!important;min-height:520px!important;scroll-snap-align:start!important}
+
+/* Four results — 2 x 2 on desktop. */
+#inicioResultadosWrap{width:100%!important}
+#inicioResultadosGrid.np-results-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:14px!important}
+#inicioResultadosGrid .llave-partido{min-width:0!important;min-height:230px!important}
+
+/* Sponsor marquee on desktop and mobile — preserve natural logo colors. */
+#view-inicio > #sponsorMarqueeMobile{display:block!important;width:100%!important;max-width:none!important;margin:40px 0 0!important;padding:56px 0 70px!important;background:#050706!important;border-top:1px solid var(--np86-line)!important;border-bottom:1px solid var(--np86-line)!important;overflow:hidden!important}
+#sponsorMarqueeMobile .sponsor-label{width:var(--np86-shell)!important;margin:0 auto 20px!important;color:#a7b1aa!important}
+#sponsorMarqueeTrack{width:max-content!important;display:flex!important;gap:18px!important;align-items:stretch!important;animation:np86-marquee 38s linear infinite!important}
+#sponsorMarqueeTrack:hover{animation-play-state:paused!important}
+#sponsorMarqueeTrack .sponsor-item{flex:0 0 230px!important;height:132px!important;display:grid!important;place-items:center!important;background:#070a09!important;border:0!important;border-radius:12px!important;padding:18px!important}
+#sponsorMarqueeTrack .sponsor-item img{max-width:100%!important;max-height:100%!important;width:auto!important;height:auto!important;object-fit:contain!important;filter:none!important;opacity:1!important}
+@keyframes np86-marquee{from{transform:translateX(0)}to{transform:translateX(calc(-50% - 9px))}}
+
+/* Admin — clear, operational, not mixed with configuration. */
+#view-admin .np-admin-modebar{width:var(--np86-shell)!important;margin:20px auto 18px!important}
+#admSelectorTorneoCard,#admGestionTorneoWrap,#admConfigGeneralWrap,#admConfigGeneralWrap2,#auspiciantesWrap{width:var(--np86-shell)!important;margin-left:auto!important;margin-right:auto!important}
+#admGestionSubnav{position:sticky!important;top:var(--np86-offset)!important;z-index:80!important;background:rgba(5,7,6,.96)!important;padding:9px 0!important;border-bottom:1px solid var(--np86-line)!important;backdrop-filter:blur(16px)!important}
+#admGestionSubnav .pill{min-height:40px!important;border-radius:11px!important}
+#admGestionTorneoWrap .card{border-radius:16px!important;box-shadow:none!important}
+#admSeccionPartidos{padding:0!important;background:transparent!important;border:0!important}
+#admSeccionPartidos>h2{font-size:42px!important;margin:28px 0 14px!important}
+
+/* Order of Play — day/date row + many time rows + courts visible. */
+#admSeccionPartidos .np-order-toolbar{display:flex!important;justify-content:space-between!important;align-items:flex-end!important;gap:20px!important;padding:22px 0 10px!important}
+#admSeccionPartidos .np-day-tabs{display:flex!important;gap:8px!important;overflow-x:auto!important;scrollbar-width:none!important;margin:0 0 12px!important;padding-bottom:4px!important}
+#admSeccionPartidos .np-day-tab{flex:0 0 auto!important;min-width:132px!important;min-height:60px!important;border:1px solid var(--np86-line)!important;border-radius:12px!important;background:#090f0c!important;color:#b9c2bc!important;padding:10px 12px!important;text-align:left!important}
+#admSeccionPartidos .np-day-tab.active{background:rgba(124,246,62,.09)!important;border-color:rgba(124,246,62,.42)!important;color:#fff!important}
+#admSeccionPartidos .np-day-tab strong{display:block!important;font-size:12px!important;text-transform:uppercase!important;letter-spacing:.08em!important}
+#admSeccionPartidos .np-day-tab span{display:block!important;margin-top:5px!important;font-size:10px!important;color:#829087!important}
+#admSeccionPartidos .np-unassigned{display:grid!important;grid-template-columns:240px 1fr!important;gap:14px!important;margin:12px 0 14px!important;padding:12px!important;border:1px dashed rgba(124,246,62,.25)!important;background:rgba(124,246,62,.03)!important}
+#admSeccionPartidos .planilla-bandeja{display:flex!important;gap:8px!important;overflow:auto!important;scrollbar-width:none!important}
+#admSeccionPartidos .planilla-bandeja .calendario-partido{flex:0 0 245px!important}
+#admSeccionPartidos .np-order-board{width:100%!important;overflow:auto!important;border:1px solid var(--np86-line)!important;background:#070a09!important}
+#admSeccionPartidos .np-order-board-head,#admSeccionPartidos .np-order-row{grid-template-columns:90px repeat(var(--calendario-cols),minmax(220px,1fr))!important;min-width:calc(90px + var(--calendario-cols)*220px)!important}
+#admSeccionPartidos .np-court-head{position:sticky!important;top:0!important;z-index:4!important;min-height:66px!important;background:#0a110d!important;border-right:1px solid var(--np86-line)!important}
+#admSeccionPartidos .np-time-cell{position:sticky!important;left:0!important;z-index:5!important;min-width:90px!important;background:#090e0c!important;border-right:1px solid var(--np86-line)!important}
+#admSeccionPartidos .np-order-cell{min-height:112px!important;padding:8px!important;border-right:1px solid var(--np86-line-soft)!important;border-bottom:1px solid var(--np86-line-soft)!important}
+#admSeccionPartidos .calendario-partido{min-height:98px!important;border-radius:11px!important;padding:10px!important}
+#admSeccionPartidos .calendario-equipo{font-size:12px!important}
+#admSeccionPartidos .calendario-vs{font-size:10px!important;color:var(--np86-green)!important}
+#admSeccionPartidos .np-order-cell.disponible .calendario-vacia{border:1px dashed rgba(124,246,62,.16)!important;background:rgba(124,246,62,.018)!important}
+#admSeccionPartidos .np-order-cell.no-disponible .calendario-vacia{opacity:.45!important;background:rgba(255,190,79,.03)!important}
+
+/* Settings mode */
+body.np-admin-config #view-admin .np-admin-modebar{margin-top:20px!important}
+body.np-admin-config #admConfigGeneralWrap .card,
+body.np-admin-config #admConfigGeneralWrap2 .card,
+body.np-admin-config #auspiciantesWrap .card{border-radius:16px!important;box-shadow:none!important;background:linear-gradient(180deg,#0a100d,#070a08)!important;padding:26px!important}
+body.np-admin-config #admConfigGeneralWrap .card h2,
+body.np-admin-config #admConfigGeneralWrap2 .card h2,
+body.np-admin-config #auspiciantesWrap .card h2{font-size:34px!important}
+
+/* responsive desktop/tablet */
+@media(max-width:960px){
+  :root{--np86-shell:calc(100vw - 32px)}
+  .np-display{font-size:clamp(48px,9vw,82px)!important}
+  #view-ranking #tablaRanking tbody tr{grid-template-columns:68px minmax(0,1fr) 120px!important;min-height:100px!important}
+  #view-ranking #tablaRanking td:nth-child(4),#view-ranking #tablaRanking td:nth-child(5){display:none!important}
+  #view-ranking #tablaRanking td:nth-child(2) .avatar-wrap,#view-ranking #tablaRanking td:nth-child(2) .avatar{width:68px!important;height:68px!important;flex-basis:68px!important}
+  #view-inicio .np-player-of-month-band .destacado-card{min-height:520px!important;padding:28px!important}
+  #view-inicio .np-player-of-month-band .destacado-info strong{font-size:clamp(34px,7vw,62px)!important}
+  #admSeccionPartidos .np-unassigned{grid-template-columns:1fr!important}
+  #admSeccionPartidos .np-order-board-head,#admSeccionPartidos .np-order-row{grid-template-columns:78px repeat(var(--calendario-cols),minmax(210px,1fr))!important;min-width:calc(78px + var(--calendario-cols)*210px)!important}
+  #admSeccionPartidos .np-order-cell{min-height:112px!important}
+  #view-inicio #inicioResultadosGrid.np-results-grid{grid-template-columns:1fr!important}
+  #view-inicio > #sponsorMarqueeMobile{padding:44px 0 54px!important}
+  #sponsorMarqueeMobile .sponsor-label{width:calc(100vw - 32px)!important}
+  #sponsorMarqueeTrack .sponsor-item{flex-basis:190px!important;height:112px!important}
+}
+
+@media(max-width:700px){
+  :root{--np86-header:0px;--np86-nav:0px;--np86-offset:0px;--np86-shell:calc(100vw - 20px)}
+  .np-site-header,.np-nav{display:none!important}
+  .app-body{padding-top:0!important}
+  .view.active{min-height:100svh!important;padding-bottom:calc(86px + env(safe-area-inset-bottom))!important}
+  .np-display{font-size:clamp(42px,12vw,68px)!important}
+  #view-inicio .np-hero-title{font-size:clamp(44px,13vw,68px)!important;max-width:92vw!important}
+  #view-inicio .np-hero-feature-image{background-position:center 35%!important}
+  #view-inicio .np-player-of-month-band .destacado-card{min-height:560px!important;padding:18px!important}
+  #view-inicio .np-player-of-month-band .np-pom-img{object-fit:contain!important;object-position:center top!important}
+  #view-inicio .np-player-of-month-band .destacado-info{max-width:92%!important;margin-bottom:4px!important}
+  #view-inicio .np-player-of-month-band .destacado-info strong{font-size:clamp(30px,8.7vw,48px)!important}
+  .np-event-hero{min-height:64svh!important}
+  .np-event-overlay{left:20px!important;bottom:56px!important;right:20px!important}
+  .np-event-overlay h2{font-size:clamp(42px,12vw,68px)!important}
+  .np-event-inside-hero{min-height:480px!important}
+  .np-event-content-grid,.np-event-statline,.np-event-sponsor-stage{grid-template-columns:1fr!important}
+  #view-ranking #tablaRanking tbody tr{grid-template-columns:48px minmax(0,1fr) 90px!important;min-height:82px!important}
+  #view-ranking #tablaRanking td:first-child{font-size:36px!important;padding:0 9px!important}
+  #view-ranking #tablaRanking td:nth-child(2) .avatar-wrap,#view-ranking #tablaRanking td:nth-child(2) .avatar{width:50px!important;height:50px!important;flex-basis:50px!important}
+  #view-ranking #tablaRanking td:nth-child(2)>div>span{font-size:13px!important}
+  #view-ranking #tablaRanking td:nth-child(3){font-size:24px!important}
+  #admSeccionPartidos .np-order-board-head,#admSeccionPartidos .np-order-row{grid-template-columns:76px repeat(var(--calendario-cols),minmax(190px,1fr))!important;min-width:calc(76px + var(--calendario-cols)*190px)!important}
+}
+
+@media(prefers-reduced-motion:reduce){#sponsorMarqueeTrack{animation:none!important}.view.active{animation:none!important}}

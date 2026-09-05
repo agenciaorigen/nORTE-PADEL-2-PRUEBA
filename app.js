@@ -963,9 +963,11 @@ function renderJugadorDelMes() {
           </div>
         </div>`;
     }
-    const fondo = row.foto_url ? `style="background-image:url('${row.foto_url}');cursor:pointer"` : `style="cursor:pointer"`;
+    const fondo = row.foto_url ? `style="cursor:pointer"` : `style="cursor:pointer"`;
+    const foto = row.foto_url ? `<img class="np-pom-img" src="${row.foto_url}" alt="${row.nombre} ${row.apellido}" loading="lazy" decoding="async" onerror="this.remove()" />` : "";
     return `
       <div class="destacado-card" data-jugador-id="${row.jugador_id}" ${fondo}>
+        ${foto}
         <div class="destacado-tag">⭐ ${TAG_DESTACADO[genero]}</div>
         <div class="destacado-stat">
           <strong>${row.puntos_ranking}</strong>
@@ -3684,7 +3686,8 @@ function calcularSlots(partidos, canchas, torneo, sintetizarVacios) {
     const esMapaPorDia = ventana && typeof ventana === "object" && ventana.desde === undefined;
     fechasDelTorneo(torneo).forEach((fecha) => {
       const baseDia = (esMapaPorDia ? ventana[fecha.getDay()] : ventana) || FRANJA_DEFAULT_DIA;
-      for (let m = baseDia.desde; m + duracion <= baseDia.hasta; m += duracion) {
+      const pasoVisual = Math.max(30, Math.min(60, duracion));
+      for (let m = baseDia.desde; m + duracion <= baseDia.hasta; m += pasoVisual) {
         const d = new Date(fecha);
         d.setHours(0, m, 0, 0);
         if (!filaPorMinuto.has(d.getTime())) filaPorMinuto.set(d.getTime(), d.toISOString());
@@ -3700,6 +3703,13 @@ function calcularSlots(partidos, canchas, torneo, sintetizarVacios) {
     const celdas = canchas.map((c) => {
       const partido = conHorario.find((p) => p.horario === horarioISO && p.cancha_id === c.id);
       if (partido) return { cancha: c, estado: "ocupado", partido };
+      const ocupadoPorOtro = conHorario.find((p) => {
+        if (p.cancha_id !== c.id || p.horario === horarioISO) return false;
+        const inicioP = new Date(p.horario);
+        const finP = new Date(inicioP.getTime() + duracionMin * 60000);
+        return desde < finP && hasta > inicioP;
+      });
+      if (ocupadoPorOtro) return { cancha: c, estado: "ocupado-solapado", partido: ocupadoPorOtro };
       const bloqueo = (bloqueos[c.id] || []).find((b) => desde < b.hasta && hasta > b.desde);
       if (bloqueo) return { cancha: c, estado: "bloqueado", bloqueo };
       return { cancha: c, estado: "disponible" };
@@ -3797,6 +3807,7 @@ function renderPartidosCalendario(containerId, partidos, canchasTorneo, editable
       html += `<div class="np-order-cell ${celda.estado} ${!estaDisponible && celda.estado==='disponible'?'no-disponible':''}>`;
       if (!estaDisponible && celda.estado==='disponible') html += noDisponibleHtml(celda.cancha);
       else if (celda.estado==='ocupado') html += tarjetaHtml(celda.partido);
+      else if (celda.estado==='ocupado-solapado') html += `<div class="calendario-vacia np-overlap-slot"><span>OCUPADA</span><strong>hasta ${new Date(new Date(celda.partido.horario).getTime() + (torneoDeReferencia?.duracion_minutos || 90)*60000).toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'})}</strong></div>`;
       else if (celda.estado==='bloqueado') html += bloqueadaHtml(celda);
       else html += vaciaHtml(fila,celda);
       html += `</div>`;
