@@ -1,0 +1,92 @@
+/* ===== V82 / PRO TOURNAMENT OPS ===== */
+:root{--np-admin-bg:#070b0a;--np-admin-panel:#0b1210;--np-admin-line:rgba(255,255,255,.09);--np-admin-green:#9cff38}
+.np-nav{position:fixed!important;top:74px!important;bottom:auto!important;left:0!important;right:0!important;height:48px!important;z-index:1500!important}
+#btnAdminPanel{display:flex!important}
+#btnAdminPanel::after{content:'⚙';font-size:9px;margin-left:7px;color:var(--np-accent)}
+
+/* Ranking: leaderboard visual */
+#view-ranking .np-ranking-stage{border-top:1px solid var(--np-line);background:linear-gradient(180deg,rgba(156,255,56,.025),transparent 22%)}
+#view-ranking .np-ranking-title-row{grid-template-columns:92px minmax(0,1fr) 150px 110px!important;padding:0 24px;height:48px;align-items:center}
+#view-ranking #tablaRanking{border-collapse:collapse;width:100%}
+#view-ranking #tablaRanking tr{display:grid;grid-template-columns:92px minmax(0,1fr) 150px 110px;align-items:center;min-height:106px;border-top:1px solid var(--np-line);padding:0 24px;transition:background .2s,transform .2s}
+#view-ranking #tablaRanking tr:hover{background:rgba(156,255,56,.035);transform:translateX(4px)}
+#view-ranking #tablaRanking td{border:0!important;padding:0!important}
+#view-ranking #tablaRanking td:first-child{font:900 clamp(44px,5vw,72px)/.8 var(--np-display);color:rgba(255,255,255,.18);letter-spacing:-.08em}
+#view-ranking #tablaRanking td:first-child.pos-1{color:var(--np-green)}
+#view-ranking #tablaRanking td:nth-child(2)>div{gap:18px!important}
+#view-ranking #tablaRanking td:nth-child(2) .avatar-wrap,.#view-ranking #tablaRanking td:nth-child(2) .avatar{width:72px!important;height:72px!important;border-radius:50%!important;flex:0 0 72px!important}
+#view-ranking #tablaRanking td:nth-child(2)>div>span{font:900 clamp(22px,2vw,34px)/.9 var(--np-display);text-transform:uppercase;letter-spacing:-.035em}
+#view-ranking #tablaRanking td:nth-child(3) strong{font:900 clamp(32px,3vw,52px)/.85 var(--np-display);color:var(--np-accent);letter-spacing:-.05em}
+#view-ranking #tablaRanking td:nth-child(4),#view-ranking #tablaRanking td:nth-child(5){font-size:10px;color:var(--np-muted);letter-spacing:.12em;text-transform:uppercase}
+
+/* Player of month */
+#view-inicio .np-player-of-month-band{width:min(var(--np-max),calc(100vw - 48px))!important;margin:96px auto!important}
+#view-inicio .np-player-of-month-band .destacado-card{background-position:center top!important;background-size:cover!important;min-height:560px!important}
+#view-inicio .np-player-of-month-band .destacado-info{margin:190px auto 0!important}
+#view-inicio .np-player-of-month-band .destacado-stat{bottom:38px!important}
+
+/* Sponsors: color, large, continuous marquee */
+#view-inicio .np-sponsors-section{display:none!important}
+#view-inicio .sponsor-marquee{display:block!important;width:100%!important;margin:0!important;padding:88px 0 98px!important;background:#040706!important;border-top:1px solid var(--np-line)!important;border-bottom:1px solid var(--np-line)!important;overflow:hidden!important}
+#view-inicio .sponsor-marquee .sponsor-label{width:min(var(--np-max),calc(100vw - 48px));margin:0 auto 28px!important;color:#dbe3de!important}
+#view-inicio #sponsorMarqueeTrack.sponsor-marquee-track{gap:28px!important;animation-duration:42s!important}
+#view-inicio #sponsorMarqueeTrack .sponsor-item{min-width:260px!important;height:126px!important;background:#080c0b!important;border:1px solid rgba(255,255,255,.08)!important;display:flex!important;align-items:center!important;justify-content:center!important}
+#view-inicio #sponsorMarqueeTrack .sponsor-item img{height:98px!important;max-width:230px!important;filter:none!important;opacity:1!important;transform:none!important}
+
+/* Professional order-of-play board */
+#admSeccionPartidos .np-order-toolbar{display:flex;justify-content:space-between;gap:30px;align-items:end;padding:10px 0 20px;border-bottom:1px solid var(--np-line)}
+#admSeccionPartidos .np-order-title h3{font:900 clamp(34px,4vw,60px)/.88 var(--np-display);text-transform:uppercase;letter-spacing:-.045em;margin:8px 0 6px}
+#admSeccionPartidos .np-order-title small{display:block;color:var(--np-muted);max-width:700px}
+#admSeccionPartidos .np-order-summary{display:grid;grid-template-columns:auto auto;gap:5px 12px;text-align:right;white-space:nowrap}
+#admSeccionPartidos .np-order-summary b{font:900 28px/.9 var(--np-display);color:var(--np-accent)}
+#admSeccionPartidos .np-order-summary span{font-size:8px;letter-spacing:.16em;color:var(--np-muted);text-transform:uppercase;align-self:end}
+#admSeccionPartidos .np-day-tabs{display:flex;gap:0;overflow:auto;border-bottom:1px solid var(--np-line);margin-top:18px}
+#admSeccionPartidos .np-day-tab{min-width:150px;padding:14px 18px;background:transparent;color:var(--np-muted);border:0;border-right:1px solid var(--np-line);text-align:left;cursor:pointer}
+#admSeccionPartidos .np-day-tab strong{display:block;font:800 14px/1 var(--np-ui);color:inherit;text-transform:uppercase;letter-spacing:.08em}
+#admSeccionPartidos .np-day-tab span{display:block;font-size:8px;margin-top:7px;letter-spacing:.13em;text-transform:uppercase}
+#admSeccionPartidos .np-day-tab.active{color:#fff;background:rgba(156,255,56,.055);box-shadow:inset 0 -2px 0 var(--np-accent)}
+#admSeccionPartidos .np-unassigned{margin:18px 0;background:#0b0f0e;border:1px solid var(--np-line);padding:16px;display:grid;grid-template-columns:190px 1fr;gap:18px;align-items:start}
+#admSeccionPartidos .np-unassigned>div:first-child strong{display:block;font-size:14px;margin-top:6px}
+#admSeccionPartidos .np-unassigned>div:first-child small{display:block;color:var(--np-muted);margin-top:4px}
+#admSeccionPartidos .np-unassigned .planilla-bandeja{display:flex;gap:10px;flex-wrap:wrap}
+#admSeccionPartidos .np-order-board{border:1px solid var(--np-line);background:#050807;margin-top:22px;overflow:auto}
+#admSeccionPartidos .np-order-board-head,#admSeccionPartidos .np-order-row{display:grid;grid-template-columns:88px repeat(var(--calendario-cols),minmax(210px,1fr));min-width:calc(88px + var(--calendario-cols)*210px)}
+#admSeccionPartidos .np-order-board-head{position:sticky;top:0;z-index:20;background:#090e0c;border-bottom:1px solid var(--np-line)}
+#admSeccionPartidos .np-time-head,#admSeccionPartidos .np-court-head,#admSeccionPartidos .np-time-cell,#admSeccionPartidos .np-order-cell{border-right:1px solid var(--np-line)}
+#admSeccionPartidos .np-time-head{padding:14px;font-size:8px;letter-spacing:.18em;color:var(--np-muted)}
+#admSeccionPartidos .np-court-head{padding:12px 14px}
+#admSeccionPartidos .np-court-head strong{display:block;font:900 14px/1 var(--np-display);text-transform:uppercase}
+#admSeccionPartidos .np-court-head span{display:block;margin-top:6px;font-size:7px;letter-spacing:.16em;color:var(--np-accent)}
+#admSeccionPartidos .np-time-cell{background:#07100c;padding:12px 10px;position:sticky;left:0;z-index:10}
+#admSeccionPartidos .np-time-cell strong{display:block;font:900 22px/.8 var(--np-display);color:#fff}
+#admSeccionPartidos .np-time-cell span{display:block;margin-top:6px;font-size:7px;color:var(--np-muted);text-transform:uppercase;letter-spacing:.12em}
+#admSeccionPartidos .np-order-cell{padding:8px;min-height:150px;background:#050807}
+#admSeccionPartidos .np-order-cell.disponible{background:rgba(156,255,56,.018)}
+#admSeccionPartidos .np-order-cell.no-disponible{background:rgba(255,255,255,.012)}
+#admSeccionPartidos .calendario-partido{background:#0d1713!important;border:1px solid rgba(255,255,255,.12)!important;border-radius:0!important;padding:14px!important;min-height:120px!important;cursor:grab!important;box-shadow:none!important}
+#admSeccionPartidos .calendario-partido:hover{border-color:rgba(156,255,56,.4)!important;transform:translateY(-2px)}
+#admSeccionPartidos .calendario-equipo{font-weight:800;font-size:12px;line-height:1.05}
+#admSeccionPartidos .calendario-vs{font:900 24px/.8 var(--np-display);color:var(--np-accent);margin:8px 0}
+#admSeccionPartidos .np-match-mini-meta{font-size:7px;letter-spacing:.12em;color:var(--np-muted);text-transform:uppercase;margin-top:8px}
+#admSeccionPartidos .calendario-vacia{min-height:132px;border:1px dashed rgba(156,255,56,.18);display:grid;place-items:center;color:rgba(156,255,56,.35);font-size:7px;letter-spacing:.18em}
+#admSeccionPartidos .calendario-vacia:hover{background:rgba(156,255,56,.045);border-color:rgba(156,255,56,.55);color:var(--np-accent)}
+#admSeccionPartidos .calendario-bloqueada{min-height:132px;display:flex;flex-direction:column;justify-content:center;gap:5px;padding:14px;background:#130f10;border:1px solid rgba(255,255,255,.06);color:#777}
+#admSeccionPartidos .calendario-bloqueada span{font-size:7px;letter-spacing:.18em}
+#admSeccionPartidos .calendario-bloqueada strong{font-size:10px}
+#admSeccionPartidos .np-no-disponible{opacity:.55;border-color:rgba(255,255,255,.06)!important;color:#5e665f}
+
+@media(max-width:767px){
+  .np-nav{top:64px!important;height:48px!important;bottom:auto!important;position:fixed!important}
+  #view-ranking .np-ranking-title-row{grid-template-columns:60px minmax(0,1fr) 90px!important;padding:0 14px}
+  #view-ranking #tablaRanking tr{grid-template-columns:60px minmax(0,1fr) 90px;min-height:90px;padding:0 14px}
+  #view-ranking #tablaRanking td:nth-child(4),#view-ranking #tablaRanking td:nth-child(5){display:none}
+  #view-ranking #tablaRanking td:nth-child(2) .avatar-wrap,#view-ranking #tablaRanking td:nth-child(2) .avatar{width:54px!important;height:54px!important;flex-basis:54px!important}
+  #view-ranking #tablaRanking td:nth-child(2)>div{gap:10px!important}
+  #view-ranking #tablaRanking td:nth-child(2)>div>span{font-size:17px}
+  #view-inicio .np-player-of-month-band{width:calc(100vw - 28px)!important}
+  #view-inicio .np-player-of-month-band .destacado-card{min-height:470px!important;background-position:center top!important}
+  #admSeccionPartidos .np-order-toolbar{display:block}
+  #admSeccionPartidos .np-order-summary{margin-top:12px;text-align:left;display:flex;gap:10px}
+  #admSeccionPartidos .np-unassigned{grid-template-columns:1fr}
+  #admSeccionPartidos .np-order-board{overflow-x:auto}
+}

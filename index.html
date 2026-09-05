@@ -21,6 +21,8 @@
 <link rel="preload" as="image" href="editorial-action-01.webp" fetchpriority="high" />
 <link rel="stylesheet" href="style.css" />
 <link rel="stylesheet" href="v80-product.css" />
+<link rel="stylesheet" href="v82-pro.css" />
+<link rel="stylesheet" href="v83-system.css" />
 </head>
 <body>
 
@@ -71,6 +73,7 @@
   </a>
   <div class="np-header-center"><span class="np-live-mark"><i></i> CIRCUIT LIVE</span></div>
   <div class="np-header-actions">
+    <button id="btnConfigTop" class="np-header-config admin-only" type="button" title="Configuración" aria-label="Configuración">CONFIG</button>
     <button id="btnNotif" class="np-header-icon" title="Notificaciones" aria-label="Notificaciones"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M6 9a6 6 0 1 1 12 0c0 4 1.5 5.5 1.5 5.5H4.5S6 13 6 9z"/><path d="M10 19a2 2 0 0 0 4 0"/></svg><span id="notifCount"></span></button>
     <button id="btnPerfil" class="np-profile-trigger" title="Mi perfil" aria-label="Mi perfil"><span id="perfilAvatarWrap" class="perfil-avatar-wrap"></span><span id="perfilNombreCorto"></span><span class="np-profile-chevron">↗</span></button>
   </div>
@@ -239,6 +242,10 @@
 
   <!-- ADMIN -->
   <section id="view-admin" class="view">
+    <div class="np-admin-modebar">
+      <div><span class="np-kicker">NORTE PADEL / CONTROL</span><h1 id="npAdminModeTitle">TOURNAMENT OPS</h1><p id="npAdminModeSub">Organizá la competencia, horarios, canchas y resultados desde un solo centro operativo.</p></div>
+      <div class="np-admin-mode-actions"><button type="button" class="np-cta np-cta-small" id="btnAdminIrConfig">CONFIGURACIÓN</button></div>
+    </div>
     <div class="card card-accent" id="admSelectorTorneoCard">
       <h2>Torneo en gestión</h2>
       <p class="match-meta" style="margin-bottom:6px">Elegí un torneo para administrar sus inscripciones, parejas, canchas, bloqueos y partidos. La edición de un torneo vive solo acá — la vista pública nunca muestra estas herramientas.</p>

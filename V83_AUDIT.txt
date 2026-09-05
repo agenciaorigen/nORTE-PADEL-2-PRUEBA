@@ -1,0 +1,14 @@
+NORTE PADEL V83 — SYSTEM POLISH
+
+- Unifica el chrome principal (header + nav) con alturas CSS predecibles.
+- Agrega acceso Config separado para admin con ruta #/config.
+- Separa visualmente TOURNAMENT OPS de CONFIGURATION sin tocar Supabase.
+- Fuerza .view:not(.active){display:none} para evitar vistas apiladas.
+- Corrige ranking a 5 columnas reales en desktop; mobile conserva POS / PLAYER / PTS.
+- Refuerza fotos del ranking mediante avatarHtml existente.
+- Evita crop agresivo del Player of the Month y mantiene cabeza visible.
+- Mantiene rail de próximos partidos a 1 banner por frame.
+- Sponsors preparados como sponsor wall continuo, con logos a color.
+- Order of Play usa fecha -> cancha -> horario y drag/drop existente.
+- No se modifica Supabase, matching.js, schema ni RPCs.
+- Validación: app.js y matching.js pasan node --check; IDs HTML sin duplicados; CSS balanceado.

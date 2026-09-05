@@ -152,9 +152,17 @@ function cambiarVista(nombre, ruta) {
   // cambiarVista("admin") por su cuenta (ver despacharRuta) — sin este chequeo,
   // ese segundo llamado deshacía el modo enfocado apenas se activaba.
   if (nombre === "admin" && !adminFocoTorneoActivo) {
-    document.getElementById("admSelectorTorneoCard").style.display = "block";
-    mostrarConfigGeneral(true);
-    document.getElementById("admBtnVolverConfigGeneral").style.display = "none";
+    if (adminPanelMode === "config") {
+      document.getElementById("admSelectorTorneoCard").style.display = "none";
+      document.getElementById("admGestionTorneoWrap").style.display = "none";
+      mostrarConfigGeneral(true);
+      document.getElementById("admBtnVolverConfigGeneral").style.display = "none";
+    } else {
+      document.getElementById("admSelectorTorneoCard").style.display = "block";
+      document.getElementById("admGestionTorneoWrap").style.display = "none";
+      mostrarConfigGeneral(false);
+      document.getElementById("admBtnVolverConfigGeneral").style.display = "none";
+    }
   } else if (nombre !== "admin") {
     adminFocoTorneoActivo = false;
   }
@@ -179,6 +187,25 @@ function mostrarConfigGeneral(visible) {
   document.getElementById("admConfigGeneralWrap2").style.display = visible ? "block" : "none";
   document.getElementById("auspiciantesWrap").style.display = visible ? "block" : "none";
   document.getElementById("btnCerrarAuspiciantesTorneo").style.display = "none";
+}
+
+
+let adminPanelMode = "ops"; // ops | config
+function setAdminPanelMode(mode){
+  adminPanelMode = mode === "config" ? "config" : "ops";
+  const selector = document.getElementById("admSelectorTorneoCard");
+  const gestion = document.getElementById("admGestionTorneoWrap");
+  const modeTitle = document.getElementById("npAdminModeTitle");
+  const modeSub = document.getElementById("npAdminModeSub");
+  const topBtn = document.getElementById("btnConfigTop");
+  const goConfig = document.getElementById("btnAdminIrConfig");
+  if (selector) selector.style.display = adminPanelMode === "ops" && !adminFocoTorneoActivo ? "block" : "none";
+  if (gestion) gestion.style.display = adminPanelMode === "config" ? "none" : (gestion.style.display === "block" || adminFocoTorneoActivo ? "block" : gestion.style.display);
+  mostrarConfigGeneral(adminPanelMode === "config");
+  if (modeTitle) modeTitle.textContent = adminPanelMode === "config" ? "CONFIGURATION" : "TOURNAMENT OPS";
+  if (modeSub) modeSub.textContent = adminPanelMode === "config" ? "Configuración general del club. Todo lo permanente, separado de la operación de un torneo." : "Organizá la competencia, horarios, canchas y resultados desde un solo centro operativo.";
+  if (goConfig) goConfig.textContent = adminPanelMode === "config" ? "VOLVER A TORNEOS" : "CONFIGURACIÓN";
+  if (topBtn) topBtn.classList.toggle("active", adminPanelMode === "config");
 }
 
 function navegarA(ruta) {
@@ -207,7 +234,16 @@ async function despacharRuta() {
     if (raiz === "jugar" && FEATURE_JUGAR_HABILITADA) { cambiarVista("jugar"); return; }
     if (raiz === "admin") {
       if (!isAdmin) { cambiarVista("inicio"); return; }
+      adminFocoTorneoActivo = false;
       cambiarVista("admin");
+      setAdminPanelMode("ops");
+      return;
+    }
+    if (raiz === "config") {
+      if (!isAdmin) { cambiarVista("inicio"); return; }
+      adminFocoTorneoActivo = false;
+      cambiarVista("admin");
+      setAdminPanelMode("config");
       return;
     }
     if (raiz === "torneo" && a) { await abrirTorneo(a, sub); return; }
@@ -3690,6 +3726,18 @@ window.matchMedia("(max-width:767px)").addEventListener("change", () => {
 // desktop — en mobile cada partido ya tiene sus propios inputs de
 // cancha/horario en la vista Lista, ver renderPartidosLista). El público/
 // jugador ya no ve esta grilla — ve la llave de Torneo (renderPartidosLlave).
+let planillaDiaSeleccionado = null;
+function localDateKey(value){
+  const d = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(d.getTime())) return "";
+  const pad=n=>String(n).padStart(2,"0");
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+}
+function localDateLabel(key){
+  const [y,m,d]=key.split("-").map(Number);
+  const dt=new Date(y,m-1,d);
+  return dt.toLocaleDateString("es-AR",{weekday:"short",day:"2-digit",month:"short"}).replace(/^./, c=>c.toUpperCase());
+}
 function renderPartidosCalendario(containerId, partidos, canchasTorneo, editable) {
   const cont = document.getElementById(containerId);
   const canchas = canchasTorneo.map((c) => c.canchas).filter(Boolean);
@@ -3706,75 +3754,71 @@ function renderPartidosCalendario(containerId, partidos, canchasTorneo, editable
     return;
   }
 
-  // Antes, para cargar un resultado desde la Planilla había que dejarla e ir
-  // a la vista Lista aparte (arrastrar y soltar era lo único que se podía
-  // hacer acá) -- mismo ícono ✏️ y mismo formulario que ya existe en Lista y
-  // en la tarjeta pública (cargaResultadoPanelHtml/wireCargaResultado), para
-  // no duplicar el guardado ni el confirmar en un tercer lugar.
+  const fechasDisponibles = [...new Set((torneoDeReferencia ? fechasDelTorneo(torneoDeReferencia).map(localDateKey) : []).concat(filas.map(f=>localDateKey(f.horarioISO))))].filter(Boolean).sort();
+  if (!planillaDiaSeleccionado || !fechasDisponibles.includes(planillaDiaSeleccionado)) planillaDiaSeleccionado = fechasDisponibles[0] || localDateKey(horarios[0]);
+  const filasDia = filas.filter(f => localDateKey(f.horarioISO) === planillaDiaSeleccionado);
+
   const puedeCargarResultado = (p) => editable && p.estado !== "jugado";
   const tarjetaHtml = (p, extraClase = "") => `
     <div class="calendario-partido ${p.estado === "jugado" ? "jugado" : ""} ${extraClase}" ${editable ? `draggable="true" data-partido="${p.id}"` : `data-abrir-partido="${p.id}"`}>
       <div class="calendario-equipo">${p.pareja1_nombre}</div>
-      <div class="calendario-vs">V</div>
+      <div class="calendario-vs">VS</div>
       <div class="calendario-equipo">${p.pareja2_nombre}</div>
-      ${p.ronda && p.ronda !== "Fase de grupos" ? `<span class="badge orange" style="margin-top:4px">${p.ronda}</span>` : (p.grupo ? `<span class="badge orange" style="margin-top:4px">Grupo ${p.grupo}</span>` : "")}
-      ${p.categoria ? `<span class="badge" style="margin-top:4px">${p.categoria}</span>` : ""}
-      ${puedeCargarResultado(p) ? `<button type="button" class="btnTogglePartidoAdmin secondary small" draggable="false" data-p="${p.id}" style="margin-top:6px;width:100%" title="Cargar resultado" aria-label="Cargar resultado">✏️ Cargar resultado</button>` : ""}
+      <div class="np-match-mini-meta">${p.categoria || ""}${p.ronda && p.ronda !== "Fase de grupos" ? ` · ${p.ronda}` : p.grupo ? ` · Grupo ${p.grupo}` : ""}</div>
+      ${p.estado === "jugado" && p.sets?.length ? setsGridHtml(p.sets, p.ganador_pareja_id === p.pareja1_id ? 1 : 2) : ""}
+      ${puedeCargarResultado(p) ? `<button type="button" class="btnTogglePartidoAdmin secondary small" draggable="false" data-p="${p.id}" style="margin-top:6px;width:100%">✎ Resultado</button>` : ""}
       ${puedeCargarResultado(p) ? cargaResultadoPanelHtml(p, true) : ""}
     </div>`;
-  const bloqueadaHtml = (celda) => `<div class="calendario-bloqueada" title="${celda.bloqueo.motivo || "Cancha bloqueada"}">🚫 Bloqueada${celda.bloqueo.motivo ? `<br>${celda.bloqueo.motivo}` : ""}</div>`;
-  const vaciaHtml = (fila, celda) => `<div class="calendario-vacia" ${editable ? `data-horario="${fila.horarioISO}" data-cancha="${celda.cancha.id}"` : ""}></div>`;
+  const bloqueadaHtml = (celda) => `<div class="calendario-bloqueada" title="${celda.bloqueo.motivo || "Cancha bloqueada"}"><span>BLOCK</span><strong>${celda.bloqueo.motivo || "No disponible"}</strong></div>`;
+  const vaciaHtml = (fila, celda) => `<div class="calendario-vacia" ${editable ? `data-horario="${fila.horarioISO}" data-cancha="${celda.cancha.id}"` : ""}><span>${editable ? "SOLTAR PARTIDO" : "DISPONIBLE"}</span></div>`;
+  const noDisponibleHtml = (c) => `<div class="calendario-vacia np-no-disponible"><span>NO DISP.</span></div>`;
 
-  let html = "";
-  if (editable && sinHorario.length > 0) {
-    html += `<p class="match-meta" style="margin-bottom:6px">Arrastrá un partido sin horario a un hueco libre (en el celular, asignalo desde su tarjeta en la vista Lista):</p>
-      <div class="planilla-bandeja" id="planillaBandeja">${sinHorario.map((p) => tarjetaHtml(p, "pendiente")).join("")}</div>`;
+  let html = '';
+  if (editable) {
+    html += `<div class="np-order-toolbar">
+      <div class="np-order-title"><span class="np-kicker">TOURNAMENT OPS / ORDER OF PLAY</span><h3>${torneoDeReferencia?.nombre || "Torneo"}</h3><small>Organizá el día visualmente: arrastrá los partidos a otra cancha y horario.</small></div>
+      <div class="np-order-summary"><b>${filasDia.length}</b><span>franjas</span><b>${canchas.length}</b><span>canchas</span></div>
+    </div>`;
+    html += `<div class="np-day-tabs" role="tablist">${fechasDisponibles.map(k=>`<button type="button" class="np-day-tab ${k===planillaDiaSeleccionado?'active':''}" data-planilla-day="${k}"><strong>${localDateLabel(k)}</strong><span>${filas.filter(f=>localDateKey(f.horarioISO)===k).reduce((n,f)=>n+f.celdas.filter(c=>c.estado==='ocupado').length,0)} partidos</span></button>`).join('')}</div>`;
+    if (sinHorario.length > 0) {
+      const sinHorarioDia = sinHorario;
+      html += `<div class="np-unassigned"><div><span class="np-kicker">UNSCHEDULED / ${sinHorarioDia.length}</span><strong>Partidos pendientes</strong><small>Arrastralos a una franja disponible.</small></div><div class="planilla-bandeja" id="planillaBandeja">${sinHorarioDia.map((p) => tarjetaHtml(p, "pendiente")).join("")}</div></div>`;
+    }
   }
 
-  const esMobile = window.matchMedia("(max-width:767px)").matches;
-  if (esMobile) {
-    // agenda vertical: fecha -> hora -> cancha — nunca scroll horizontal como solución
-    let fechaAnterior = null;
-    filas.forEach((fila) => {
-      const d = new Date(fila.horarioISO);
-      const fechaTxt = d.toLocaleDateString("es-AR", { weekday: "long", day: "2-digit", month: "2-digit" });
-      if (fechaTxt !== fechaAnterior) { html += `<div class="calendario-agenda-fecha">${fechaTxt}</div>`; fechaAnterior = fechaTxt; }
-      html += `<div class="calendario-agenda-hora">${iconoReloj()} ${d.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" })}</div>`;
-      fila.celdas.forEach((celda) => {
-        if (celda.estado === "disponible" && !editable) return; // en la agenda pública no hace falta mostrar huecos vacíos
-        html += `<div class="calendario-agenda-item"><p class="match-meta meta-caption" style="margin-bottom:2px">${celda.cancha.nombre}</p>`;
-        if (celda.estado === "ocupado") html += tarjetaHtml(celda.partido);
-        else if (celda.estado === "bloqueado") html += bloqueadaHtml(celda);
-        else html += vaciaHtml(fila, celda);
-        html += `</div>`;
-      });
+  html += `<div class="np-order-board" style="--calendario-cols:${canchas.length}"><div class="np-order-board-head"><div class="np-time-head">HORA</div>${canchas.map(c=>`<div class="np-court-head"><strong>${c.nombre}</strong><span>${(() => { const ref=canchasTorneo.find(x=>x.canchas?.id===c.id); const ds=ref?.dias_semana; const dow=new Date(filasDia[0]?.horarioISO || `${planillaDiaSeleccionado}T12:00:00`).getDay(); return (!ds || !ds.length || ds.includes(dow)) ? 'DISPONIBLE' : 'NO DISPONIBLE'; })()}</span></div>`).join('')}</div>`;
+  html += `<div class="np-order-board-body">`;
+  filasDia.forEach((fila) => {
+    const d=new Date(fila.horarioISO);
+    html += `<div class="np-order-row"><div class="np-time-cell"><strong>${d.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'})}</strong><span>${d.toLocaleDateString('es-AR',{weekday:'short'})}</span></div>`;
+    fila.celdas.forEach((celda) => {
+      const ref=canchasTorneo.find(x=>x.canchas?.id===celda.cancha.id);
+      const dow=d.getDay(); const estaDisponible=!ref?.dias_semana || !ref.dias_semana.length || ref.dias_semana.includes(dow);
+      html += `<div class="np-order-cell ${celda.estado} ${!estaDisponible && celda.estado==='disponible'?'no-disponible':''}>`;
+      if (!estaDisponible && celda.estado==='disponible') html += noDisponibleHtml(celda.cancha);
+      else if (celda.estado==='ocupado') html += tarjetaHtml(celda.partido);
+      else if (celda.estado==='bloqueado') html += bloqueadaHtml(celda);
+      else html += vaciaHtml(fila,celda);
+      html += `</div>`;
     });
-  } else {
-    // grilla de escritorio: auto-fit/minmax se reacomoda al ancho disponible, nunca se corta
-    html += `<div class="calendario-grid-scroll"><div class="calendario-grid" style="--calendario-cols:${canchas.length}">`;
-    html += `<div></div>` + canchas.map((c) => `<div class="calendario-grid-cabecera">${c.nombre}</div>`).join("");
-    filas.forEach((fila) => {
-      const fecha = new Date(fila.horarioISO).toLocaleString("es-AR", { dateStyle: "short", timeStyle: "short" });
-      html += `<div class="calendario-hora">${fecha}</div>`;
-      fila.celdas.forEach((celda) => {
-        if (celda.estado === "ocupado") html += tarjetaHtml(celda.partido);
-        else if (celda.estado === "bloqueado") html += bloqueadaHtml(celda);
-        else html += vaciaHtml(fila, celda);
-      });
-    });
-    html += `</div></div>`;
-  }
+    html += `</div>`;
+  });
+  html += `</div></div>`;
 
   if (!editable && sinHorario.length > 0) {
-    html += `<p class="match-meta" style="margin-top:10px">Sin horario asignado (${sinHorario.length}): ` +
-      sinHorario.map((p) => `${p.pareja1_nombre} vs ${p.pareja2_nombre}`).join(" · ") + "</p>";
+    html += `<p class="match-meta" style="margin-top:10px">Sin horario asignado (${sinHorario.length}): ${sinHorario.map((p) => `${p.pareja1_nombre} vs ${p.pareja2_nombre}`).join(" · ")}</p>`;
   }
   cont.innerHTML = html;
 
-  if (editable) { wirePlanillaDragAndDrop(containerId); wireCargaResultado(cont); }
-  cont.querySelectorAll("[data-abrir-partido]").forEach((el) => {
-    el.addEventListener("click", () => abrirDetallePartido(el.dataset.abrirPartido));
-  });
+  if (editable) {
+    cont.querySelectorAll('[data-planilla-day]').forEach(btn=>btn.addEventListener('click',()=>{
+      planillaDiaSeleccionado=btn.dataset.planillaDay;
+      renderPartidosCalendario(containerId, partidos, canchasTorneo, editable);
+    }));
+    wirePlanillaDragAndDrop(containerId);
+    wireCargaResultado(cont);
+  }
+  cont.querySelectorAll('[data-abrir-partido]').forEach(el=>el.addEventListener('click',()=>abrirDetallePartido(el.dataset.abrirPartido)));
   registrarRerenderResponsive(containerId, () => renderPartidosCalendario(containerId, partidos, canchasTorneo, editable));
 }
 
@@ -4073,6 +4117,7 @@ function renderPartidosLlave(containerId, partidos) {
 document.getElementById("btnAdministrarEsteTorneo").addEventListener("click", async () => {
   if (!torneoActualId) return;
   adminFocoTorneoActivo = true;
+  adminPanelMode = "ops";
   cambiarVista("admin", "/admin");
   await cargarGestionTorneo(torneoActualId);
   // pantalla enfocada SOLO en este torneo: se oculta el selector suelto y toda la
@@ -4086,9 +4131,7 @@ document.getElementById("btnAdministrarEsteTorneo").addEventListener("click", as
 });
 document.getElementById("admBtnVolverConfigGeneral").addEventListener("click", () => {
   adminFocoTorneoActivo = false;
-  document.getElementById("admSelectorTorneoCard").style.display = "block";
-  mostrarConfigGeneral(true);
-  document.getElementById("admBtnVolverConfigGeneral").style.display = "none";
+  navegarA("/config");
 });
 
 // Atajo pedido por el club: desde "Administrar este torneo" poder cargar/ver

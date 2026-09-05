@@ -1,0 +1,119 @@
+/* ============================================================
+   NORTE PADEL V83 — SYSTEM POLISH
+   Product-level structural cleanup without changing data contracts.
+   ============================================================ */
+:root{
+  --v83-bg:#050706;
+  --v83-surface:#09100d;
+  --v83-surface-2:#0d1511;
+  --v83-text:#f1f5f2;
+  --v83-muted:#87918b;
+  --v83-line:rgba(255,255,255,.11);
+  --v83-line-soft:rgba(255,255,255,.06);
+  --v83-green:#78f53c;
+  --v83-gold:#d9bd72;
+  --v83-head:74px;
+  --v83-nav:52px;
+  --v83-shell:min(1480px,calc(100vw - 64px));
+}
+
+/* --- single predictable app chrome --- */
+.np-site-header{height:var(--v83-head)!important;min-height:var(--v83-head)!important}
+.tabbar.np-nav{height:var(--v83-nav)!important;min-height:var(--v83-nav)!important;top:var(--v83-head)!important;position:sticky!important}
+.np-admin-modebar{width:var(--v83-shell);margin:38px auto 28px;display:flex;align-items:flex-end;justify-content:space-between;gap:24px;border-bottom:1px solid var(--v83-line);padding-bottom:22px}
+.np-admin-modebar h1{font:900 clamp(38px,5vw,74px)/.88 Manrope,system-ui,sans-serif;letter-spacing:-.07em;margin:9px 0 8px;text-transform:uppercase}
+.np-admin-modebar p{margin:0;color:var(--v83-muted);max-width:62ch;line-height:1.55;font-size:13px}
+.np-admin-mode-actions{display:flex;gap:10px;align-items:center}
+.np-header-config{height:32px;padding:0 12px;background:transparent;color:#87918b;border:1px solid var(--v83-line);font:800 8px/1 Manrope,system-ui,sans-serif;letter-spacing:.2em;cursor:pointer}
+.np-header-config:hover,.np-header-config.active{color:#fff;border-color:rgba(120,245,60,.5);background:rgba(120,245,60,.04)}
+
+/* views must behave as screens; remove old “stacked app” feel */
+.view:not(.active){display:none!important}
+.view.active{display:block!important;min-height:calc(100svh - var(--v83-head) - var(--v83-nav))!important;box-sizing:border-box}
+#view-admin.view.active{padding-bottom:100px!important}
+
+/* --- ranking: five real columns, stronger athlete hierarchy --- */
+#view-ranking .np-ranking-stage{width:var(--v83-shell);margin:42px auto 120px;overflow:visible}
+#view-ranking .np-ranking-title-row{display:grid!important;grid-template-columns:90px minmax(0,1fr) 180px 90px 90px!important;column-gap:0!important;padding:0 18px 14px!important}
+#view-ranking #tablaRanking{width:100%!important;border-collapse:separate!important;border-spacing:0 10px!important;table-layout:fixed!important}
+#view-ranking #tablaRanking thead{display:none!important}
+#view-ranking #tablaRanking tbody tr{display:grid!important;grid-template-columns:90px minmax(0,1fr) 180px 90px 90px!important;align-items:center;min-height:112px;background:linear-gradient(90deg,rgba(255,255,255,.035),rgba(255,255,255,.01));border:1px solid var(--v83-line-soft);transition:transform .25s ease,border-color .25s ease,background .25s ease}
+#view-ranking #tablaRanking tbody tr:hover{transform:translateY(-2px);border-color:rgba(120,245,60,.36);background:linear-gradient(90deg,rgba(120,245,60,.055),rgba(255,255,255,.015))}
+#view-ranking #tablaRanking td{border:0!important;background:transparent!important;padding:0 18px!important;min-width:0!important}
+#view-ranking #tablaRanking td:first-child{font:900 58px/.8 Manrope,system-ui,sans-serif;letter-spacing:-.08em;color:#56605a}
+#view-ranking #tablaRanking tr:nth-child(1) td:first-child{color:var(--v83-green)}
+#view-ranking #tablaRanking td:nth-child(2)>div{gap:16px!important}
+#view-ranking #tablaRanking td:nth-child(2) .avatar-wrap,
+#view-ranking #tablaRanking td:nth-child(2) .avatar{width:76px!important;height:76px!important;flex:0 0 76px!important}
+#view-ranking #tablaRanking td:nth-child(2)>div>span{display:block;font:900 clamp(17px,2vw,28px)/.95 Manrope,system-ui,sans-serif;text-transform:uppercase;letter-spacing:-.035em}
+#view-ranking #tablaRanking td:nth-child(3){font:900 clamp(32px,3.2vw,56px)/.8 Manrope,system-ui,sans-serif;color:var(--v83-green);letter-spacing:-.07em}
+#view-ranking #tablaRanking td:nth-child(4),#view-ranking #tablaRanking td:nth-child(5){font:800 11px/1 Manrope,system-ui,sans-serif;color:#aeb7b1;text-transform:uppercase;letter-spacing:.16em}
+#view-ranking .pill-row{scrollbar-width:none}
+
+/* --- player of month: never crop the athlete's head --- */
+#view-inicio .np-player-of-month-band{width:var(--v83-shell)!important;margin:96px auto!important;overflow:hidden!important}
+#view-inicio .np-player-of-month-band .destacado-card{background-size:cover!important;background-position:center 22%!important;min-height:600px!important}
+#view-inicio .np-player-of-month-band .destacado-card::before{background:linear-gradient(180deg,rgba(5,7,8,.02) 15%,rgba(5,7,8,.18) 48%,rgba(5,7,8,.95) 100%)!important}
+#view-inicio .np-player-of-month-band .destacado-info{margin:0 auto!important;align-self:end!important;position:relative!important;z-index:3!important;padding-bottom:18px!important}
+
+/* --- upcoming match: exactly one banner per frame --- */
+#inicioProximosWrap{overflow:hidden!important}
+#inicioProximosGrid.np-match-rail{display:flex!important;gap:0!important;overflow-x:auto!important;scroll-snap-type:x mandatory!important;scroll-behavior:smooth!important;scrollbar-width:none!important;padding:0!important}
+#inicioProximosGrid.np-match-rail::-webkit-scrollbar{display:none}
+#inicioProximosGrid.np-match-rail>.np-match-banner{flex:0 0 100%!important;width:100%!important;min-width:100%!important;max-width:100%!important;scroll-snap-align:start!important;scroll-snap-stop:always!important}
+
+/* --- sponsors: premium continuous wall --- */
+.np-sponsors-section .sponsor-strip{display:flex!important;gap:0!important;overflow:hidden!important;max-width:none!important;border-top:1px solid var(--v83-line);border-bottom:1px solid var(--v83-line);padding:0!important}
+.np-sponsors-section .sponsor-strip a,.np-sponsors-section .sponsor-strip span.sponsor-item{flex:0 0 clamp(180px,18vw,300px)!important;min-height:152px!important;background:transparent!important;border-right:1px solid var(--v83-line-soft)!important;border-radius:0!important;padding:18px 28px!important;display:flex!important;align-items:center;justify-content:center}
+.np-sponsors-section .sponsor-strip img{max-width:220px!important;max-height:92px!important;width:auto!important;height:auto!important;object-fit:contain!important;filter:none!important;opacity:1!important}
+
+/* --- admin ops: clearer sections + denser control center --- */
+#admGestionTorneoWrap{width:var(--v83-shell);margin:0 auto}
+#admGestionTorneoWrap .card{border-radius:0!important;box-shadow:none!important}
+#admGestionSubnav{position:sticky;top:calc(var(--v83-head) + var(--v83-nav) + 8px);z-index:50;background:rgba(5,7,6,.92);backdrop-filter:blur(10px);padding:8px 0;border-bottom:1px solid var(--v83-line)}
+#admSeccionPartidos{padding:0!important;background:transparent!important;border:0!important}
+#admSeccionPartidos>h2{font:900 clamp(42px,5vw,72px)/.86 Manrope,system-ui,sans-serif;letter-spacing:-.07em;text-transform:uppercase;margin:20px 0 10px}
+#admSeccionPartidos>.primary,#admSeccionPartidos>.secondary{min-height:44px}
+#admSeccionPartidos .np-order-toolbar{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;align-items:end!important;gap:28px!important;padding:28px 0 12px!important}
+#admSeccionPartidos .np-order-board{margin-top:14px!important;box-shadow:none!important}
+#admSeccionPartidos .np-order-board-head,#admSeccionPartidos .np-order-row{grid-template-columns:92px repeat(var(--calendario-cols),minmax(230px,1fr))!important;min-width:calc(92px + var(--calendario-cols)*230px)!important}
+#admSeccionPartidos .np-court-head{min-height:72px!important;background:#0a110d!important}
+#admSeccionPartidos .np-time-cell{min-width:92px!important}
+#admSeccionPartidos .np-order-cell{min-height:154px!important;padding:10px!important}
+#admSeccionPartidos .calendario-partido{min-height:124px!important}
+
+/* --- config mode: visually distinct general settings --- */
+body.np-admin-config #admConfigGeneralWrap,
+body.np-admin-config #admConfigGeneralWrap2,
+body.np-admin-config #auspiciantesWrap{width:var(--v83-shell);margin-left:auto;margin-right:auto}
+body.np-admin-config #admConfigGeneralWrap .card,
+body.np-admin-config #admConfigGeneralWrap2 .card,
+body.np-admin-config #auspiciantesWrap .card{border-radius:0!important;box-shadow:none!important;background:linear-gradient(180deg,#0b110e,#070a08)!important;padding:28px!important}
+body.np-admin-config #admConfigGeneralWrap .card h2,
+body.np-admin-config #admConfigGeneralWrap2 .card h2,
+body.np-admin-config #auspiciantesWrap .card h2{font:900 clamp(26px,3vw,44px)/.9 Manrope,system-ui,sans-serif;text-transform:uppercase;letter-spacing:-.055em}
+
+/* --- mobile --- */
+@media(max-width:900px){
+  :root{--v83-shell:calc(100vw - 30px)}
+  .np-admin-modebar{align-items:flex-start;flex-direction:column;margin-top:24px}
+  .np-admin-mode-actions{width:100%}.np-admin-mode-actions .np-cta{width:100%}
+  #view-ranking .np-ranking-title-row{display:none!important}
+  #view-ranking #tablaRanking tbody tr{grid-template-columns:62px minmax(0,1fr) 110px!important;min-height:94px}
+  #view-ranking #tablaRanking td:nth-child(4),#view-ranking #tablaRanking td:nth-child(5){display:none!important}
+  #view-ranking #tablaRanking td:first-child{font-size:44px;padding:0 12px!important}
+  #view-ranking #tablaRanking td:nth-child(2){padding:0 8px!important}
+  #view-ranking #tablaRanking td:nth-child(2) .avatar-wrap,#view-ranking #tablaRanking td:nth-child(2) .avatar{width:56px!important;height:56px!important;flex-basis:56px!important}
+  #view-ranking #tablaRanking td:nth-child(3){padding:0 10px!important;font-size:32px}
+  #view-inicio .np-player-of-month-band{width:calc(100vw - 30px)!important;margin:64px auto!important}
+  #view-inicio .np-player-of-month-band .destacado-card{min-height:480px!important;background-position:center 18%!important}
+  #admGestionTorneoWrap .np-day-tabs{overflow-x:auto}
+  #admSeccionPartidos .np-order-board{max-width:100%;overflow-x:auto}
+  #admSeccionPartidos .np-order-toolbar{display:block!important}
+  .np-header-config{display:none!important}
+}
+
+@media(max-width:600px){
+  #view-inicio .np-player-of-month-band .destacado-card{min-height:440px!important;background-position:center 12%!important}
+  #admSeccionPartidos .np-order-board-head,#admSeccionPartidos .np-order-row{grid-template-columns:76px repeat(var(--calendario-cols),minmax(190px,1fr))!important;min-width:calc(76px + var(--calendario-cols)*190px)!important}
+}
