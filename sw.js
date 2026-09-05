@@ -1,4 +1,4 @@
-const CACHE = "norte-padel-v64-redesign";
+const CACHE = "norte-padel-v68-editorial";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -10,12 +10,20 @@ const APP_SHELL = [
   "./icon-192.png",
   "./icon-512.png",
   "./icon-512-maskable.png",
-  "./hero-cancha.jpg",
-  "./brasil-tour.jpg",
-  "./destacados-fondo.jpg",
-  "./pelotas.jpg",
-  "./hero-torneos.jpg",
-  "./hero-ranking.jpg"
+  "./hero-cancha.webp",
+  "./brasil-tour.webp",
+  "./destacados-fondo.webp",
+  "./pelotas.webp",
+  "./editorial-action-01.webp",
+  "./editorial-action-02.webp",
+  "./editorial-action-03.webp",
+  "./editorial-action-04.webp",
+  "./editorial-action-05.webp",
+  "./editorial-court-01.webp",
+  "./editorial-net.webp",
+  "./editorial-community.webp",
+  "./hero-torneos.webp",
+  "./hero-ranking.webp"
 ];
 
 self.addEventListener("install", (event) => {

@@ -34,6 +34,56 @@ let ultimasCanchasTorneo = [];
 let partidosCategoriaFiltro = ""; // "" = todas las categorías del torneo
 let configApp = {}; // clave/valor de la tabla "config" (whatsapp_numero, instagram_url)
 
+// ---------- cache liviano de lecturas públicas ----------
+// Evita repetir las mismas consultas en el arranque (Inicio + Torneos +
+// auth callback) y permite que el UI filtre/ordene en memoria sin volver a
+// golpear Supabase. Las mutaciones invalidan explícitamente el cache.
+let torneosCacheLoaded = false;
+let torneosRequest = null;
+let rankingPublicoCache = null;
+let rankingPublicoRequest = null;
+
+function fechaLocalISO(date = new Date()) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
+async function obtenerTorneosCache(force = false) {
+  if (!force && torneosCacheLoaded) return cacheTorneos;
+  if (!force && torneosRequest) return torneosRequest;
+  torneosRequest = sb.from("torneos")
+    .select("id,nombre,complejo_id,fecha_inicio,fecha_fin,flyer_url,costo,duracion_minutos,dias_semana,hora_desde,hora_hasta,horarios_por_dia,fase_grupos_formato,tamano_grupo,avanzan_por_grupo,estado,complejos(nombre,direccion),torneo_categorias(categoria,estado_fase)")
+    .order("fecha_inicio", { ascending: false })
+    .then(({ data }) => {
+      cacheTorneos = data || [];
+      torneosCacheLoaded = true;
+      return cacheTorneos;
+    })
+    .finally(() => { torneosRequest = null; });
+  return torneosRequest;
+}
+
+function invalidarCacheTorneos() {
+  torneosCacheLoaded = false;
+  torneosRequest = null;
+}
+
+async function obtenerRankingPublico(force = false) {
+  if (!force && rankingPublicoCache) return rankingPublicoCache;
+  if (!force && rankingPublicoRequest) return rankingPublicoRequest;
+  rankingPublicoRequest = sb.rpc("ranking_categoria_publico")
+    .then(({ data }) => {
+      rankingPublicoCache = data || [];
+      return rankingPublicoCache;
+    })
+    .finally(() => { rankingPublicoRequest = null; });
+  return rankingPublicoRequest;
+}
+
+function invalidarCacheRanking() { rankingPublicoCache = null; }
+
 // "Jugar" (reservar cancha) está armado pero pausado hasta cerrar el acuerdo con el club
 // y activar el botón en index.html — mientras tanto no se llama a sus funciones para no
 // pegarle a tablas/RPCs que todavía no se corrieron en la base de producción.
@@ -507,7 +557,8 @@ document.getElementById("btnGuardarPerfil").addEventListener("click", async () =
   renderVistaPerfil();
   suscribirseANotificacionesRealtime();
   actualizarContadorNotificaciones();
-  cargarRanking();
+  invalidarCacheRanking();
+  cargarRanking(true);
   cargarJugadorDelMes();
   if (torneoActualId) renderInscribirme();
 });
@@ -561,7 +612,12 @@ async function manejarCambioSesion(session) {
   renderVistaPerfil();
   suscribirseANotificacionesRealtime();
   actualizarContadorNotificaciones();
-  if (isAdmin) { cargarJugadoresAdmin(); if (FEATURE_JUGAR_HABILITADA) cargarReservasPendientesAdmin(); }
+  if (isAdmin) {
+    cargarJugadoresAdmin();
+    cargarComplejos();
+    cargarPuntosRonda();
+    if (FEATURE_JUGAR_HABILITADA) cargarReservasPendientesAdmin();
+  }
   calcularTorneoDestacado();
   cargarHeroPosicion();
   if (torneoActualId) refrescarDetalleTorneo();
@@ -578,12 +634,11 @@ sb.auth.onAuthStateChange((_event, session) => manejarCambioSesion(session));
 // RANKING (segmentado por categoría, vía función pública)
 // ============================================================
 let generoRankingActual = localStorage.getItem("np_genero_ranking") || null;
-async function cargarRanking() {
+async function cargarRanking(force = false) {
   // ranking_categoria_publico() (no jugadores_publicos()): devuelve una fila por cada
   // categoría en la que el jugador tiene puntos, así el mismo jugador puede aparecer
   // en el ranking de más de una categoría a la vez.
-  const { data } = await sb.rpc("ranking_categoria_publico");
-  const todos = data || [];
+  const todos = await obtenerRankingPublico(force);
   const categorias = [...new Set(todos.map((j) => j.categoria).filter(Boolean))]
     .sort((a, b) => a.localeCompare(b, "es", { numeric: true }));
 
@@ -748,9 +803,10 @@ document.getElementById("btnVerMiPerfilPublico").addEventListener("click", () =>
 // INICIO: próximos torneos con flyer + jugador del mes
 // ============================================================
 async function cargarInicio() {
-  const hoy = new Date().toISOString().slice(0, 10);
-  const { data } = await sb.from("torneos").select("*").not("flyer_url", "is", null).order("fecha_inicio", { ascending: true });
-  const proximos = (data || []).filter((t) => !t.fecha_fin || t.fecha_fin >= hoy);
+  const hoy = fechaLocalISO();
+  const data = await obtenerTorneosCache();
+  const proximos = data.filter((t) => t.flyer_url && (!t.fecha_fin || t.fecha_fin >= hoy))
+    .sort((a, b) => a.fecha_inicio.localeCompare(b.fecha_inicio));
 
   const destacado = document.getElementById("flyerDestacado");
   const grid = document.getElementById("flyerMini");
@@ -778,7 +834,7 @@ async function cargarInicio() {
 
   resto.forEach((t) => {
     const div = document.createElement("div");
-    div.innerHTML = `<img src="${t.flyer_url}" alt="${t.nombre}" loading="lazy" style="cursor:pointer" /><div class="match-meta meta-caption">${t.nombre}</div>`;
+    div.innerHTML = `<img src="${t.flyer_url}" alt="${t.nombre}" loading="lazy" decoding="async" style="cursor:pointer" /><div class="match-meta meta-caption">${t.nombre}</div>`;
     div.querySelector("img").addEventListener("click", () => abrirTorneo(t.id));
     grid.appendChild(div);
   });
@@ -796,7 +852,7 @@ function avatarHtml(fotoUrl, size, extraClass, ampliable) {
   const cls = (extraClass ? ` ${extraClass}` : "") + (clickable ? " avatar-clickable" : "");
   const dataAttr = clickable ? ` data-foto-grande="${fotoUrl}" tabindex="0" role="button" aria-label="Ver foto en grande"` : "";
   const img = fotoUrl
-    ? `<img class="avatar${cls}" src="${fotoUrl}" alt="" loading="lazy" style="width:${s}px;height:${s}px" onerror="this.style.display='none'"${dataAttr} />`
+    ? `<img class="avatar${cls}" src="${fotoUrl}" alt="" loading="lazy" decoding="async" style="width:${s}px;height:${s}px" onerror="this.style.display='none'"${dataAttr} />`
     : `<div class="avatar avatar-placeholder${cls}" style="width:${s}px;height:${s}px">🎾</div>`;
   if (!clickable) return img;
   const iconoLupa = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><circle cx="10" cy="10" r="6.5"/><path d="M10 7.2v5.6M7.2 10h5.6"/><path d="M15 15l5.5 5.5"/></svg>`;
@@ -966,8 +1022,8 @@ function renderInicioPartidosGrid(wrapId, gridId, items, onClick) {
 async function cargarHeroPosicion() {
   const card = document.getElementById("heroPosicionCard");
   if (!miJugador) { card.style.display = "none"; return; }
-  const { data } = await sb.rpc("ranking_categoria_publico");
-  const delGrupo = (data || []).filter((j) => j.categoria === miJugador.categoria)
+  const todos = await obtenerRankingPublico();
+  const delGrupo = todos.filter((j) => j.categoria === miJugador.categoria)
     .sort((a, b) => b.puntos_ranking - a.puntos_ranking);
   const pos = delGrupo.findIndex((j) => j.id === miJugador.id);
   if (pos === -1) { card.style.display = "none"; return; }
@@ -1033,11 +1089,14 @@ function matchVsRowHtml(p, ganador) {
 // función). Se mantiene solo para calcular torneoDestacadoId, que es a dónde lleva la
 // banda "Inscribite ya" de Inicio.
 async function calcularTorneoDestacado() {
-  const hoy = new Date().toISOString().slice(0, 10);
-  const { data: torneos } = await sb.from("torneos").select("*, complejos(nombre, direccion)").order("fecha_inicio");
-  const enCurso = (torneos || []).find((t) => t.fecha_inicio <= hoy && (t.fecha_fin || t.fecha_inicio) >= hoy);
-  const proximo = (torneos || []).filter((t) => t.fecha_inicio > hoy).sort((a, b) => a.fecha_inicio.localeCompare(b.fecha_inicio))[0];
+  const hoy = fechaLocalISO();
+  const torneos = await obtenerTorneosCache();
+  const enCurso = torneos
+    .filter((t) => t.fecha_inicio <= hoy && (t.fecha_fin || t.fecha_inicio) >= hoy)
+    .sort((a, b) => a.fecha_inicio.localeCompare(b.fecha_inicio))[0];
+  const proximo = torneos.filter((t) => t.fecha_inicio > hoy).sort((a, b) => a.fecha_inicio.localeCompare(b.fecha_inicio))[0];
   torneoDestacadoId = (enCurso || proximo)?.id || null;
+  return torneoDestacadoId;
 }
 
 document.getElementById("btnDestacarJugador").addEventListener("click", async () => {
@@ -1204,7 +1263,8 @@ async function cargarCategorias() {
         ]);
         toast("Categoría renombrada");
         cargarCategorias();
-        cargarRanking();
+        invalidarCacheRanking();
+        cargarRanking(true);
         if (isAdmin) cargarJugadoresAdmin();
       });
     });
@@ -1488,7 +1548,8 @@ function renderListaJugadoresAdmin() {
           if (error) { toast("Error: " + error.message); return; }
           toast("Puntos actualizados");
           await cargarJugadoresAdmin();
-          cargarRanking();
+          invalidarCacheRanking();
+          cargarRanking(true);
         });
         fila.querySelector(".btnQuitarCategoriaRanking").addEventListener("click", async () => {
           if (!confirm(`¿Sacar a ${j.nombre} ${j.apellido} del ranking de ${categoria}?`)) return;
@@ -1496,7 +1557,8 @@ function renderListaJugadoresAdmin() {
           if (error) { toast("Error: " + error.message); return; }
           toast("Categoría quitada del ranking");
           await cargarJugadoresAdmin();
-          cargarRanking();
+          invalidarCacheRanking();
+          cargarRanking(true);
         });
       });
       div.querySelector(".btnAgregarCategoriaRanking").addEventListener("click", async () => {
@@ -1506,7 +1568,8 @@ function renderListaJugadoresAdmin() {
         if (error) { toast("Error: " + error.message); return; }
         toast(`${j.nombre} ${j.apellido} ahora también rankea en ${categoria}`);
         await cargarJugadoresAdmin();
-        cargarRanking();
+        invalidarCacheRanking();
+        cargarRanking(true);
       });
     };
     renderRankingExtra();
@@ -1542,7 +1605,8 @@ function renderListaJugadoresAdmin() {
       if (error) { toast("Error: " + error.message); return; }
       toast("Jugador actualizado");
       cargarJugadoresAdmin();
-      cargarRanking();
+      invalidarCacheRanking();
+      cargarRanking(true);
     });
     // Blanquear la clave de un jugador (ej: la olvidó, o quedó con la provisoria
     // de una importación vieja). No se puede hacer desde el cliente con la clave
@@ -1568,7 +1632,8 @@ function renderListaJugadoresAdmin() {
       if (error) { toast("Error: " + error.message); return; }
       toast("Perfil eliminado");
       cargarJugadoresAdmin();
-      cargarRanking();
+      invalidarCacheRanking();
+      cargarRanking(true);
     });
     cont.appendChild(div);
   });
@@ -1599,7 +1664,8 @@ function renderSolicitudesCategoria(jugadores) {
       await sb.from("historial_categoria").insert({ jugador_id: j.id, categoria_anterior: j.categoria, categoria_nueva: j.categoria_pendiente });
       toast("Categoría aprobada");
       cargarJugadoresAdmin();
-      cargarRanking();
+      invalidarCacheRanking();
+      cargarRanking(true);
     });
     div.querySelector(".btnRechazarCategoria").addEventListener("click", async () => {
       const { error } = await sb.from("jugadores").update({ categoria_pendiente: null }).eq("id", j.id);
@@ -1615,7 +1681,7 @@ function renderSolicitudesCategoria(jugadores) {
 // TORNEOS
 // ============================================================
 function estaEnVivo(t) {
-  const hoy = new Date().toISOString().slice(0, 10);
+  const hoy = fechaLocalISO();
   return t.fecha_inicio <= hoy && (t.fecha_fin || t.fecha_inicio) >= hoy;
 }
 
@@ -1633,9 +1699,8 @@ function linkMapsComplejo(complejo) {
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
 }
 
-async function cargarTorneos() {
-  const { data } = await sb.from("torneos").select("*, complejos(nombre, direccion), torneo_categorias(categoria)").order("fecha_inicio", { ascending: false });
-  cacheTorneos = data || [];
+async function cargarTorneos(force = false) {
+  const data = await obtenerTorneosCache(force);
   const cont = document.getElementById("listaTorneos");
   cont.innerHTML = "";
 
@@ -1819,8 +1884,10 @@ document.getElementById("btnCrearTorneo").addEventListener("click", async () => 
   document.getElementById("tCosto").value = "";
   document.querySelectorAll(".chkTorneoCategoria:checked").forEach((c) => (c.checked = false));
   document.getElementById("crearTorneoCard").style.display = "none";
-  cargarTorneos();
-  cargarInicio();
+  invalidarCacheTorneos();
+  await cargarTorneos(true);
+  await cargarInicio();
+  await calcularTorneoDestacado();
   abrirTorneo(data.id);
 });
 
@@ -2733,7 +2800,8 @@ document.getElementById("btnBorrarTorneo").addEventListener("click", async () =>
   document.getElementById("admGestionTorneoWrap").style.display = "none";
   document.getElementById("admSelectTorneoGestion").value = "";
   document.getElementById("admSelectorTorneoCard").style.display = "block";
-  await cargarTorneos();
+  invalidarCacheTorneos();
+  await cargarTorneos(true);
   avisarActualizacionEnVivo();
 });
 
@@ -2826,8 +2894,10 @@ document.getElementById("btnGuardarTorneo").addEventListener("click", async () =
 
   toast("Torneo actualizado");
   document.getElementById("editarTorneoCard").style.display = "none";
-  cargarTorneos();
-  cargarInicio();
+  invalidarCacheTorneos();
+  await cargarTorneos(true);
+  await cargarInicio();
+  await calcularTorneoDestacado();
   refrescarTrasAccionGestion();
 });
 
@@ -3736,7 +3806,8 @@ function wireCargaResultado(cont) {
       toast("Resultado cargado, ranking actualizado ✅");
       avisarActualizacionEnVivo();
       refrescarTrasAccionGestion();
-      cargarRanking();
+      invalidarCacheRanking();
+      cargarRanking(true);
       if (btn.dataset.ronda === "Final") cargarCampeones();
     });
   });
@@ -4190,7 +4261,7 @@ function renderPartidosLista(containerId, partidos, canchasTorneo, editable, par
 // transparente y necesitan la caja blanca para leerse sobre el fondo oscuro.
 function renderSponsorItem(s, caption) {
   const esJpg = /\.jpe?g(\?|#|$)/i.test(s.logo_url || "");
-  const contenido = `<img src="${s.logo_url}" alt="${s.nombre}" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'sponsor-caption',textContent:'${s.nombre.replace(/'/g, "\\'")}'}))" />` +
+  const contenido = `<img src="${s.logo_url}" alt="${s.nombre}" loading="lazy" decoding="async" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'sponsor-caption',textContent:'${s.nombre.replace(/'/g, "\\'")}'}))" />` +
     (caption ? `<span class="sponsor-caption">${caption}</span>` : "");
   const clase = "sponsor-item" + (esJpg ? " sponsor-sin-fondo" : "");
   return s.link_url
@@ -4320,7 +4391,7 @@ document.getElementById("btnSubirSponsor").addEventListener("click", async () =>
 // NOTICIAS (novedades del club en Inicio + botón a Instagram)
 // ============================================================
 function renderNoticiaCard(n) {
-  const imagen = n.imagen_url ? `<img src="${n.imagen_url}" alt="${n.titulo}" loading="lazy" onerror="this.style.display='none'" />` : "";
+  const imagen = n.imagen_url ? `<img src="${n.imagen_url}" alt="${n.titulo}" loading="lazy" decoding="async" onerror="this.style.display='none'" />` : "";
   const contenido = `${imagen}<strong>${n.titulo}</strong>${n.texto ? `<p>${n.texto}</p>` : ""}` +
     (n.link ? `<a href="${n.link}" target="_blank" rel="noopener noreferrer" class="link-btn">Ver más →</a>` : "");
   return `<div class="noticia-card">${contenido}</div>`;
@@ -4500,7 +4571,9 @@ function suscribirseANotificacionesRealtime() {
 const canalEnVivo = sb.channel("norte-padel-en-vivo");
 canalEnVivo
   .on("broadcast", { event: "actualizado" }, () => {
-    cargarRanking();
+    invalidarCacheRanking();
+    invalidarCacheTorneos();
+    cargarRanking(true);
     calcularTorneoDestacado();
     if (torneoActualId) refrescarDetalleTorneo();
   })
@@ -4529,8 +4602,11 @@ if ("serviceWorker" in navigator) {
 // calcularTorneoDestacado(); pedirla de nuevo acá solo duplicaba esas llamadas en cada carga.
 async function init() {
   await Promise.all([cargarCategorias(), cargarTorneos()]);
+
+  // Configuración es necesaria para Noticias (Instagram) y para algunos CTAs;
+  // esperamos ese dato antes de renderizar Noticias para evitar una carrera.
+  const configPromise = cargarConfig();
   await Promise.all([
-    cargarComplejos(),
     cargarInicio(),
     cargarUltimosProximos(),
     cargarJugadorDelMes(),
@@ -4538,9 +4614,8 @@ async function init() {
     cargarAscendidos(),
     cargarSponsors(),
     cargarRanking(),
-    cargarPuntosRonda(),
-    cargarConfig(),
-    cargarNoticias()
+    configPromise
   ]);
+  await cargarNoticias();
 }
 init();
