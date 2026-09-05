@@ -4011,9 +4011,14 @@ function renderPartidosLlave(containerId, partidos) {
   // columna con todos sus partidos apilados en vertical (igual que una Zona con varios
   // partidos) — lo horizontal es solo el avance de fase (Zona -> Cuartos -> Semis -> Final).
   const eliminacion = partidos.filter((p) => p.ronda && p.ronda !== "Fase de grupos" && p.grupo == null && !(p.ronda === "Zona" && p.slot_cuadro));
-  const nombresOrdenados = [...new Set(
-    [...eliminacion].sort((a, b) => new Date(a.created_at) - new Date(b.created_at)).map((p) => p.ronda)
-  )];
+  const ordenFases = ["Dieciseisavos", "Octavos", "Cuartos", "Semifinal", "Final"];
+  const rondasEncontradas = [...new Set(eliminacion.map((p) => p.ronda).filter(Boolean))];
+  const nombresOrdenados = [
+    ...ordenFases.filter((r) => rondasEncontradas.includes(r)),
+    ...rondasEncontradas
+      .filter((r) => !ordenFases.includes(r))
+      .sort((a, b) => a.localeCompare(b, "es", { numeric: true }))
+  ];
   nombresOrdenados.forEach((r) => {
     // sin título de columna: ya lo dice el título de la fase (h3) arriba, una
     // sola vez -- repetirlo en el h4 de la columna quedaba redundante ahora
