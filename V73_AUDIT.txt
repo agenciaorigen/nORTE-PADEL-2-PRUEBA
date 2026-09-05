@@ -1,0 +1,9 @@
+NORTE PADEL V73 — COMPLETE ROUTING / FUNCTIONALITY AUDIT
+
+- Original and V72 HTML id sets compared: no original element ids were removed.
+- Original and V72 named JS function sets compared: only renderProximoDestacado was intentionally replaced by the unified upcoming match rail; all other original functions remain.
+- Fixed legacy CSS overrides that forced torneo-info/torneo-inscripcion to display even when inactive.
+- Ranking, Torneos and Profile are now authoritative top-level SPA views.
+- Added /config alias for the existing admin configuration screen; non-admins are redirected to Inicio.
+- Bracket rounds now render deterministically left-to-right: Zona, Octavos, Cuartos, Semifinal, Final.
+- No database, RPC, field names, player data, results, dates, signup logic or matching engine changed.

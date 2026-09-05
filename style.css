@@ -3266,7 +3266,6 @@ label { color: #89938d; font-size: 10px; text-transform: uppercase; letter-spaci
   #view-torneo-resultados .torneo-hero-overlay h2 { font-size:clamp(48px,14vw,82px); }
   #view-torneo-resultados #dtInscripcionCard { width:calc(100% - 28px); margin:-50px auto 28px; }
 
-  #view-torneo-info, #view-torneo-inscripcion { display:block; background:transparent; }
   #view-torneo-info > .card, #view-torneo-inscripcion > .card { margin-bottom:2px; }
   #view-torneo-info > .card:nth-child(n), #view-torneo-inscripcion > .card:nth-child(n) { min-height:0; }
 
@@ -4127,7 +4126,6 @@ button.tertiary { text-transform: uppercase; letter-spacing: .1em; font-size: 10
   .torneo-hero { min-height: 62vh !important; }
   .torneo-hero-overlay h2 { font-size:58px !important; }
 
-  #view-torneo-info { display:block; }
   #view-torneo-info > .card,
   #view-torneo-info > .card:nth-child(even) { padding:24px 0 !important; border-left:0 !important; }
 
@@ -4673,3 +4671,35 @@ body{overflow-x:hidden}
 .np-event-art::after{content:"";position:absolute;inset:0;background-image:url('norte-editorial-02.webp');background-repeat:no-repeat;background-size:contain;background-position:center;opacity:.88;z-index:0}
 .np-event-overlay{z-index:2!important}
 @media(max-width:959px){.np-event-art::after{background-position:center center}.np-event-art{min-height:100%}}
+
+
+/* ============================================================
+   V73 — ROUTING VISIBILITY / FINAL LAYOUT GUARD
+   The app is a multi-view SPA. Only the active view is painted.
+   Older responsive rules must never force a child view visible.
+   ============================================================ */
+.view { display:none !important; }
+.view.active { display:block !important; width:100%; min-width:0; }
+.view:not(.active) { visibility:hidden; pointer-events:none; }
+.view.active { visibility:visible; pointer-events:auto; }
+
+/* Route pages are complete screens, not sections of the home page. */
+body:not(.is-admin) #btnAdminPanel { display:none !important; }
+#view-ranking, #view-torneos, #view-torneo-resultados, #view-torneo-info,
+#view-torneo-inscripcion, #view-mi-inscripcion, #view-mi-disponibilidad-torneo,
+#view-perfil, #view-perfil-jugador, #view-admin { min-height:calc(100svh - 74px); }
+
+/* Keep the tournament context bar attached to the tournament route, while
+   the rest of the SPA remains isolated. */
+#torneoContextBar { position:relative; z-index:20; }
+
+/* Avoid accidental horizontal layout growth on editorial pages. */
+.np-view, .np-home, .np-view > *, .np-home > * { min-width:0; }
+.np-event-info-view, .np-event-view, .np-join-view, .np-ranking-view,
+.np-torneos-view, .np-profile-view, .np-player-view { overflow:clip; }
+
+/* Bracket: deterministic competition order, left → right. */
+.llave { display:flex !important; align-items:flex-start !important; }
+.llave-fase { flex:0 0 auto; min-width:260px; }
+.llave-fase-zona { min-width:260px; }
+.llave-fase-columnas { min-width:0; }
