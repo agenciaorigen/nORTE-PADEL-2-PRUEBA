@@ -2531,6 +2531,11 @@ async function refrescarDetalleTorneo() {
   // del rediseño): mismo dato, solo se muestra también acá en grande.
   document.getElementById("dtNombreHero").textContent = t.nombre;
   document.getElementById("dtEstadoHero").innerHTML = badgeEstadoTorneo(t);
+  const torneoFlyer = t.flyer_url || "hero-torneos.webp";
+  const torneoArt = document.querySelector(".np-event-art");
+  const torneoInfoArt = document.querySelector(".np-event-inside-art");
+  if (torneoArt) torneoArt.style.backgroundImage = `linear-gradient(90deg, rgba(4,7,5,.16), rgba(4,7,5,.06)), url("${String(torneoFlyer).replace(/\"/g, "%22")}")`;
+  if (torneoInfoArt) torneoInfoArt.style.backgroundImage = `linear-gradient(0deg, rgba(4,7,5,.08), rgba(4,7,5,.02)), url("${String(torneoFlyer).replace(/\"/g, "%22")}")`;
   categoriasTorneoActual = (t.torneo_categorias || []).map((c) => c.categoria);
   const categorias = categoriasTorneoActual.join(", ") || "todas las categorías";
   document.getElementById("dtInfo").textContent = `${t.complejos?.nombre || "sin complejo"} · ${categorias} · ${t.fecha_inicio} a ${t.fecha_fin}`;
@@ -3686,7 +3691,7 @@ function calcularSlots(partidos, canchas, torneo, sintetizarVacios) {
     const esMapaPorDia = ventana && typeof ventana === "object" && ventana.desde === undefined;
     fechasDelTorneo(torneo).forEach((fecha) => {
       const baseDia = (esMapaPorDia ? ventana[fecha.getDay()] : ventana) || FRANJA_DEFAULT_DIA;
-      const pasoVisual = Math.max(30, Math.min(60, duracion));
+      const pasoVisual = 30;
       for (let m = baseDia.desde; m + duracion <= baseDia.hasta; m += pasoVisual) {
         const d = new Date(fecha);
         d.setHours(0, m, 0, 0);

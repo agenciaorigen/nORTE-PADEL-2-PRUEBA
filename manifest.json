@@ -1,12 +1,12 @@
 {
   "name": "Norte Padel",
   "short_name": "Norte Padel",
-  "description": "Ranking, torneos y resultados en vivo de Norte Padel",
+  "description": "Norte Padel — circuito, torneos, partidos, ranking y comunidad.",
   "start_url": "./index.html#/",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#05080A",
-  "theme_color": "#05080A",
+  "background_color": "#050607",
+  "theme_color": "#050607",
   "orientation": "portrait-primary",
   "display_override": [
     "standalone",
