@@ -4505,10 +4505,12 @@ main{max-width:none!important;margin:0!important;padding:0!important}
 .np-rail-dots button.active{width:24px;border-radius:4px;background:var(--np-accent)}
 
 /* photos integrated into the new visual system */
-.np-hero-bg{background:radial-gradient(circle at 78% 48%,rgba(121,240,74,.08),transparent 24%),linear-gradient(90deg,rgba(4,6,7,.97) 0%,rgba(4,6,7,.8) 34%,rgba(4,6,7,.2) 64%,rgba(4,6,7,.84) 100%),url('padel-action-01.png') 67% center/cover no-repeat!important}
-.np-feature-image{background-image:linear-gradient(90deg,rgba(5,7,9,.15),rgba(5,7,9,.28)),url('padel-action-02.png')!important}
-.np-story-image{background-image:linear-gradient(180deg,rgba(5,7,9,.15),rgba(5,7,9,.56)),url('padel-community-01.png')!important}
-.np-split-story::after{background-image:url('padel-court-01.png')!important}
+.np-hero-bg{background-color:#07100d!important;background-image:radial-gradient(circle at 78% 48%,rgba(121,240,74,.08),transparent 24%),linear-gradient(90deg,rgba(4,6,7,.97) 0%,rgba(4,6,7,.80) 34%,rgba(4,6,7,.18) 64%,rgba(4,6,7,.84) 100%),url('padel-action-01.webp')!important;background-size:auto,auto,cover!important;background-position:center!important;background-repeat:no-repeat!important;}
+.np-hero-bg::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 72% 50%,rgba(6,12,10,.34),rgba(5,7,9,.72) 68%),url('padel-action-01.webp') center/contain no-repeat;z-index:0;opacity:.92;}
+.np-hero-bg > *{position:relative;z-index:2;}
+.np-feature-image{background-image:linear-gradient(90deg,rgba(5,7,9,.15),rgba(5,7,9,.28)),url('padel-action-02.webp')!important}
+.np-story-image{background-image:linear-gradient(180deg,rgba(5,7,9,.15),rgba(5,7,9,.56)),url('padel-community-01.webp')!important}
+.np-split-story::after{background-image:url('padel-court-01.webp')!important}
 
 /* sponsor presentation — larger, clear, premium */
 .np-sponsors-section{padding:56px 0 94px}
@@ -4524,7 +4526,7 @@ main{max-width:none!important;margin:0!important;padding:0!important}
 
 /* tournament interior — not a blank information sheet anymore */
 .np-event-inside-hero{width:min(var(--np-max),calc(100vw - 48px));min-height:66vh;margin:0 auto;position:relative;overflow:hidden;border-bottom:1px solid var(--np-line)}
-.np-event-inside-art{position:absolute;inset:0;background:linear-gradient(90deg,rgba(5,7,9,.96) 0%,rgba(5,7,9,.72) 38%,rgba(5,7,9,.22) 72%,rgba(5,7,9,.75) 100%),url('padel-action-02.png') 68% 50%/cover no-repeat}
+.np-event-inside-art{position:absolute;inset:0;background:linear-gradient(90deg,rgba(5,7,9,.96) 0%,rgba(5,7,9,.72) 38%,rgba(5,7,9,.22) 72%,rgba(5,7,9,.75) 100%),url('padel-action-02.webp') 68% 50%/cover no-repeat}
 .np-event-inside-art::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(5,7,9,.1),transparent 45%,rgba(5,7,9,.92))}
 .np-event-inside-copy{position:absolute;z-index:2;left:0;bottom:58px;max-width:790px}
 .np-event-inside-copy h3{font:900 clamp(60px,8.5vw,150px)/.78 var(--np-display)!important;letter-spacing:-.06em;text-transform:uppercase;margin:12px 0 26px!important}
@@ -4576,3 +4578,98 @@ main{max-width:none!important;margin:0!important;padding:0!important}
   .np-event-statline{width:calc(100vw - 28px);grid-template-columns:1fr}.np-event-stat-main{border-right:0;border-bottom:1px solid var(--np-line);padding:24px 0}.np-event-stats{grid-template-columns:1fr 1fr!important}.np-event-stats>div{padding:24px 16px}.np-event-content-grid{width:calc(100vw - 28px);grid-template-columns:1fr;gap:46px;padding:55px 0}.np-event-sponsor-stage{grid-template-columns:1fr;gap:28px;padding:55px 0 80px}.np-event-sponsor-stage .sponsor-strip{grid-template-columns:1fr 1fr!important}
   #tablaRanking td:nth-child(2) .avatar-wrap,#tablaRanking td:nth-child(2) .avatar{width:64px!important;height:64px!important}#tablaRanking tr:first-child td:nth-child(2) .avatar-wrap,#tablaRanking tr:first-child td:nth-child(2) .avatar,#tablaRanking tr:nth-child(2) td:nth-child(2) .avatar-wrap,#tablaRanking tr:nth-child(2) td:nth-child(2) .avatar{width:74px!important;height:74px!important}
 }
+
+/* ============================================================
+   V71 — APP / PWA INSTALL
+   Producto editorial: la PWA se presenta como parte del circuito,
+   no como un banner técnico.
+   ============================================================ */
+.np-app-section{position:relative;min-height:62vh;margin:0 calc(50% - 50vw);padding:clamp(48px,8vw,110px) max(24px,calc((100vw - var(--np-max))/2));overflow:hidden;background:#070908;border-top:1px solid rgba(255,255,255,.12);border-bottom:1px solid rgba(255,255,255,.08);display:grid;grid-template-columns:minmax(0,1.05fr) minmax(280px,.95fr);align-items:center;gap:clamp(28px,7vw,110px)}
+.np-app-section:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 72% 50%,rgba(121,240,74,.08),transparent 24%),linear-gradient(90deg,rgba(4,6,7,.2),transparent 55%)}
+.np-app-copy,.np-app-art{position:relative;z-index:1}.np-app-copy{max-width:760px}.np-app-copy h3{font-size:clamp(56px,8vw,124px);line-height:.84;letter-spacing:-.065em;margin:16px 0 24px;text-transform:uppercase}.np-app-copy h3 em{font-style:normal;color:var(--accent-bright)}.np-app-copy p{max-width:48ch;color:var(--muted);font-size:16px;line-height:1.6;margin:0 0 26px}.np-app-actions{display:flex;align-items:center;gap:18px;flex-wrap:wrap}.np-app-note{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#9ba39e;max-width:42ch}.np-app-art{display:flex;justify-content:center;align-items:center;min-height:380px}.np-app-phone{width:min(360px,72vw);aspect-ratio:9/17.6;border:1px solid rgba(255,255,255,.18);border-radius:34px;background:linear-gradient(145deg,#121713,#070908 70%);box-shadow:0 40px 100px rgba(0,0,0,.55),0 0 70px rgba(121,240,74,.08);padding:12px;transform:rotate(5deg);transition:transform .5s ease}.np-app-section:hover .np-app-phone{transform:rotate(2deg) translateY(-8px)}.np-app-phone-bar{height:38px;display:flex;align-items:center;justify-content:space-between;padding:0 13px;font-size:11px;letter-spacing:.12em;font-weight:800}.np-app-phone-bar span{color:var(--accent-bright)}.np-app-phone-screen{height:calc(100% - 38px);border-radius:22px;overflow:hidden;position:relative;padding:26px 18px;background:linear-gradient(180deg,rgba(5,7,9,.1),rgba(5,7,9,.9)),url('padel-player-vertical-02.jpg') center/cover no-repeat;display:flex;flex-direction:column;justify-content:flex-end}.np-app-phone-screen:before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 30%,rgba(4,6,7,.9))}.np-app-phone-screen b,.np-app-phone-screen strong,.np-app-phone-screen small{position:relative;z-index:1}.np-app-phone-screen b{font-size:10px;letter-spacing:.16em;color:var(--accent-bright)}.np-app-phone-screen strong{font-size:68px;line-height:.8;letter-spacing:-.08em;margin:18px 0}.np-app-phone-screen small{font-size:8px;letter-spacing:.12em;color:#c4cbc6}
+@media (max-width:767px){.np-app-section{margin:0 -18px;padding:56px 18px 68px;grid-template-columns:1fr;gap:20px}.np-app-art{order:-1;min-height:300px}.np-app-phone{width:min(230px,62vw);transform:rotate(4deg)}.np-app-copy h3{font-size:clamp(54px,16vw,84px)}.np-app-copy p{font-size:14px}.np-app-note{font-size:9px}}
+
+
+/* ============================================================
+   V72 — VISUAL / NAV / TOURNAMENT FIXES
+   ============================================================ */
+html{scroll-behavior:auto}
+body{overflow-x:hidden}
+
+/* Every top-level module behaves as a real page, not as a continuation of Home. */
+#view-ranking,#view-torneos,#view-torneo-resultados,#view-torneo-info,#view-torneo-inscripcion,#view-mi-inscripcion,#view-mi-disponibilidad-torneo,#view-perfil-jugador,#view-perfil,#view-jugar,#view-admin{
+  scroll-margin-top:0;
+}
+
+/* Keep hero photography recognizable: cover blur fills the canvas while the actual
+   photo keeps its complete aspect ratio in the foreground. */
+.np-hero-bg{background-size:cover!important;}
+.np-hero-bg::after,.np-event-inside-art::before{
+  content:"";position:absolute;inset:0;z-index:-1;
+}
+.np-hero-bg::after{
+  background:inherit;filter:blur(22px) saturate(.72);transform:scale(1.06);opacity:.44;
+}
+.np-hero-bg{isolation:isolate;background-position:center!important;background-color:#07100d!important;}
+
+/* Main event image: complete foreground + dark immersive fill. */
+.np-event-inside-art{background-color:#07100d!important;background-image:linear-gradient(90deg,rgba(5,7,9,.84),rgba(5,7,9,.1) 58%,rgba(5,7,9,.72)),url('padel-action-02.webp')!important;background-size:cover!important;background-position:center!important;}
+.np-event-inside-art::before{background-image:url('padel-action-02.webp');background-size:contain;background-repeat:no-repeat;background-position:center;filter:saturate(1.02);opacity:.93;z-index:0;}
+.np-event-inside-art::after{z-index:1!important;}
+.np-event-inside-copy,.np-event-inside-number{z-index:3!important;}
+
+/* Sponsor wall: no white cards. The logo floats on the same dark stage. */
+.np-sponsors-section .sponsor-strip a,.np-sponsors-section .sponsor-strip span.sponsor-item,
+.np-event-sponsor-stage .sponsor-item{
+  background:#050709!important;border:1px solid rgba(255,255,255,.09)!important;border-radius:0!important;
+  box-shadow:none!important;
+}
+.np-sponsors-section .sponsor-strip img,.np-event-sponsor-stage .sponsor-strip img{
+  height:88px!important;max-width:250px!important;object-fit:contain!important;
+}
+.np-sponsors-section .sponsor-strip a:hover,.np-sponsors-section .sponsor-strip span.sponsor-item:hover,
+.np-event-sponsor-stage .sponsor-item:hover{border-color:rgba(121,240,74,.4)!important;background:#080b0a!important;}
+
+/* Tournament interior is a real competition page, not a blank split layout. */
+.np-event-results{width:min(var(--np-max),calc(100vw - 48px));margin:0 auto;padding:78px 0 110px;}
+.np-event-results .np-section-head{border-bottom:1px solid var(--np-line);padding-bottom:22px;margin-bottom:0;display:flex;align-items:end;justify-content:space-between;gap:20px}
+.np-event-results .np-section-head h3{font:900 clamp(46px,6vw,86px)/.82 var(--np-display);letter-spacing:-.055em;color:var(--np-text);margin:8px 0 0;text-transform:uppercase}
+.np-section-note{font:700 9px/1.4 var(--np-ui);letter-spacing:.14em;color:var(--np-muted);text-transform:uppercase;text-align:right}
+.np-competition-state{border-bottom:1px solid var(--np-line);padding:28px 0 30px}
+.np-competition-state-head{display:flex;align-items:flex-end;justify-content:space-between;gap:24px}
+.np-competition-state h4{font:900 clamp(28px,3.5vw,54px)/.86 var(--np-display);letter-spacing:-.045em;text-transform:uppercase;margin:8px 0 0;color:var(--np-text)}
+.np-competition-state-badge{font:800 8px/1 var(--np-ui);letter-spacing:.13em;color:#88958e;border:1px solid var(--np-line-strong);padding:9px 10px;text-transform:uppercase}
+.np-competition-state-badge.is-live{color:var(--np-accent);border-color:rgba(121,240,74,.34)}
+.np-competition-state>p{max-width:720px;color:#9eaaa3;font-size:13px;line-height:1.65;margin:12px 0 24px}
+.np-competition-metrics{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--np-line)}
+.np-competition-metrics>div{padding:22px 18px;border-right:1px solid var(--np-line)}
+.np-competition-metrics>div:last-child{border-right:0}
+.np-competition-metrics strong{display:block;font:900 clamp(30px,4vw,56px)/.85 var(--np-display);color:var(--np-text)}
+.np-competition-metrics span{display:block;margin-top:8px;font:800 8px/1 var(--np-ui);letter-spacing:.12em;color:var(--np-muted)}
+
+/* Results block gets a strong publication rhythm. */
+#pubResultadosLlave{padding-top:26px}
+#pubResultadosLlave .llave-partido{border-radius:0!important;border-left:0!important;border-right:0!important;border-top:0!important;background:transparent!important;box-shadow:none!important;padding:20px 0!important}
+#pubResultadosLlave .llave-partido:hover{background:rgba(121,240,74,.025)!important}
+
+@media(max-width:959px){
+  .np-sponsors-section .sponsor-strip img,.np-event-sponsor-stage .sponsor-strip img{height:70px!important;max-width:180px!important}
+  .np-event-results{width:calc(100vw - 28px);padding:54px 0 85px}
+  .np-event-results .np-section-head{align-items:start}
+  .np-event-results .np-section-head h3{font-size:56px}
+  .np-section-note{text-align:left;max-width:160px}
+  .np-competition-state-head{align-items:start;flex-direction:column}
+  .np-competition-metrics{grid-template-columns:1fr 1fr}
+  .np-competition-metrics>div{border-bottom:1px solid var(--np-line)}
+  .np-competition-metrics>div:nth-child(2){border-right:0}
+  .np-competition-metrics>div:nth-child(3){border-bottom:0}
+  .np-competition-metrics>div:nth-child(4){border-right:0;border-bottom:0}
+}
+
+
+/* V72 — contained photography for event art without letterbox dead zones. */
+.np-event-art{background-color:#07100d!important;position:absolute!important;overflow:hidden}
+.np-event-art::before{content:"";position:absolute;inset:-2%;background:inherit;filter:blur(24px) saturate(.68);transform:scale(1.08);opacity:.42;z-index:-1}
+.np-event-art::after{content:"";position:absolute;inset:0;background-image:url('norte-editorial-02.webp');background-repeat:no-repeat;background-size:contain;background-position:center;opacity:.88;z-index:0}
+.np-event-overlay{z-index:2!important}
+@media(max-width:959px){.np-event-art::after{background-position:center center}.np-event-art{min-height:100%}}

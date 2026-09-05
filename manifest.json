@@ -2,7 +2,7 @@
   "name": "Norte Padel",
   "short_name": "Norte Padel",
   "description": "Ranking, torneos y resultados en vivo de Norte Padel",
-  "start_url": "./index.html",
+  "start_url": "./index.html#/",
   "scope": "./",
   "display": "standalone",
   "background_color": "#05080A",
