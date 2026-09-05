@@ -1,0 +1,242 @@
+/* NORTE PADEL V84 — MOBILE APP SYSTEM
+   Mobile is treated as a first-class app surface, not a shrunken desktop page. */
+:root{
+  --np-app-bg:#05080a;
+  --np-app-surface:#0b1110;
+  --np-app-surface-2:#0f1714;
+  --np-app-line:rgba(220,235,228,.11);
+  --np-app-line-strong:rgba(220,235,228,.18);
+  --np-app-green:#7cf63e;
+  --np-app-text:#f5f8f6;
+  --np-app-muted:#8a9690;
+  --np-app-header:66px;
+  --np-app-nav:74px;
+}
+
+/* Always keep the mobile controls hidden on desktop. */
+.np-mobile-appbar,.np-mobile-bottom,.np-mobile-sheet-backdrop,.np-mobile-sheet{display:none}
+
+@media (max-width: 768px){
+  html{background:var(--np-app-bg);overscroll-behavior-y:none}
+  body{
+    min-width:0!important;
+    width:100%!important;
+    max-width:100%!important;
+    overflow-x:hidden!important;
+    background:
+      radial-gradient(circle at 90% 0%,rgba(124,246,62,.08),transparent 30%),
+      var(--np-app-bg)!important;
+    padding-bottom:calc(var(--np-app-nav) + env(safe-area-inset-bottom) + 12px)!important;
+  }
+  body::before{display:none!important}
+
+  /* Replace the desktop-like header with a compact native-app top bar. */
+  .np-site-header{display:none!important}
+  .np-nav{display:none!important}
+  .app-body{padding:0!important;width:100%!important;max-width:100%!important}
+  main{width:100%!important;max-width:none!important;margin:0!important;padding:0!important}
+  .view{width:100%!important;max-width:none!important;margin:0!important}
+
+  .np-mobile-appbar{
+    display:flex!important;
+    position:fixed;
+    top:0;left:0;right:0;
+    z-index:1000;
+    height:calc(var(--np-app-header) + env(safe-area-inset-top));
+    padding:env(safe-area-inset-top) 14px 0;
+    align-items:center;
+    justify-content:space-between;
+    background:rgba(5,8,10,.90);
+    border-bottom:1px solid var(--np-app-line);
+    backdrop-filter:blur(18px) saturate(1.05);
+    -webkit-backdrop-filter:blur(18px) saturate(1.05);
+  }
+  .np-mobile-brand{display:flex;align-items:center;gap:10px;min-width:0}
+  .np-mobile-mark{width:34px;height:34px;border:1px solid rgba(124,246,62,.55);border-radius:50%;overflow:hidden;flex:none;background:#07100c}
+  .np-mobile-mark img{width:100%;height:100%;object-fit:contain}
+  .np-mobile-wordmark{display:flex;flex-direction:column;line-height:1}
+  .np-mobile-wordmark b{font:900 15px/1 Manrope,system-ui,sans-serif;letter-spacing:.11em;color:var(--np-app-text)}
+  .np-mobile-wordmark b span{color:var(--np-app-green)}
+  .np-mobile-wordmark small{margin-top:4px;font:700 7px/1 Manrope,system-ui,sans-serif;letter-spacing:.22em;color:var(--np-app-muted)}
+  .np-mobile-actions{display:flex;align-items:center;gap:7px}
+  .np-mobile-action{
+    width:40px;height:40px;border-radius:50%;
+    border:1px solid var(--np-app-line);
+    background:rgba(255,255,255,.02);
+    color:var(--np-app-text);
+    display:grid;place-items:center;
+    padding:0;
+  }
+  .np-mobile-action svg{width:18px;height:18px}
+  .np-mobile-action .np-mobile-user-dot{width:24px;height:24px;border-radius:50%;background:var(--np-app-surface-2);display:grid;place-items:center;overflow:hidden}
+  .np-mobile-action .np-mobile-user-dot img{width:100%;height:100%;object-fit:cover}
+  .np-mobile-live{position:absolute;left:50%;transform:translateX(-50%);top:calc(env(safe-area-inset-top) + 8px);font:800 8px/1 Manrope,system-ui,sans-serif;letter-spacing:.24em;color:#a5b0aa;white-space:nowrap;text-transform:uppercase}
+  .np-mobile-live i{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--np-app-green);box-shadow:0 0 12px rgba(124,246,62,.6);margin-right:5px;vertical-align:1px}
+
+  /* App content starts below the safe top bar. */
+  .np-home,.np-view{padding-top:calc(var(--np-app-header) + env(safe-area-inset-top) + 12px)!important;padding-bottom:26px!important}
+  .np-home > :first-child,.np-view > :first-child{margin-top:0!important}
+
+  /* Fixed bottom app navigation */
+  .np-mobile-bottom{
+    display:grid!important;
+    position:fixed;
+    left:10px;right:10px;
+    bottom:calc(8px + env(safe-area-inset-bottom));
+    z-index:1100;
+    grid-template-columns:repeat(4,1fr);
+    gap:4px;
+    padding:6px;
+    border:1px solid rgba(220,235,228,.12);
+    border-radius:22px;
+    background:rgba(8,12,11,.94);
+    box-shadow:0 18px 50px rgba(0,0,0,.45),0 1px 0 rgba(255,255,255,.04) inset;
+    backdrop-filter:blur(20px) saturate(1.1);
+    -webkit-backdrop-filter:blur(20px) saturate(1.1);
+  }
+  .np-mobile-tab{
+    min-width:0;min-height:58px;
+    border:0;border-radius:17px;
+    background:transparent;color:#8e9892;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;
+    font:800 8px/1 Manrope,system-ui,sans-serif;letter-spacing:.14em;text-transform:uppercase;
+    padding:7px 4px;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .np-mobile-tab svg{width:19px;height:19px;stroke-width:1.8}
+  .np-mobile-tab.active{background:rgba(124,246,62,.10);color:var(--np-app-text)}
+  .np-mobile-tab.active svg{color:var(--np-app-green)}
+  .np-mobile-tab:active{transform:scale(.97)}
+
+  /* Native-style sheets for account/config. */
+  .np-mobile-sheet-backdrop{display:block;position:fixed;inset:0;z-index:1400;background:rgba(0,0,0,.58);opacity:0;pointer-events:none;transition:opacity .22s ease}
+  .np-mobile-sheet{display:block;position:fixed;left:10px;right:10px;bottom:calc(10px + env(safe-area-inset-bottom));z-index:1410;transform:translateY(110%);transition:transform .25s cubic-bezier(.22,.8,.24,1);background:#0a100e;border:1px solid var(--np-app-line);border-radius:24px;padding:12px;box-shadow:0 30px 80px rgba(0,0,0,.55)}
+  .np-mobile-sheet.open{transform:translateY(0)}
+  .np-mobile-sheet-backdrop.open{opacity:1;pointer-events:auto}
+  .np-mobile-sheet-head{display:flex;align-items:center;justify-content:space-between;padding:10px 8px 12px}
+  .np-mobile-sheet-head strong{font:900 14px/1 Manrope,sans-serif;letter-spacing:.08em;text-transform:uppercase}
+  .np-mobile-sheet-close{width:34px;height:34px;border-radius:50%;border:1px solid var(--np-app-line);background:transparent;color:#fff}
+  .np-mobile-sheet-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .np-mobile-sheet-btn{min-height:58px;border:1px solid var(--np-app-line);border-radius:16px;background:#0d1512;color:#fff;text-align:left;padding:12px}
+  .np-mobile-sheet-btn b{display:block;font:800 11px/1.1 Manrope,sans-serif;letter-spacing:.06em;text-transform:uppercase}
+  .np-mobile-sheet-btn span{display:block;margin-top:6px;color:#7f8b84;font:600 10px/1.2 Manrope,sans-serif}
+
+  /* App-like home hierarchy */
+  #view-inicio .np-hero{
+    min-height:calc(100svh - var(--np-app-header) - env(safe-area-inset-top) - 10px)!important;
+    height:auto!important;
+    border-radius:0 0 24px 24px;
+    overflow:hidden;
+    margin:0!important;
+  }
+  #view-inicio .np-hero-copy{padding:24px 18px 28px!important;max-width:100%!important}
+  #view-inicio .np-hero-title{font-size:clamp(54px,18vw,92px)!important;line-height:.82!important;letter-spacing:-.07em!important}
+  #view-inicio .np-hero-sub{max-width:290px;font-size:12px!important;line-height:1.45!important}
+  #view-inicio .np-hero-feature-image{inset:0!important;opacity:.78!important;background-position:center!important}
+  #view-inicio .np-hero-bottom{bottom:12px!important;left:16px!important;right:16px!important;font-size:7px!important;letter-spacing:.13em!important}
+  #view-inicio .np-hero-side{display:none!important}
+  #view-inicio .np-hero-cta-row{gap:8px!important}
+  #view-inicio .np-hero-cta-row .np-cta-main{min-height:46px!important;padding:0 16px!important}
+
+  /* Each major section gets an app surface, not a desktop canvas. */
+  .np-section,.np-feature-breaker,.np-split-story,.np-app-section,.np-sponsors-section,#view-inicio .np-player-of-month-band{
+    width:calc(100% - 20px)!important;
+    max-width:none!important;
+    margin-left:auto!important;margin-right:auto!important;
+  }
+  .np-section{margin-top:28px!important;margin-bottom:28px!important}
+  .np-section-head{align-items:end!important;gap:12px!important;margin-bottom:12px!important}
+  .np-section-head h3{font-size:clamp(30px,10vw,48px)!important;line-height:.9!important}
+  .np-section-index{font-size:7px!important;letter-spacing:.18em!important;white-space:nowrap}
+
+  /* One match per screen, app carousel feel. */
+  #inicioProximosGrid.np-match-rail>.np-match-banner{border-radius:22px!important;overflow:hidden!important}
+  #inicioProximosGrid.np-match-rail{scroll-padding:0!important}
+  .np-match-rail-controls{margin-top:10px!important}
+  .np-rail-arrow{width:42px!important;height:42px!important;border-radius:14px!important}
+
+  /* Results stack as tap targets. */
+  #inicioResultadosGrid.np-results-grid{grid-template-columns:1fr!important;gap:10px!important}
+  #inicioResultadosGrid .np-result-item{border-radius:18px!important}
+
+  /* Player of month: preserve the photo, never chop the face. */
+  #view-inicio .np-player-of-month-band{margin-top:44px!important;margin-bottom:44px!important;border:0!important;background:transparent!important}
+  #view-inicio .np-player-of-month-band .destacados-overline{padding:0 6px 12px!important}
+  #view-inicio .np-player-of-month-band .destacado-card{min-height:520px!important;background-size:contain!important;background-repeat:no-repeat!important;background-position:center top!important;background-color:#0a0f0d!important;border-radius:22px!important}
+  #view-inicio .np-player-of-month-band .destacado-card::before{background:linear-gradient(180deg,rgba(5,7,8,0) 18%,rgba(5,7,8,.05) 45%,rgba(5,7,8,.96) 100%)!important}
+  #view-inicio .np-player-of-month-band .destacado-info{padding:0 18px 18px!important}
+
+  /* Full-width sponsor carousel */
+  #view-inicio .np-sponsors-section{overflow:hidden!important}
+  #view-inicio .np-sponsors-section .sponsor-strip{border-radius:18px!important;overflow:hidden!important}
+  .np-sponsors-section .sponsor-strip a,.np-sponsors-section .sponsor-strip span.sponsor-item{min-height:118px!important;flex-basis:170px!important;padding:12px!important}
+  .np-sponsors-section .sponsor-strip img{max-width:140px!important;max-height:70px!important}
+
+  /* Tournament / ranking pages */
+  .np-page-hero{width:calc(100% - 20px)!important;margin:0 auto 14px!important;min-height:210px!important;padding:18px!important;border-radius:22px!important;overflow:hidden}
+  .np-page-hero .np-display{font-size:clamp(54px,18vw,88px)!important}
+  .np-page-number{font-size:72px!important;opacity:.18!important}
+  .np-toolbar{width:calc(100% - 20px)!important;margin:0 auto!important;display:flex!important;gap:8px!important;overflow:auto!important}
+  .np-toolbar>*{white-space:nowrap}
+  .np-tournament-list{width:calc(100% - 20px)!important;margin:14px auto!important}
+  .np-tournament-list .torneo-card{border-radius:20px!important}
+
+  /* Ranking: mobile app rows with avatar-first hierarchy. */
+  #view-ranking .np-ranking-view,.np-ranking-view{padding-top:calc(var(--np-app-header) + env(safe-area-inset-top) + 12px)!important}
+  #view-ranking .np-ranking-filters{position:sticky!important;top:calc(var(--np-app-header) + env(safe-area-inset-top))!important;z-index:20;background:rgba(5,8,10,.88);padding:6px 10px 10px;margin:0 -0px 10px!important;backdrop-filter:blur(12px)}
+  #view-ranking .np-ranking-stage{width:calc(100% - 20px)!important;margin:0 auto!important}
+  #view-ranking #tablaRanking tbody tr{grid-template-columns:52px minmax(0,1fr) 88px!important;min-height:82px!important;border-radius:18px!important;background:#0b1110!important;margin-bottom:8px!important;transform:none!important}
+  #view-ranking #tablaRanking tbody tr:hover{transform:none!important}
+  #view-ranking #tablaRanking td{padding:0 8px!important}
+  #view-ranking #tablaRanking td:first-child{font-size:36px!important}
+  #view-ranking #tablaRanking td:nth-child(2)>div{gap:10px!important}
+  #view-ranking #tablaRanking td:nth-child(2) .avatar-wrap,#view-ranking #tablaRanking td:nth-child(2) .avatar{width:48px!important;height:48px!important;flex-basis:48px!important}
+  #view-ranking #tablaRanking td:nth-child(2) > div > span{font-size:14px!important;line-height:1!important}
+  #view-ranking #tablaRanking td:nth-child(3){font-size:25px!important}
+
+  /* Tournament event: compact sticky context tabs. */
+  #torneoContextBar{position:sticky!important;top:calc(var(--np-app-header) + env(safe-area-inset-top))!important;z-index:40!important;background:rgba(5,8,10,.92)!important;backdrop-filter:blur(14px);padding:6px 10px!important;border-bottom:1px solid var(--np-app-line)!important}
+  .np-event-hero{width:calc(100% - 20px)!important;margin:0 auto 10px!important;min-height:280px!important;border-radius:22px!important;overflow:hidden!important}
+  .np-event-actionbar,.np-event-results,.np-event-info-view,.np-join-view,.np-status-view,.np-availability-view,.np-player-view,.np-profile-shell{width:calc(100% - 20px)!important;margin-left:auto!important;margin-right:auto!important}
+  .np-event-actionbar{border-radius:18px!important}
+
+  /* Order of play becomes a real mobile agenda. */
+  #admSeccionPartidos .np-order-board{overflow-x:auto!important;border-radius:18px!important;-webkit-overflow-scrolling:touch!important}
+  #admSeccionPartidos .np-order-board-head,#admSeccionPartidos .np-order-row{min-width:calc(76px + var(--calendario-cols)*178px)!important;grid-template-columns:76px repeat(var(--calendario-cols),minmax(178px,1fr))!important}
+  #admSeccionPartidos .np-order-cell{min-height:132px!important}
+
+  /* Forms become thumb-friendly */
+  input,select,textarea,button{font-size:16px!important}
+  button,.np-cta,.secondary,.primary,.link-btn{min-height:44px}
+  .row{display:grid!important;grid-template-columns:1fr!important;gap:10px!important}
+
+  /* Keep huge editorial text from creating horizontal overflow. */
+  .np-display,.np-hero-title,.np-feature-breaker h3,.np-split-story h3{max-width:100%!important;overflow-wrap:anywhere!important}
+  img{max-width:100%;height:auto}
+
+  /* Reduce decorative fixed canvases on mobile. */
+  .np-feature-breaker,.np-split-story{min-height:420px!important;border-radius:22px!important;overflow:hidden!important}
+  .np-feature-breaker{grid-template-columns:1fr!important}
+  .np-feature-breaker .np-feature-number{display:none!important}
+  .np-feature-copy{padding:18px!important;align-self:end!important}
+  .np-split-story{grid-template-columns:1fr!important}
+  .np-split-story .np-story-image{min-height:260px!important;order:-1}
+  .np-split-story .np-story-copy{padding:20px!important}
+
+  /* Notifications / overlays fill like native sheets. */
+  .overlay-bloqueante{padding:0!important;align-items:flex-end!important}
+  .overlay-bloqueante > .card{width:100%!important;max-width:none!important;max-height:88dvh!important;border-radius:24px 24px 0 0!important;margin:0!important;border-bottom:0!important}
+
+  /* Desktop-only decorative / duplicate elements should not reserve space. */
+  #heroCarousel,.np-legacy-carousel,#inicioProximoDestacadoWrap{display:none!important}
+}
+
+@media (max-width:390px){
+  .np-mobile-wordmark b{font-size:14px}
+  .np-mobile-tab{font-size:7px}
+  #view-ranking #tablaRanking tbody tr{grid-template-columns:46px minmax(0,1fr) 80px!important}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .np-mobile-tab,.np-mobile-sheet,.np-mobile-sheet-backdrop{transition:none!important}
+}

@@ -1,0 +1,240 @@
+// ============================================================
+// NORTE PADEL — lógica de la app (vanilla JS, sin frameworks)
+// ============================================================
+
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const DIAS = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+const DIAS_CORTO = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
+
+// ---------- estado ----------
+let currentUser = null;   // usuario de Supabase Auth, o null si no hay sesión
+let miJugador = null;     // fila de "jugadores" ligada al usuario logueado
+let isAdmin = false;
+let editandoPerfil = false;
+let torneoActualId = null;
+let torneoActualData = null; // torneo completo cargado en refrescarDetalleTorneo, para prefill de "Editar torneo"
+let yaInscriptoEnTorneoActual = false; // lo setea actualizarAccesoInscripcion — evita volver a mostrar el wizard de inscripción si se llega por un link directo o "Atrás" del navegador estando ya anotado
+let categoriaRankingActual = localStorage.getItem("np_categoria_ranking") || null;
+let cacheComplejos = [];
+let cacheCanchas = [];
+let cacheJugadoresAdmin = [];
+let cacheCategorias = [];
+let cacheEtiquetas = []; // etiquetas_jugador — uso interno del admin, con color
+let cacheRankingCategoriaAdmin = {}; // jugador_id -> [{categoria, puntos_ranking, partidos_jugados, partidos_ganados}], para el bloque "categorías de ranking" del admin
+let cacheTorneos = [];
+let torneoDestacadoId = null; // el torneo en curso o el próximo; a donde lleva la banda "Inscribite ya" de Inicio
+let ultimosPartidos = [];
+// true si alguna categoría del torneo abierto ya tiene calendario (cancha+horario
+// asignados) o terminó — fuente de verdad para mostrar Calendario/Resultados
+// (ver renderTorneoSubnav), en vez de "hay partidos" que también es cierto para
+// un fixture recién armado y todavía sin horario.
+let hayCalendarioTorneoActual = false;
+let ultimasCanchasTorneo = [];
+let partidosCategoriaFiltro = ""; // "" = todas las categorías del torneo
+let configApp = {}; // clave/valor de la tabla "config" (whatsapp_numero, instagram_url)
+
+// ---------- cache liviano de lecturas públicas ----------
+// Evita repetir las mismas consultas en el arranque (Inicio + Torneos +
+// auth callback) y permite que el UI filtre/ordene en memoria sin volver a
+// golpear Supabase. Las mutaciones invalidan explícitamente el cache.
+let torneosCacheLoaded = false;
+let torneosRequest = null;
+let rankingPublicoCache = null;
+let rankingPublicoRequest = null;
+
+function fechaLocalISO(date = new Date()) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
+async function obtenerTorneosCache(force = false) {
+  if (!force && torneosCacheLoaded) return cacheTorneos;
+  if (!force && torneosRequest) return torneosRequest;
+  torneosRequest = sb.from("torneos")
+    .select("id,nombre,complejo_id,fecha_inicio,fecha_fin,flyer_url,costo,duracion_minutos,dias_semana,hora_desde,hora_hasta,horarios_por_dia,fase_grupos_formato,tamano_grupo,avanzan_por_grupo,estado,complejos(nombre,direccion),torneo_categorias(categoria,estado_fase)")
+    .order("fecha_inicio", { ascending: false })
+    .then(({ data }) => {
+      cacheTorneos = data || [];
+      torneosCacheLoaded = true;
+      return cacheTorneos;
+    })
+    .finally(() => { torneosRequest = null; });
+  return torneosRequest;
+}
+
+function invalidarCacheTorneos() {
+  torneosCacheLoaded = false;
+  torneosRequest = null;
+}
+
+async function obtenerRankingPublico(force = false) {
+  if (!force && rankingPublicoCache) return rankingPublicoCache;
+  if (!force && rankingPublicoRequest) return rankingPublicoRequest;
+  rankingPublicoRequest = sb.rpc("ranking_categoria_publico")
+    .then(({ data }) => {
+      rankingPublicoCache = data || [];
+      return rankingPublicoCache;
+    })
+    .finally(() => { rankingPublicoRequest = null; });
+  return rankingPublicoRequest;
+}
+
+function invalidarCacheRanking() { rankingPublicoCache = null; }
+
+// "Jugar" (reservar cancha) está armado pero pausado hasta cerrar el acuerdo con el club
+// y activar el botón en index.html — mientras tanto no se llama a sus funciones para no
+// pegarle a tablas/RPCs que todavía no se corrieron en la base de producción.
+const FEATURE_JUGAR_HABILITADA = false;
+
+// ---------- utilidades UI ----------
+function toast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.style.display = "block";
+  clearTimeout(toast._h);
+  toast._h = setTimeout(() => (t.style.display = "none"), 3500);
+}
+
+// ============================================================
+// ROUTER — hash liviano sobre el mismo mecanismo .view/.active de siempre.
+// Sin librerías ni build step: el hosting es estático sin reglas de rewrite,
+// así que el hash (#/torneo/xyz) es la única forma de tener enlaces
+// compartibles + F5 sin romper + atrás/adelante del navegador, gratis.
+// `cambiarVista` sigue funcionando exactamente igual para quien la llama
+// solo con el nombre — el segundo parámetro (ruta) es opcional.
+// ============================================================
+let syncingDesdeHash = false; // evita el loop cambiarVista → navegarA → hashchange → enrutar → cambiarVista
+
+// Pantallas Público/Jugador de UN torneo (todas viven bajo la misma barra de
+// contexto — ver #torneoContextBar en index.html). Es la única tabla que
+// mapea ruta -> vista para estas pantallas, así abrirTorneo y el mini-nav
+// del torneo nunca se desincronizan entre sí.
+// "" (Torneo) es la pantalla que ve la gente apenas entra: hero + inscripción
+// (si está abierta) + categoría/etapa + partidos, todo junto — antes eran 3
+// pestañas (Inicio/Calendario/Resultados) que mostraban casi lo mismo.
+// "info" junta lo que antes eran Categorías + Jugadores + datos de sede.
+const PANTALLAS_TORNEO = {
+  "": { view: "torneo-resultados", label: "Torneo" },
+  info: { view: "torneo-info", label: "Info" }
+};
+// estas no van en el mini-nav (se llega a ellas desde un botón puntual, no
+// como una pestaña más) pero también son "pantallas de torneo" a los
+// efectos de mostrar/ocultar la barra de contexto
+const PANTALLAS_TORNEO_EXTRA = {
+  inscripcion: "torneo-inscripcion",
+  "mi-inscripcion": "mi-inscripcion",
+  "mi-disponibilidad": "mi-disponibilidad-torneo"
+};
+const VISTAS_DE_TORNEO = new Set([
+  ...Object.values(PANTALLAS_TORNEO).map((p) => p.view),
+  ...Object.values(PANTALLAS_TORNEO_EXTRA)
+]);
+
+let adminFocoTorneoActivo = false; // true mientras se administra UN torneo puntual (ver cambiarVista)
+function cambiarVista(nombre, ruta) {
+  document.querySelectorAll(".view").forEach((v) => v.classList.remove("active"));
+  document.querySelectorAll(".tab").forEach((b) => b.classList.remove("active"));
+  const view = document.getElementById("view-" + nombre);
+  if (view) view.classList.add("active");
+  const tab = document.querySelector(`.tab[data-view="${nombre}"]`);
+  if (tab) tab.classList.add("active");
+  // la barra de contexto de un torneo (nombre, estado, mini-nav) persiste
+  // arriba de cualquiera de sus 8 pantallas, y se oculta en cualquier otra
+  document.getElementById("torneoContextBar").style.display = VISTAS_DE_TORNEO.has(nombre) ? "block" : "none";
+  // entrar a Admin por la vía normal (tab Config / "Más") siempre muestra todo — el
+  // modo enfocado "solo este torneo" (adminFocoTorneoActivo) lo activa
+  // btnAdministrarEsteTorneo y lo apaga admBtnVolverConfigGeneral (ver más abajo en
+  // este archivo). Se chequea acá y no solo en esos dos handlers porque cambiar el
+  // hash a #/admin dispara además un "hashchange" que vuelve a llamar a
+  // cambiarVista("admin") por su cuenta (ver despacharRuta) — sin este chequeo,
+  // ese segundo llamado deshacía el modo enfocado apenas se activaba.
+  if (nombre === "admin" && !adminFocoTorneoActivo) {
+    if (adminPanelMode === "config") {
+      document.getElementById("admSelectorTorneoCard").style.display = "none";
+      document.getElementById("admGestionTorneoWrap").style.display = "none";
+      mostrarConfigGeneral(true);
+      document.getElementById("admBtnVolverConfigGeneral").style.display = "none";
+    } else {
+      document.getElementById("admSelectorTorneoCard").style.display = "block";
+      document.getElementById("admGestionTorneoWrap").style.display = "none";
+      mostrarConfigGeneral(false);
+      document.getElementById("admBtnVolverConfigGeneral").style.display = "none";
+    }
+  } else if (nombre !== "admin") {
+    adminFocoTorneoActivo = false;
+  }
+  if (!syncingDesdeHash) navegarA(ruta || (nombre === "inicio" ? "/" : "/" + nombre));
+  // Cada vista pública es una pantalla propia: al cambiar de módulo siempre
+  // arrancamos arriba, en lugar de heredar la posición de scroll de la vista anterior.
+  requestAnimationFrame(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  });
+}
+
+// Prende/apaga TODA la configuración general del club de una sola vez —
+// admConfigGeneralWrap (cfg general, complejos, categorías...) y
+// admConfigGeneralWrap2 (noticias, jugadores registrados) son dos wraps
+// separados por HTML solo porque "Auspiciantes" (auspiciantesWrap) quedó
+// en el medio de los dos para poder mostrarse solo, sin el resto, desde el
+// atajo de "Administrar este torneo" — ver btnAuspiciantesTorneo más abajo.
+function mostrarConfigGeneral(visible) {
+  document.getElementById("admConfigGeneralWrap").style.display = visible ? "block" : "none";
+  document.getElementById("admConfigGeneralWrap2").style.display = visible ? "block" : "none";
+  document.getElementById("auspiciantesWrap").style.display = visible ? "block" : "none";
+  document.getElementById("btnCerrarAuspiciantesTorneo").style.display = "none";
+}
+
+
+let adminPanelMode = "ops"; // ops | config
+function setAdminPanelMode(mode){
+  adminPanelMode = mode === "config" ? "config" : "ops";
+  const selector = document.getElementById("admSelectorTorneoCard");
+  const gestion = document.getElementById("admGestionTorneoWrap");
+  const modeTitle = document.getElementById("npAdminModeTitle");
+  const modeSub = document.getElementById("npAdminModeSub");
+  const topBtn = document.getElementById("btnConfigTop");
+  const goConfig = document.getElementById("btnAdminIrConfig");
+  if (selector) selector.style.display = adminPanelMode === "ops" && !adminFocoTorneoActivo ? "block" : "none";
+  if (gestion) gestion.style.display = adminPanelMode === "config" ? "none" : (gestion.style.display === "block" || adminFocoTorneoActivo ? "block" : gestion.style.display);
+  mostrarConfigGeneral(adminPanelMode === "config");
+  if (modeTitle) modeTitle.textContent = adminPanelMode === "config" ? "CONFIGURATION" : "TOURNAMENT OPS";
+  if (modeSub) modeSub.textContent = adminPanelMode === "config" ? "Configuración general del club. Todo lo permanente, separado de la operación de un torneo." : "Organizá la competencia, horarios, canchas y resultados desde un solo centro operativo.";
+  if (goConfig) goConfig.textContent = adminPanelMode === "config" ? "VOLVER A TORNEOS" : "CONFIGURACIÓN";
+  if (topBtn) topBtn.classList.toggle("active", adminPanelMode === "config");
+}
+
+function navegarA(ruta) {
+  if ((location.hash.slice(1) || "/") === ruta) return;
+  location.hash = ruta;
+}
+
+function parsearHash() {
+  const cruda = (location.hash || "#/").slice(1) || "/";
+  const [ruta, query] = cruda.split("?");
+  return { segmentos: ruta.split("/").filter(Boolean), params: new URLSearchParams(query || "") };
+}
+
+// despacha la ruta actual a la pantalla correspondiente, reutilizando las
+// mismas funciones que ya usan los botones/clicks de siempre (abrirTorneo,
+// abrirPerfilJugador, cambiarVista) — el router no duplica ninguna lógica.
+async function despacharRuta() {
+  const { segmentos: seg } = parsearHash();
+  const [raiz, a, sub] = seg;
+  syncingDesdeHash = true;
+  try {
+    if (!raiz) { cambiarVista("inicio"); return; }
+    if (raiz === "torneos") { cambiarVista("torneos"); return; }
+    if (raiz === "ranking") { cambiarVista("ranking"); return; }
+    if (raiz === "perfil") { cambiarVista("perfil"); return; }
+    if (raiz === "jugar" && FEATURE_JUGAR_HABILITADA) { cambiarVista("jugar"); return; }
+    if (raiz === "admin") {
+      if (!isAdmin) { cambiarVista("inicio"); return; }
+      adminFocoTorneoActivo = false;
+      cambiarVista("admin");
+      setAdminPanelMode("ops");
+      return;
