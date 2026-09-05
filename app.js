@@ -972,39 +972,59 @@ async function cargarUltimosProximos() {
   const { data } = await sb.rpc("partidos_publicos", { p_torneo_id: idTorneo });
   const partidos = data || [];
   const ahora = new Date();
-
   const jugados = partidos.filter((p) => p.estado === "jugado" && p.horario)
     .sort((a, b) => new Date(b.horario) - new Date(a.horario)).slice(0, 3);
   const proximos = partidos.filter((p) => p.horario && p.estado !== "jugado" && new Date(p.horario) >= ahora)
     .sort((a, b) => new Date(a.horario) - new Date(b.horario)).slice(0, 3);
 
-  // "resultados" y "calendario" ya no son pantallas separadas — las dos tarjetas
-  // llevan a la misma pantalla única de Torneo ("").
   renderInicioPartidosGrid("inicioResultadosWrap", "inicioResultadosGrid", jugados, () => abrirTorneo(idTorneo, ""));
-  renderInicioPartidosGrid("inicioProximosWrap", "inicioProximosGrid", proximos, () => abrirTorneo(idTorneo, ""));
-
-  // "Próximo partido destacado": el partido más próximo de
-  // este mismo array, reusando matchVsRowHtml (ya arma el VS con la foto de
-  // cada jugador) en vez de un componente nuevo.
-  renderProximoDestacado(proximos[0], idTorneo);
+  renderUpcomingMatchRail("inicioProximosWrap", "inicioProximosGrid", proximos, () => abrirTorneo(idTorneo, ""));
+  const legacy = document.getElementById("inicioProximoDestacadoWrap");
+  if (legacy) legacy.style.display = "none";
 }
 
-function renderProximoDestacado(p, idTorneo) {
-  const wrap = document.getElementById("inicioProximoDestacadoWrap");
-  if (!p) { wrap.style.display = "none"; return; }
-  const horario = p.horario
-    ? new Date(p.horario).toLocaleString("es-AR", { weekday: "long", day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })
-    : "Horario a definir";
-  const local = p.cancha_nombre ? `${p.complejo_nombre ? p.complejo_nombre + " · " : ""}${p.cancha_nombre}` : (p.complejo_nombre || "A definir");
-  const contenido = document.getElementById("inicioProximoDestacadoContenido");
-  contenido.innerHTML = `
-    <div class="match-pair-destacado" style="cursor:pointer">
-      ${matchVsRowHtml(p)}
-      <p class="match-meta">${p.categoria ? `${p.categoria} · ` : ""}${iconoCalendarioChico()} ${horario} · ${iconoPin()} ${local}</p>
-    </div>`;
-  contenido.querySelector(".match-pair-destacado").addEventListener("click", () => abrirTorneo(idTorneo, ""));
+function renderUpcomingMatchRail(wrapId, gridId, items, onClick) {
+  const wrap = document.getElementById(wrapId);
+  const rail = document.getElementById(gridId);
+  if (!wrap || !rail) return;
+  if (!items.length) { wrap.style.display = "none"; rail.innerHTML = ""; return; }
   wrap.style.display = "block";
+  const itemHtml = (p, idx) => {
+    const hora = p.horario ? new Date(p.horario).toLocaleString("es-AR", { weekday:"short", day:"2-digit", month:"short", hour:"2-digit", minute:"2-digit" }) : "Horario a definir";
+    const local = p.cancha_nombre ? `${p.complejo_nombre ? p.complejo_nombre + " · " : ""}${p.cancha_nombre}` : (p.complejo_nombre || "A definir");
+    const player = (n, a, foto) => `<div class="np-rail-player">${avatarHtml(foto, 72, "np-rail-avatar", true)}<span>${[n,a].filter(Boolean).join(" ") || "?"}</span></div>`;
+    return `<article class="np-match-banner" data-index="${idx}" tabindex="0" role="button" aria-label="Ver próximo partido">
+      <div class="np-banner-top"><span>0${idx+1} / NEXT MATCH</span><span>${p.categoria || "PADEL"}</span></div>
+      <div class="np-banner-main">
+        <div class="np-banner-team">${player(p.j1a_nombre,p.j1a_apellido,p.j1a_foto)}${player(p.j1b_nombre,p.j1b_apellido,p.j1b_foto)}</div>
+        <div class="np-banner-vs"><strong>VS</strong><small>${hora}</small><small>${local}</small></div>
+        <div class="np-banner-team right">${player(p.j2a_nombre,p.j2a_apellido,p.j2a_foto)}${player(p.j2b_nombre,p.j2b_apellido,p.j2b_foto)}</div>
+      </div>
+      <span class="np-banner-open">VER PARTIDO ↗</span>
+    </article>`;
+  };
+  rail.innerHTML = items.map(itemHtml).join("");
+  rail.querySelectorAll(".np-match-banner").forEach((el) => { el.addEventListener("click", onClick); el.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onClick(); } }); });
+  const dots = document.getElementById("npMatchRailDots");
+  if (dots) {
+    dots.innerHTML = items.map((_,i)=>`<button type="button" aria-label="Ir al partido ${i+1}" data-i="${i}"></button>`).join("");
+    dots.querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>rail.scrollTo({left:Number(b.dataset.i)*rail.clientWidth,behavior:"smooth"})));
+  }
+  const updateDots = () => { const active=Math.round(rail.scrollLeft/(rail.clientWidth||1)); dots?.querySelectorAll("button").forEach((b,i)=>b.classList.toggle("active",i===active)); };
+  rail.onscroll = () => requestAnimationFrame(updateDots); updateDots();
+  const prev = document.querySelector('.np-match-rail-controls [data-rail="prev"]');
+  const next = document.querySelector('.np-match-rail-controls [data-rail="next"]');
+  prev && (prev.onclick=()=>rail.scrollBy({left:-rail.clientWidth,behavior:'smooth'}));
+  next && (next.onclick=()=>rail.scrollBy({left:rail.clientWidth,behavior:'smooth'}));
+  if (rail.dataset.autoplayBound !== "1") {
+    rail.dataset.autoplayBound = "1";
+    let timer;
+    const start = () => { clearInterval(timer); if (items.length < 2 || matchMedia('(prefers-reduced-motion: reduce)').matches) return; timer=setInterval(()=>{ const nextIdx=(Math.round(rail.scrollLeft/(rail.clientWidth||1))+1)%items.length; rail.scrollTo({left:nextIdx*rail.clientWidth,behavior:'smooth'}); }, 5200); };
+    const stop = () => clearInterval(timer);
+    rail.addEventListener('mouseenter',stop); rail.addEventListener('mouseleave',start); wrap.addEventListener('focusin',stop); wrap.addEventListener('focusout',start); start();
+  }
 }
+
 window.matchMedia("(min-width: 960px)").addEventListener("change", () => cargarUltimosProximos());
 
 function renderInicioPartidosGrid(wrapId, gridId, items, onClick) {

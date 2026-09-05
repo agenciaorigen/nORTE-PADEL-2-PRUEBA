@@ -4471,3 +4471,108 @@ main{max-width:none!important;margin:0!important;padding:0!important}
   #view-admin{width:calc(100vw - 28px)!important;padding-top:80px!important;padding-bottom:90px}.np-profile-shell{width:calc(100vw - 28px)!important}.np-status-actions{align-items:stretch;flex-direction:column}.np-status-actions .np-cta{width:100%}
 }
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
+
+/* ============================================================
+   V70 — MATCH RAIL / RANKING PORTRAITS / EVENT EDITION
+   ============================================================ */
+.np-upcoming-section{padding-top:76px;padding-bottom:72px}
+.np-upcoming-section .np-section-head{margin-bottom:22px}
+.np-match-rail{display:flex;gap:18px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;padding:4px 0 14px}
+.np-match-rail::-webkit-scrollbar{display:none}
+.np-match-banner{scroll-snap-align:start;flex:0 0 100%;min-height:400px;position:relative;overflow:hidden;background:linear-gradient(120deg,#0b1410,#08100d 58%,#0d1814);border:1px solid rgba(255,255,255,.09);padding:28px 30px 22px;cursor:pointer;transition:transform .25s ease,border-color .25s ease,background .25s ease}
+.np-match-banner::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 50% 50%,rgba(121,240,74,.08),transparent 34%),linear-gradient(90deg,transparent 0 49.85%,rgba(255,255,255,.12) 50%,transparent 50.15%);opacity:.8}
+.np-match-banner:hover{transform:translateY(-3px);border-color:rgba(121,240,74,.38);background:linear-gradient(120deg,#0c1712,#09110e 58%,#0d1814)}
+.np-banner-top{position:relative;z-index:1;display:flex;justify-content:space-between;gap:20px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,.1);color:#91a098;font:800 8px/1 var(--np-ui);letter-spacing:.18em;text-transform:uppercase}
+.np-banner-top span:last-child{color:var(--np-accent)}
+.np-banner-main{position:relative;z-index:1;display:grid;grid-template-columns:1fr 150px 1fr;align-items:center;gap:18px;min-height:285px}
+.np-banner-team{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:end}
+.np-banner-team.right{direction:rtl}
+.np-rail-player{display:flex;flex-direction:column;align-items:flex-start;gap:11px;min-width:0}
+.np-rail-player.right{align-items:flex-end}
+.np-rail-player .avatar-wrap,.np-rail-player .avatar{width:clamp(110px,12vw,170px)!important;height:clamp(110px,12vw,170px)!important;border-radius:50%!important;object-fit:cover!important;border:1px solid rgba(255,255,255,.16);background:#0b1712}
+.np-rail-player .avatar-placeholder{display:grid;place-items:center;font-size:30px}
+.np-rail-player span{font:900 clamp(13px,1.2vw,19px)/.9 var(--np-display);letter-spacing:-.02em;text-transform:uppercase;color:#f2f6f2;max-width:170px}
+.np-banner-vs{display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px}
+.np-banner-vs strong{font:900 clamp(48px,6vw,84px)/.75 var(--np-display);color:var(--np-accent);letter-spacing:-.06em}
+.np-banner-vs small{font:700 8px/1.2 var(--np-ui);letter-spacing:.14em;color:#aab5af;text-transform:uppercase}
+.np-banner-vs small:last-child{color:#6f7c75}
+.np-banner-open{position:relative;z-index:1;display:inline-block;padding-top:13px;border-top:1px solid rgba(255,255,255,.1);color:var(--np-text);font:900 8px/1 var(--np-ui);letter-spacing:.16em;text-transform:uppercase}
+.np-match-rail-controls{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:4px}
+.np-rail-arrow{width:34px;height:34px;border:1px solid var(--np-line);background:transparent;color:var(--np-text);font:700 16px/1 var(--np-ui);cursor:pointer;transition:.2s ease}
+.np-rail-arrow:hover{border-color:var(--np-accent);color:var(--np-accent)}
+.np-rail-dots{display:flex;gap:6px;align-items:center}
+.np-rail-dots button{width:6px;height:6px;border-radius:50%;border:0;background:#425049;padding:0;cursor:pointer;transition:.2s ease}
+.np-rail-dots button.active{width:24px;border-radius:4px;background:var(--np-accent)}
+
+/* photos integrated into the new visual system */
+.np-hero-bg{background:radial-gradient(circle at 78% 48%,rgba(121,240,74,.08),transparent 24%),linear-gradient(90deg,rgba(4,6,7,.97) 0%,rgba(4,6,7,.8) 34%,rgba(4,6,7,.2) 64%,rgba(4,6,7,.84) 100%),url('padel-action-01.png') 67% center/cover no-repeat!important}
+.np-feature-image{background-image:linear-gradient(90deg,rgba(5,7,9,.15),rgba(5,7,9,.28)),url('padel-action-02.png')!important}
+.np-story-image{background-image:linear-gradient(180deg,rgba(5,7,9,.15),rgba(5,7,9,.56)),url('padel-community-01.png')!important}
+.np-split-story::after{background-image:url('padel-court-01.png')!important}
+
+/* sponsor presentation — larger, clear, premium */
+.np-sponsors-section{padding:56px 0 94px}
+.np-sponsors-section .sponsor-label{font-size:9px!important;letter-spacing:.24em;color:#8f9c95;margin-bottom:22px}
+.np-sponsors-section .sponsor-strip{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;overflow:visible!important;align-items:stretch}
+.np-sponsors-section .sponsor-strip a,.np-sponsors-section .sponsor-strip span.sponsor-item{min-height:110px;display:grid!important;place-items:center;padding:18px 22px;background:#f7f7f2;border:0;border-radius:0}
+.np-sponsors-section .sponsor-strip img{height:72px!important;max-width:220px!important;filter:none!important;opacity:1!important}
+.np-event-sponsor-stage{display:grid;grid-template-columns:.55fr 1.45fr;gap:50px;padding:70px 0 95px;border-top:1px solid var(--np-line);align-items:end}
+.np-event-sponsor-stage h4{font:900 clamp(26px,3vw,46px)/.9 var(--np-display);letter-spacing:-.04em;text-transform:uppercase;margin:10px 0 0;max-width:440px}
+.np-event-sponsor-stage .sponsor-strip{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;overflow:visible!important}
+.np-event-sponsor-stage .sponsor-item{min-height:110px;display:grid!important;place-items:center;background:#f7f7f2;padding:18px;border-radius:0}
+.np-event-sponsor-stage .sponsor-strip img{height:74px!important;max-width:240px!important;filter:none!important;opacity:1!important}
+
+/* tournament interior — not a blank information sheet anymore */
+.np-event-inside-hero{width:min(var(--np-max),calc(100vw - 48px));min-height:66vh;margin:0 auto;position:relative;overflow:hidden;border-bottom:1px solid var(--np-line)}
+.np-event-inside-art{position:absolute;inset:0;background:linear-gradient(90deg,rgba(5,7,9,.96) 0%,rgba(5,7,9,.72) 38%,rgba(5,7,9,.22) 72%,rgba(5,7,9,.75) 100%),url('padel-action-02.png') 68% 50%/cover no-repeat}
+.np-event-inside-art::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(5,7,9,.1),transparent 45%,rgba(5,7,9,.92))}
+.np-event-inside-copy{position:absolute;z-index:2;left:0;bottom:58px;max-width:790px}
+.np-event-inside-copy h3{font:900 clamp(60px,8.5vw,150px)/.78 var(--np-display)!important;letter-spacing:-.06em;text-transform:uppercase;margin:12px 0 26px!important}
+.np-event-inside-copy h3 em{color:var(--np-accent);font-style:normal}
+.np-event-inside-copy #dtInfo{margin:0;max-width:690px;font:700 clamp(11px,1vw,14px)/1.5 var(--np-ui);letter-spacing:.11em;text-transform:uppercase;color:#c3ccc7}
+.np-event-inside-number{position:absolute;z-index:2;right:0;top:34px;text-align:right;color:rgba(255,255,255,.18);font:900 clamp(60px,9vw,150px)/.75 var(--np-display);letter-spacing:-.07em}
+.np-event-statline{width:min(var(--np-max),calc(100vw - 48px));margin:0 auto;display:grid;grid-template-columns:.75fr 1.25fr;border-bottom:1px solid var(--np-line);min-height:170px}
+.np-event-stat-main{padding:34px 35px 28px 0;border-right:1px solid var(--np-line)}
+.np-event-stat-main #dtCanchas{display:flex;flex-wrap:wrap;gap:9px;margin-top:15px}
+.np-event-stat-main #dtCanchas .badge{margin:0!important;background:transparent!important;border:1px solid var(--np-line-strong)!important;color:var(--np-text)!important;border-radius:0!important;padding:10px 12px!important;font-size:9px!important;letter-spacing:.1em;text-transform:uppercase}
+.np-event-stats{display:grid!important;grid-template-columns:repeat(4,1fr)!important;padding:0!important;margin:0!important;border:0!important;align-items:stretch}
+.np-event-stats>div{display:flex!important;flex-direction:column;justify-content:center;padding:28px 24px;border-right:1px solid var(--np-line)!important}
+.np-event-stats>div:last-child{border-right:0!important}
+.np-event-stats strong{font:900 clamp(34px,4vw,58px)/.8 var(--np-display)!important;color:var(--np-text)!important}
+.np-event-stats span{font:700 8px/1 var(--np-ui);letter-spacing:.12em;color:var(--np-muted);text-transform:uppercase;margin-top:11px}
+.np-event-content-grid{width:min(var(--np-max),calc(100vw - 48px));margin:0 auto;display:grid;grid-template-columns:1fr 1.25fr;gap:70px;padding:82px 0;border-bottom:1px solid var(--np-line)}
+.np-event-content-block h4{font:900 clamp(36px,4vw,64px)/.84 var(--np-display);letter-spacing:-.05em;text-transform:uppercase;margin:10px 0 28px}
+.np-event-content-block .pareja-row{padding:15px 0;border-bottom:1px solid var(--np-line);font-size:13px}
+.np-event-content-block .pareja-row .badge{border-radius:0!important;background:transparent!important}
+.np-event-content-block #dtCategorias .pareja-row{font:900 19px/.95 var(--np-display);text-transform:uppercase}
+.np-event-content-block #dtCategorias .badge{font-family:var(--np-ui);font-size:8px;letter-spacing:.1em}
+.np-pairs-block{max-height:650px;overflow:auto;padding-right:12px}
+.np-pairs-block::-webkit-scrollbar{width:3px}.np-pairs-block::-webkit-scrollbar-thumb{background:var(--np-line-strong)}
+
+/* ranking portrait hierarchy */
+#tablaRanking td:nth-child(2) .avatar-wrap,#tablaRanking td:nth-child(2) .avatar{width:82px!important;height:82px!important}
+#tablaRanking tr:first-child td:nth-child(2) .avatar-wrap,#tablaRanking tr:first-child td:nth-child(2) .avatar,
+#tablaRanking tr:nth-child(2) td:nth-child(2) .avatar-wrap,#tablaRanking tr:nth-child(2) td:nth-child(2) .avatar{width:104px!important;height:104px!important}
+#tablaRanking td:nth-child(2)>div{gap:18px!important}
+#tablaRanking td:nth-child(2) .avatar-wrap{display:inline-flex!important;flex:0 0 auto}
+#tablaRanking td:nth-child(2) .avatar{object-fit:cover!important;border:2px solid rgba(121,240,74,.24)!important;background:#0a120f}
+#tablaRanking tr:first-child td:nth-child(2) .avatar{border-color:rgba(255,215,0,.55)!important}
+
+@media(max-width:959px){
+  .np-match-banner{flex-basis:100%;min-height:520px;padding:20px 18px}
+  .np-banner-main{grid-template-columns:1fr;gap:15px;padding:18px 0;min-height:0}
+  .np-banner-team{grid-template-columns:1fr 1fr;gap:10px}
+  .np-banner-team.right{direction:ltr}
+  .np-rail-player,.np-rail-player.right{align-items:center;text-align:center}
+  .np-rail-player .avatar-wrap,.np-rail-player .avatar{width:112px!important;height:112px!important}
+  .np-banner-vs{order:-1;display:grid;grid-template-columns:auto 1fr 1fr;align-items:center;gap:12px;text-align:left}
+  .np-banner-vs strong{font-size:48px}
+  .np-banner-vs small{font-size:7px}
+  .np-sponsors-section .sponsor-strip{grid-template-columns:1fr 1fr!important}
+  .np-sponsors-section .sponsor-strip a,.np-sponsors-section .sponsor-strip span.sponsor-item{min-height:90px}
+  .np-sponsors-section .sponsor-strip img{height:56px!important;max-width:150px!important}
+  .np-event-inside-hero{width:calc(100vw - 28px);min-height:68svh}
+  .np-event-inside-copy{left:0;right:0;bottom:28px}.np-event-inside-copy h3{font-size:60px!important}.np-event-inside-number{right:0;top:20px;font-size:70px}
+  .np-event-statline{width:calc(100vw - 28px);grid-template-columns:1fr}.np-event-stat-main{border-right:0;border-bottom:1px solid var(--np-line);padding:24px 0}.np-event-stats{grid-template-columns:1fr 1fr!important}.np-event-stats>div{padding:24px 16px}.np-event-content-grid{width:calc(100vw - 28px);grid-template-columns:1fr;gap:46px;padding:55px 0}.np-event-sponsor-stage{grid-template-columns:1fr;gap:28px;padding:55px 0 80px}.np-event-sponsor-stage .sponsor-strip{grid-template-columns:1fr 1fr!important}
+  #tablaRanking td:nth-child(2) .avatar-wrap,#tablaRanking td:nth-child(2) .avatar{width:64px!important;height:64px!important}#tablaRanking tr:first-child td:nth-child(2) .avatar-wrap,#tablaRanking tr:first-child td:nth-child(2) .avatar,#tablaRanking tr:nth-child(2) td:nth-child(2) .avatar-wrap,#tablaRanking tr:nth-child(2) td:nth-child(2) .avatar{width:74px!important;height:74px!important}
+}
