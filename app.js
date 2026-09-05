@@ -159,6 +159,13 @@ function cambiarVista(nombre, ruta) {
     adminFocoTorneoActivo = false;
   }
   if (!syncingDesdeHash) navegarA(ruta || (nombre === "inicio" ? "/" : "/" + nombre));
+  // Cada vista pública es una pantalla propia: al cambiar de módulo siempre
+  // arrancamos arriba, en lugar de heredar la posición de scroll de la vista anterior.
+  requestAnimationFrame(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  });
 }
 
 // Prende/apaga TODA la configuración general del club de una sola vez —
@@ -846,13 +853,24 @@ async function cargarInicio() {
 // suma una lupa chica superpuesta (pointer-events:none, no interfiere con el click
 // ni con el foco por teclado, que siguen siendo los de la imagen) para que la acción
 // de ampliar sea visible de un vistazo y no dependa solo del cursor al pasar el mouse.
+function avatarFallback(img, size, cls = "") {
+  if (!img || img.dataset.fallbackApplied === "1") return;
+  img.dataset.fallbackApplied = "1";
+  const placeholder = document.createElement("div");
+  placeholder.className = `avatar avatar-placeholder${cls}`;
+  placeholder.style.width = `${size || 44}px`;
+  placeholder.style.height = `${size || 44}px`;
+  placeholder.textContent = "🎾";
+  img.replaceWith(placeholder);
+}
+
 function avatarHtml(fotoUrl, size, extraClass, ampliable) {
   const s = size || 44;
   const clickable = ampliable && fotoUrl;
   const cls = (extraClass ? ` ${extraClass}` : "") + (clickable ? " avatar-clickable" : "");
   const dataAttr = clickable ? ` data-foto-grande="${fotoUrl}" tabindex="0" role="button" aria-label="Ver foto en grande"` : "";
   const img = fotoUrl
-    ? `<img class="avatar${cls}" src="${fotoUrl}" alt="" loading="lazy" decoding="async" style="width:${s}px;height:${s}px" onerror="this.style.display='none'"${dataAttr} />`
+    ? `<img class="avatar${cls}" src="${fotoUrl}" alt="" loading="lazy" decoding="async" style="width:${s}px;height:${s}px" onerror="avatarFallback(this, ${s}, ${JSON.stringify(cls)})"${dataAttr} />`
     : `<div class="avatar avatar-placeholder${cls}" style="width:${s}px;height:${s}px">🎾</div>`;
   if (!clickable) return img;
   const iconoLupa = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><circle cx="10" cy="10" r="6.5"/><path d="M10 7.2v5.6M7.2 10h5.6"/><path d="M15 15l5.5 5.5"/></svg>`;
@@ -1016,13 +1034,39 @@ function renderUpcomingMatchRail(wrapId, gridId, items, onClick) {
   const next = document.querySelector('.np-match-rail-controls [data-rail="next"]');
   prev && (prev.onclick=()=>rail.scrollBy({left:-rail.clientWidth,behavior:'smooth'}));
   next && (next.onclick=()=>rail.scrollBy({left:rail.clientWidth,behavior:'smooth'}));
-  if (rail.dataset.autoplayBound !== "1") {
-    rail.dataset.autoplayBound = "1";
-    let timer;
-    const start = () => { clearInterval(timer); if (items.length < 2 || matchMedia('(prefers-reduced-motion: reduce)').matches) return; timer=setInterval(()=>{ const nextIdx=(Math.round(rail.scrollLeft/(rail.clientWidth||1))+1)%items.length; rail.scrollTo({left:nextIdx*rail.clientWidth,behavior:'smooth'}); }, 5200); };
-    const stop = () => clearInterval(timer);
-    rail.addEventListener('mouseenter',stop); rail.addEventListener('mouseleave',start); wrap.addEventListener('focusin',stop); wrap.addEventListener('focusout',start); start();
+  // El rail se vuelve a renderizar cuando cambia el torneo destacado o el tamaño
+  // de pantalla. El estado del autoplay vive en el propio elemento para evitar
+  // timers huérfanos y, sobre todo, cierres sobre un array viejo de partidos.
+  if (!rail._matchRailState) {
+    rail._matchRailState = { timer: null, itemsLength: 0 };
+    const stop = () => {
+      if (rail._matchRailState?.timer) clearInterval(rail._matchRailState.timer);
+      rail._matchRailState.timer = null;
+    };
+    const start = () => {
+      stop();
+      const state = rail._matchRailState;
+      if (!state || state.itemsLength < 2 || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      state.timer = setInterval(() => {
+        const count = rail.querySelectorAll('.np-match-banner').length;
+        if (count < 2) return;
+        const current = Math.round(rail.scrollLeft / (rail.clientWidth || 1));
+        const nextIdx = (current + 1) % count;
+        rail.scrollTo({ left: nextIdx * rail.clientWidth, behavior: 'smooth' });
+      }, 5200);
+    };
+    rail.addEventListener('mouseenter', stop);
+    rail.addEventListener('mouseleave', start);
+    wrap.addEventListener('focusin', stop);
+    wrap.addEventListener('focusout', start);
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) stop(); else start();
+    });
+    rail._matchRailStart = start;
+    rail._matchRailStop = stop;
   }
+  rail._matchRailState.itemsLength = items.length;
+  rail._matchRailStart?.();
 }
 
 window.matchMedia("(min-width: 960px)").addEventListener("change", () => cargarUltimosProximos());
@@ -2514,6 +2558,13 @@ async function refrescarDetalleTorneo() {
   renderParejasEn("dtParejas", "dtSinPareja", insc || [], parejas || [], false);
   cargarCategoriasTorneo(parejas || []);
   renderStatsInicioTorneo(parejas || [], tc || [], ultimosPartidos);
+  renderEstadoCompetenciaTorneo(
+    ultimosPartidos,
+    parejas || [],
+    tc || [],
+    categoriasPublicadas,
+    t
+  );
 
   await cargarBloqueosCancha();
   renderResultadosPublico();
@@ -2558,6 +2609,35 @@ function renderStatsInicioTorneo(parejas, canchasTorneo, partidos) {
   ]);
 }
 
+function renderEstadoCompetenciaTorneo(partidos, parejas, canchas, categoriasPublicadas, torneo) {
+  const cont = document.getElementById("dtCompetitionState");
+  if (!cont) return;
+  const publicados = (partidos || []).length;
+  const categorias = categoriasTorneoActual.length;
+  const estado = torneo?.estado || "";
+  const tieneCalendario = categoriasPublicadas?.size > 0;
+  const title = publicados > 0 ? "COMPETENCIA EN MARCHA" : "CUADRO DE COMPETICIÓN";
+  const copy = publicados > 0
+    ? "Partidos publicados por categoría, listos para seguir el circuito."
+    : tieneCalendario
+      ? "El calendario ya está publicado. Los encuentros aparecerán aquí por categoría."
+      : estado === "inscripcion"
+        ? "La inscripción está abierta. El cuadro se publica cuando el club confirma el calendario."
+        : "El club todavía está preparando el cuadro de esta competencia.";
+  cont.innerHTML = `
+    <div class="np-competition-state-head">
+      <div><span class="np-kicker">LIVE COMPETITION</span><h4>${title}</h4></div>
+      <span class="np-competition-state-badge ${publicados ? "is-live" : ""}">${publicados ? "PUBLICADO" : "EN PREPARACIÓN"}</span>
+    </div>
+    <p>${copy}</p>
+    <div class="np-competition-metrics">
+      <div><strong>${parejas?.length || 0}</strong><span>PAREJAS</span></div>
+      <div><strong>${categorias}</strong><span>CATEGORÍAS</span></div>
+      <div><strong>${canchas?.length || 0}</strong><span>CANCHAS</span></div>
+      <div><strong>${publicados}</strong><span>PARTIDOS PUBLICADOS</span></div>
+    </div>`;
+}
+
 // ---------- Bloqueos de cancha (admin) ----------
 // Concepto DISTINTO de la disponibilidad de un jugador: acá la cancha entera
 // queda inutilizable para TODOS en ese horario (lluvia, mantenimiento, otro
@@ -2580,6 +2660,13 @@ function bloqueosPorCanchaMapa() {
 }
 
 async function cargarBloqueosCancha() {
+  // Los bloqueos son una herramienta operativa del administrador; la experiencia
+  // pública no los necesita. Evitamos así una consulta extra cada vez que un
+  // jugador abre un torneo.
+  if (!isAdmin) {
+    cacheBloqueosCancha = [];
+    return;
+  }
   const { data } = await sb.from("canchas_bloqueos").select("*, canchas(nombre)").order("desde");
   cacheBloqueosCancha = data || [];
   renderBloqueosAdmin();
@@ -4639,3 +4726,50 @@ async function init() {
   await cargarNoticias();
 }
 init();
+
+// ============================================================
+// APP / PWA — instalación contextual
+// ============================================================
+let npInstallPrompt = null;
+function npEsStandalone() {
+  return window.matchMedia?.('(display-mode: standalone)').matches || window.navigator.standalone === true;
+}
+function npEsIOS() {
+  return /iphone|ipad|ipod/i.test(navigator.userAgent);
+}
+function actualizarUIInstalacion() {
+  const section = document.getElementById('npAppSection');
+  const btn = document.getElementById('btnInstallApp');
+  const note = document.getElementById('appInstallNote');
+  if (!section || !btn || !note) return;
+  if (npEsStandalone()) { section.style.display = 'none'; return; }
+  section.style.display = '';
+  if (npInstallPrompt) {
+    btn.style.display = 'inline-flex';
+    note.textContent = 'Instalala en un toque y abrila como una app.';
+  } else if (npEsIOS()) {
+    btn.style.display = 'none';
+    note.textContent = 'En Safari: Compartir → Agregar a pantalla de inicio.';
+  } else {
+    btn.style.display = 'none';
+    note.textContent = 'Desde el menú del navegador buscá “Instalar app” o “Agregar a pantalla de inicio”.';
+  }
+}
+window.addEventListener('beforeinstallprompt', (event) => {
+  event.preventDefault();
+  npInstallPrompt = event;
+  actualizarUIInstalacion();
+});
+window.addEventListener('appinstalled', () => {
+  npInstallPrompt = null;
+  actualizarUIInstalacion();
+  toast('Norte Padel quedó instalada en tu dispositivo.');
+});
+document.getElementById('btnInstallApp')?.addEventListener('click', async () => {
+  if (!npInstallPrompt) return;
+  npInstallPrompt.prompt();
+  try { await npInstallPrompt.userChoice; } catch (_) {}
+  npInstallPrompt = null;
+  actualizarUIInstalacion();
+});
+window.addEventListener('load', actualizarUIInstalacion);
