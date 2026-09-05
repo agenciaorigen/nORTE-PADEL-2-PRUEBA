@@ -2,6 +2,16 @@
 // NORTE PADEL — lógica de la app (vanilla JS, sin frameworks)
 // ============================================================
 
+const __npConfigValida = typeof SUPABASE_URL === "string" && /^https?:\/\//.test(SUPABASE_URL) && !SUPABASE_URL.includes("PEGA_ACA_TU_") && typeof SUPABASE_ANON_KEY === "string" && SUPABASE_ANON_KEY.length > 20 && !SUPABASE_ANON_KEY.includes("PEGA_ACA_TU_");
+if (!__npConfigValida) {
+  document.addEventListener("DOMContentLoaded", () => {
+    const box = document.createElement("div");
+    box.style.cssText = "position:fixed;inset:0;z-index:99999;background:#050708;color:#f4f7f5;display:grid;place-items:center;padding:24px;font-family:system-ui,sans-serif";
+    box.innerHTML = '<div style="max-width:620px;border:1px solid rgba(255,255,255,.16);padding:28px;background:#0b110e"><strong style="display:block;font-size:22px;margin-bottom:10px">Norte Padel no pudo iniciar</strong><p style="color:#aeb9b2;line-height:1.6;margin:0 0 12px">La configuración de Supabase no está cargada. Conservá tu <code>config.js</code> actual con la URL y la anon key reales del proyecto.</p><p style="color:#79f34d;margin:0">No se modificó la base de datos.</p></div>';
+    document.body.appendChild(box);
+  });
+  throw new Error("Configuración de Supabase ausente o inválida. Conservá el config.js real del proyecto.");
+}
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const DIAS = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
@@ -4771,23 +4781,40 @@ if ("serviceWorker" in navigator) {
 // acá — sb.auth.onAuthStateChange() ya se dispara solo, una vez, apenas se suscribe
 // (con la sesión que haya en ese momento), y manejarCambioSesion() ya llama a
 // calcularTorneoDestacado(); pedirla de nuevo acá solo duplicaba esas llamadas en cada carga.
-async function init() {
-  await Promise.all([cargarCategorias(), cargarTorneos()]);
+async function npConTimeout(promiseLike, ms = 12000) {
+  const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error("Tiempo de espera agotado")), ms));
+  return Promise.race([Promise.resolve(promiseLike), timeout]);
+}
 
-  // Configuración es necesaria para Noticias (Instagram) y para algunos CTAs;
-  // esperamos ese dato antes de renderizar Noticias para evitar una carrera.
-  const configPromise = cargarConfig();
-  await Promise.all([
-    cargarInicio(),
-    cargarUltimosProximos(),
-    cargarJugadorDelMes(),
-    cargarCampeones(),
-    cargarAscendidos(),
-    cargarSponsors(),
-    cargarRanking(),
-    configPromise
+async function npIntentar(nombre, fn, ms = 12000) {
+  try {
+    return await npConTimeout(fn(), ms);
+  } catch (e) {
+    console.warn(`[Norte Padel] ${nombre} no pudo completar el arranque:`, e);
+    return null;
+  }
+}
+
+async function init() {
+  // Arranque progresivo: el shell y el router no deben quedar bloqueados porque
+  // una lectura pública de Supabase falle o quede pendiente.
+  await npIntentar("categorías", () => cargarCategorias(), 10000);
+  await npIntentar("torneos", () => cargarTorneos(), 10000);
+
+  await Promise.allSettled([
+    npIntentar("inicio", () => cargarInicio(), 12000),
+    npIntentar("partidos", () => cargarUltimosProximos(), 12000),
+    npIntentar("jugador del mes", () => cargarJugadorDelMes(), 12000),
+    npIntentar("campeones", () => cargarCampeones(), 12000),
+    npIntentar("ascendidos", () => cargarAscendidos(), 12000),
+    npIntentar("sponsors", () => cargarSponsors(), 12000),
+    npIntentar("ranking", () => cargarRanking(), 12000),
+    npIntentar("configuración", () => cargarConfig(), 10000)
   ]);
-  await cargarNoticias();
+
+  // Las noticias no deben impedir que el usuario entre al producto si Instagram
+  // o la configuración externa están lentos.
+  npIntentar("noticias", () => cargarNoticias(), 8000);
 }
 init();
 

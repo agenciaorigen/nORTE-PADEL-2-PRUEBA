@@ -1,6 +1,6 @@
-const CACHE = "norte-padel-v91-final";
+const CACHE = "norte-padel-v91-2-safe";
 const APP_SHELL = [
-  "./","./index.html","./style.css","./v91-system.css","./app.js","./matching.js","./v91-app.js","./config.js","./manifest.json",
+  "./","./index.html","./style.css","./v91-system.css","./app.js","./matching.js","./manifest.json",
   "./icon-192.png","./icon-512.png","./icon-512-maskable.png","./hero-cancha.webp","./hero-ranking.webp","./hero-torneos.webp","./brasil-tour.webp","./destacados-fondo.webp","./pelotas.webp",
   "./editorial-action-01.webp","./editorial-action-02.webp","./editorial-action-03.webp","./editorial-action-04.webp","./editorial-action-05.webp","./editorial-court-01.webp","./editorial-net.webp","./editorial-community.webp",
   "./norte-editorial-01.webp","./norte-editorial-02.webp","./norte-editorial-03.webp","./norte-editorial-04.webp","./norte-editorial-05.webp","./norte-editorial-06.webp","./norte-editorial-03-square.webp","./pelotas.jpg"

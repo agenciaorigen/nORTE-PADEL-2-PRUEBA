@@ -1,0 +1,5 @@
+NORTE PADEL V91.2
+
+IMPORTANTE: este paquete NO incluye config.js a propósito.
+Conservá tu config.js real del proyecto con SUPABASE_URL y SUPABASE_ANON_KEY.
+No lo reemplaces por un archivo de ejemplo.
