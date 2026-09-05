@@ -991,7 +991,7 @@ async function cargarUltimosProximos() {
   const partidos = data || [];
   const ahora = new Date();
   const jugados = partidos.filter((p) => p.estado === "jugado" && p.horario)
-    .sort((a, b) => new Date(b.horario) - new Date(a.horario)).slice(0, 4);
+    .sort((a, b) => new Date(b.horario) - new Date(a.horario)).slice(0, 3);
   const proximos = partidos.filter((p) => p.horario && p.estado !== "jugado" && new Date(p.horario) >= ahora)
     .sort((a, b) => new Date(a.horario) - new Date(b.horario)).slice(0, 3);
 
