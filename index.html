@@ -3,8 +3,9 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>Norte Padel</title>
-<meta name="theme-color" content="#05080A" />
+<title>NORTE PADEL — Digital Circuit 2026</title>
+<meta name="theme-color" content="#050505" />
+<meta name="description" content="Norte Padel — circuito, torneos, ranking, resultados y jugadores." />
 <!-- iOS no lee manifest.json para "Agregar a inicio" — sin estas etiquetas
      abre como acceso directo al navegador, no como app a pantalla completa -->
 <meta name="mobile-web-app-capable" content="yes" />
@@ -63,7 +64,7 @@
 
 <header class="topbar">
   <div class="logo-ring"><img src="icon-192.png" alt="Norte Padel" /></div>
-  <h1>NORTE <span>PADEL</span></h1>
+  <div class="brand-lockup"><h1>NORTE <span>PADEL</span></h1><small>PADEL CIRCUIT · 2026</small></div>
   <button id="btnNotif" title="Notificaciones" aria-label="Notificaciones">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M6 9a6 6 0 1 1 12 0c0 4 1.5 5.5 1.5 5.5H4.5S6 13 6 9z"/><path d="M10 19a2 2 0 0 0 4 0"/></svg>
     <span id="notifCount"></span>
@@ -91,29 +92,29 @@
       <div class="hero-carousel-track" id="heroCarouselTrack">
         <div class="hero-carousel-slide">
           <div class="hero-club">
-            <div class="hero-live-label"><span class="hero-live-dot"></span> NORTE PADEL · CIRCUITO 2026</div>
+            <div class="hero-live-label"><span class="hero-live-dot"></span> NORTE / PADEL CIRCUIT · 2026</div>
             <div class="hero-club-widget" id="heroPosicionCard" style="display:none">
               <span class="hero-club-widget-label">Tu posición</span>
               <strong id="heroPosicionValor">—</strong>
               <span class="hero-club-widget-sub" id="heroPosicionSub"></span>
             </div>
-            <h2 class="hero-club-titulo">El circuito.<br /><span>Tu juego.</span><br />Tu lugar.</h2>
-            <p class="hero-club-sub">Torneos, ranking, resultados y protagonistas. Todo el circuito Norte Padel en un solo lugar.</p>
-            <button class="hero-club-cta" id="btnHeroTorneos" type="button">Ver torneos <span aria-hidden="true">→</span></button>
+            <h2 class="hero-club-titulo">PLAY.<br /><span>COMPETE.</span><br />BELONG.</h2>
+            <p class="hero-club-sub">El circuito Norte Padel. Torneos, ranking, resultados y jugadores en una experiencia pensada para competir.</p>
+            <button class="hero-club-cta" id="btnHeroTorneos" type="button">Entrar al circuito <span aria-hidden="true">↗</span></button>
           </div>
         </div>
         <div class="hero-carousel-slide" id="heroSlideTorneo">
           <div class="hero-club hero-club-torneo">
-            <h2 class="hero-club-titulo">Torneos<br /><span>todo el año.</span></h2>
-            <p class="hero-club-sub">Categorías para todos los niveles, fecha a fecha.</p>
-            <button class="hero-club-cta" id="btnHeroTorneos2" type="button">Ver torneos <span aria-hidden="true">→</span></button>
+            <h2 class="hero-club-titulo">THE<br /><span>CIRCUIT.</span></h2>
+            <p class="hero-club-sub">Una temporada. Una tabla. Cada partido cuenta.</p>
+            <button class="hero-club-cta" id="btnHeroTorneos2" type="button">Explorar torneos <span aria-hidden="true">↗</span></button>
           </div>
         </div>
         <div class="hero-carousel-slide" id="heroSlideRanking">
           <div class="hero-club hero-club-ranking">
-            <h2 class="hero-club-titulo">Ranking<br /><span>en vivo.</span></h2>
-            <p class="hero-club-sub">Mirá cómo vas en tu categoría, partido a partido.</p>
-            <button class="hero-club-cta" id="btnHeroRanking" type="button">Ver ranking <span aria-hidden="true">→</span></button>
+            <h2 class="hero-club-titulo">THE<br /><span>RANKING.</span></h2>
+            <p class="hero-club-sub">Puntos, ascensos y una posición que se gana partido a partido.</p>
+            <button class="hero-club-cta" id="btnHeroRanking" type="button">Ver ranking <span aria-hidden="true">↗</span></button>
           </div>
         </div>
       </div>
@@ -121,14 +122,14 @@
     </div>
 
     <div class="seccion" id="inicioProximoDestacadoWrap" style="display:none">
-      <h3>Próximo partido destacado</h3>
+      <h3>EN VIVO / PRÓXIMO PARTIDO</h3>
       <div id="inicioProximoDestacadoContenido"></div>
     </div>
 
     <button type="button" class="marquee-banda" id="marqueeBanda" aria-label="Ver el próximo torneo e inscribirte">
       <div class="marquee-track" aria-hidden="true">
-        <span>NORTE PADEL</span><span class="marquee-dot">•</span><span>RANKING EN VIVO</span><span class="marquee-dot">•</span><span>INSCRIBITE YA</span><span class="marquee-dot">•</span>
-        <span>NORTE PADEL</span><span class="marquee-dot">•</span><span>RANKING EN VIVO</span><span class="marquee-dot">•</span><span>INSCRIBITE YA</span><span class="marquee-dot">•</span>
+        <span>NORTE PADEL CIRCUIT</span><span class="marquee-dot">•</span><span>LIVE SCORES</span><span class="marquee-dot">•</span><span>SEASON 2026</span><span class="marquee-dot">•</span>
+        <span>NORTE PADEL CIRCUIT</span><span class="marquee-dot">•</span><span>LIVE SCORES</span><span class="marquee-dot">•</span><span>SEASON 2026</span><span class="marquee-dot">•</span>
       </div>
     </button>
 
@@ -158,24 +159,24 @@
     </div>
 
     <div class="destacados-band">
-      <div class="destacados-heading"><div class="destacados-overline"><span>FEATURED PLAYERS · 2026</span></div><h2>Jugadores del mes</h2><p>Los protagonistas que están marcando el circuito.</p></div>
+      <div class="destacados-heading"><div class="destacados-overline"><span>THE PLAYERS · 2026</span></div><h2>Los protagonistas.</h2><p>Dos jugadores. Una temporada. El momento de competir.</p></div>
       <div class="destacados-grid" id="jugadorDelMesContenido"></div>
     </div>
 
     <div class="seccion" id="ascendidosCard" style="display:none">
-      <h3>📈 Ascendieron este mes</h3>
+      <h3>ASCENSOS / ESTE MES</h3>
       <div class="ascendidos-wrap">
         <div class="ascendidos-track" id="ascendidosContenido"></div>
       </div>
     </div>
 
     <div class="seccion campeones-section" id="campeonesCard" style="display:none">
-      <div class="section-kicker">PALMARÉS · ÚLTIMOS TORNEOS</div><h2>Campeones</h2><p class="section-lead">Las parejas que llegaron hasta el final.</p>
+      <div class="section-kicker">THE WINNERS · PALMARÉS</div><h2>Los que levantaron la copa.</h2><p class="section-lead">Las parejas que llegaron hasta el final.</p>
       <div class="campeones-strip" id="campeonesContenido"></div>
     </div>
 
     <div class="seccion">
-      <h2>Próximos torneos</h2>
+      <h2>Next stop.</h2>
       <div id="flyerDestacado"></div>
       <div class="flyer-grid" id="flyerMini"></div>
       <p class="empty" id="inicioSinTorneos" style="display:none">Todavía no hay torneos publicados.</p>
@@ -185,14 +186,14 @@
          hay columna lateral aparte donde reubicarla). -->
     <div class="energia-banda" id="energiaBanda">
       <div class="energia-texto">
-        <h3>En noviembre vamos a Brasil</h3>
-        <p>Padel Tour 2026</p>
+        <h3>THE NEXT STOP</h3>
+        <p>Temporada 2026 · Brasil</p>
       </div>
     </div>
 
     <div class="seccion" id="noticiasCard" style="display:none">
       <div class="torneo-card-header">
-        <h3>📰 Noticias</h3>
+        <h3>THE NEWS</h3>
         <div id="noticiasInstagram"></div>
       </div>
       <div id="noticiasContenido"></div>
@@ -208,7 +209,7 @@
   <section id="view-torneos" class="view">
     <div class="card">
       <div class="torneo-card-header">
-        <h2>Torneos</h2>
+        <h2>THE CIRCUIT</h2>
         <button type="button" class="secondary small admin-only public-create-hidden" id="btnMostrarCrearTorneo">+ Crear torneo</button>
       </div>
       <div id="listaTorneos"></div>
@@ -530,20 +531,20 @@
       <div class="tournament-dashboard-topbar">
         <div>
           <button type="button" class="link-btn" id="btnVolverConfigDesdeDashboard">← Configuración</button>
-          <p class="dashboard-kicker">NORTE PADEL · TOURNAMENT CONTROL CENTER</p>
+          <p class="dashboard-kicker">NORTE / TOURNAMENT OPERATIONS</p>
           <h1>Gestión de torneos</h1>
-          <p class="match-meta">Administrá horarios, canchas, partidos, resultados, inscripciones y toda la operación del torneo desde un solo lugar.</p>
+          <p class="match-meta">Horarios, canchas, partidos, resultados y parejas. Todo el torneo, bajo control.</p>
         </div>
-        <div class="dashboard-status-chip">● OPERACIONES</div>
+        <div class="dashboard-status-chip">● CONTROL ACTIVO</div>
       </div>
 
       <div class="dashboard-quick-actions">
-        <button type="button" class="dashboard-action active" id="btnDashboardSeleccionarTorneo">🏆 Seleccionar torneo</button>
-        <button type="button" class="dashboard-action" id="btnDashboardIrPlanilla">▦ Abrir planilla</button>
-        <button type="button" class="dashboard-action dashboard-action-primary" id="btnDashboardNuevoTorneo">＋ Nuevo torneo</button>
+        <button type="button" class="dashboard-action active" id="btnDashboardSeleccionarTorneo">01 / TORNEO</button>
+        <button type="button" class="dashboard-action" id="btnDashboardIrPlanilla">02 / PLANILLA</button>
+        <button type="button" class="dashboard-action dashboard-action-primary" id="btnDashboardNuevoTorneo">03 / NUEVO TORNEO</button>
       </div>
 
-    <div class="dashboard-command-strip"><span>OPERACIONES</span><strong>Elegí un torneo para entrar a su centro de control</strong><small>La configuración del sitio y la operación de cada torneo están separadas.</small></div>
+    <div class="dashboard-command-strip"><span>TOURNAMENT OS</span><strong>Elegí un torneo para entrar al centro de operaciones</strong><small>La marca y el contenido viven en Configuración. El torneo se opera acá.</small></div>
     <div class="card card-accent" id="admSelectorTorneoCard">
       <h2>Torneo en gestión</h2>
       <p class="match-meta" style="margin-bottom:6px">Elegí un torneo para administrar sus inscripciones, parejas, canchas, bloqueos y partidos. La edición de un torneo vive solo acá — la vista pública nunca muestra estas herramientas.</p>
@@ -870,7 +871,7 @@
        ya tiene calendario armado). -->
   <button data-view="torneos" class="tab">
     <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 9.5h16"/></svg></span>
-    Torneos
+    Circuito
   </button>
   <button data-view="ranking" class="tab">
     <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20v-4"/><path d="M12 20v-9"/><path d="M19 20V7"/></svg></span>
@@ -883,7 +884,7 @@
        tener nada más adentro para el resto de la gente. -->
   <button id="btnAdminPanel" data-view="admin" class="tab" title="Panel de administrador" aria-label="Administración">
     <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.04 1.56V21a2 2 0 1 1-4 0v-.09A1.7 1.7 0 0 0 8.96 19a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.6 14.6a1.7 1.7 0 0 0-1.56-1.04H3a2 2 0 1 1 0-4h.09A1.7 1.7 0 0 0 4.6 8.6a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1.04-1.56V3a2 2 0 1 1 4 0v.09A1.7 1.7 0 0 0 15.4 4.6a1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.4 9c.36.1.68.3.94.56"/></svg></span>
-    Config
+    Control
   </button>
 </nav>
 
