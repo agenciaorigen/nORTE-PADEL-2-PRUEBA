@@ -157,7 +157,7 @@
     </div>
 
     <div class="destacados-band">
-      <div class="destacados-overline"><span>⭐ Destacado del mes</span></div>
+      <div class="destacados-overline"><span>⭐ JUGADORES DEL MES</span></div>
       <div class="destacados-grid" id="jugadorDelMesContenido"></div>
     </div>
 
@@ -523,8 +523,24 @@
     </div>
   </section>
 
-  <!-- ADMIN -->
-  <section id="view-admin" class="view">
+  <!-- TOURNAMENT CONTROL CENTER: espacio operativo separado de la configuración general -->
+  <section id="view-torneo-dashboard" class="view">
+    <div class="tournament-dashboard-shell">
+      <div class="tournament-dashboard-topbar">
+        <div>
+          <button type="button" class="link-btn" id="btnVolverConfigDesdeDashboard">← Configuración</button>
+          <p class="dashboard-kicker">NORTE PADEL · TOURNAMENT CONTROL CENTER</p>
+          <h1>Gestión de torneos</h1>
+          <p class="match-meta">Administrá horarios, canchas, partidos, resultados, inscripciones y toda la operación del torneo desde un solo lugar.</p>
+        </div>
+        <div class="dashboard-status-chip">● OPERACIONES</div>
+      </div>
+
+      <div class="dashboard-quick-actions">
+        <button type="button" class="dashboard-action active" id="btnDashboardSeleccionarTorneo">🏆 Seleccionar torneo</button>
+        <button type="button" class="dashboard-action" id="btnDashboardIrPlanilla">▦ Abrir planilla</button>
+      </div>
+
     <div class="card card-accent" id="admSelectorTorneoCard">
       <h2>Torneo en gestión</h2>
       <p class="match-meta" style="margin-bottom:6px">Elegí un torneo para administrar sus inscripciones, parejas, canchas, bloqueos y partidos. La edición de un torneo vive solo acá — la vista pública nunca muestra estas herramientas.</p>
@@ -675,11 +691,26 @@
       </div>
     </div>
 
+
+    </div>
+  </section>
+
+  <!-- ADMIN / CONFIGURACIÓN GENERAL -->
+  <section id="view-admin" class="view">
     <!-- Todo lo de acá para abajo es de la BASE GENERAL del club (canchas, categorías,
          jugadores registrados, etc.) — no es de un torneo puntual, por eso se oculta
          cuando se entra a administrar un torneo específico (ver admBtnVolverConfigGeneral
          y btnAdministrarEsteTorneo en app.js): esa pantalla queda solo para ESE torneo. -->
     <div id="admConfigGeneralWrap">
+    <div class="admin-launch-card">
+      <div>
+        <span class="admin-launch-eyebrow">CENTRO DE OPERACIONES</span>
+        <h2>🏆 Gestión de torneos</h2>
+        <p>Entrá al panel operativo para organizar partidos, horarios, canchas, resultados, inscripciones y la planilla del torneo.</p>
+      </div>
+      <button type="button" class="primary" id="btnAbrirDashboardTorneos">Abrir gestión de torneos →</button>
+    </div>
+
     <div class="card card-accent">
       <h2>Configuración general</h2>
       <label>WhatsApp del club (para coordinar pagos)</label>

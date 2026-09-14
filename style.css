@@ -1632,3 +1632,265 @@ button.secondary { border-radius: 3px; }
 @media (prefers-reduced-motion: reduce) {
   * { scroll-behavior: auto !important; }
 }
+
+/* ============================================================
+   NORTE PADEL V65 — HOME PREMIUM + TOURNAMENT CONTROL CENTER
+   Capa visual adicional: no modifica el modelo de datos ni la lógica.
+   ============================================================ */
+
+/* ---------- Home: Jugadores del mes ---------- */
+.destacados-grid:not(.destacados-grid-banner) {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+.destacados-grid:not(.destacados-grid-banner) .destacado-card {
+  min-height: 350px;
+  border-radius: 18px;
+  padding: 20px;
+  box-shadow: 0 18px 48px rgba(0,0,0,.22);
+}
+.destacados-grid:not(.destacados-grid-banner) .destacado-card::before {
+  background: linear-gradient(180deg, rgba(0,0,0,.08) 0%, rgba(0,0,0,.08) 30%, rgba(0,0,0,.86) 100%);
+}
+.destacados-grid:not(.destacados-grid-banner) .destacado-tag {
+  font-size: 11px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  padding: 6px 11px;
+}
+.destacados-grid:not(.destacados-grid-banner) .destacado-stat strong {
+  font-size: 40px;
+}
+.destacados-grid:not(.destacados-grid-banner) .destacado-info strong {
+  font-size: 27px;
+  line-height: 1.04;
+}
+.destacados-grid:not(.destacados-grid-banner) .destacado-info span {
+  font-size: 11px;
+  margin-top: 5px;
+  display: block;
+}
+
+/* ---------- Home: campeones protagonistas ---------- */
+.campeones-strip {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding: 4px 2px 12px;
+  scroll-snap-type: x proximity;
+  scrollbar-width: thin;
+}
+.campeon-card {
+  flex: 0 0 clamp(250px, 30vw, 350px);
+  min-height: 205px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255,255,255,.06), transparent 42%),
+    linear-gradient(145deg, rgba(255,255,255,.045), rgba(255,255,255,.015));
+  border: 1px solid rgba(255,255,255,.09);
+  border-radius: 16px;
+  padding: 20px 18px 18px;
+  box-shadow: 0 16px 42px rgba(0,0,0,.18);
+  scroll-snap-align: start;
+}
+.campeon-card::before {
+  content: "🏆";
+  display: block;
+  font-size: 18px;
+  margin-bottom: 9px;
+  opacity: .9;
+}
+.campeon-avatares { margin-bottom: 10px; }
+.campeon-avatares .avatar {
+  width: 78px;
+  height: 78px;
+  margin-left: -20px;
+  border-width: 3px;
+}
+.campeon-avatares .avatar:first-child { margin-left: 0; }
+.campeon-nombres {
+  font-size: 17px;
+  font-weight: 800;
+  line-height: 1.16;
+  letter-spacing: -.01em;
+}
+.campeon-nombre-link:hover { text-decoration: none; }
+.campeon-torneo {
+  font-size: 12px;
+  line-height: 1.35;
+  margin-top: 7px;
+  text-transform: uppercase;
+  letter-spacing: .035em;
+}
+
+/* ---------- Entrada al centro de operaciones ---------- */
+.admin-launch-card {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 18px;
+  padding: 24px;
+  border: 1px solid rgba(255,255,255,.09);
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(105,255,181,.10), transparent 38%),
+    linear-gradient(135deg, rgba(255,255,255,.045), rgba(255,255,255,.015));
+  box-shadow: 0 20px 50px rgba(0,0,0,.18);
+}
+.admin-launch-card h2 { margin: 4px 0 6px; }
+.admin-launch-card p { max-width: 720px; margin: 0; color: var(--muted); }
+.admin-launch-eyebrow,
+.dashboard-kicker {
+  display: block;
+  color: var(--accent);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+/* ---------- Tournament Control Center ---------- */
+.tournament-dashboard-shell { max-width: 1480px; margin: 0 auto; }
+.tournament-dashboard-topbar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 16px;
+  padding: 8px 2px 18px;
+  border-bottom: 1px solid var(--border);
+}
+.tournament-dashboard-topbar h1 {
+  margin: 4px 0 6px;
+  font-family: "Big Shoulders Display", sans-serif;
+  font-size: clamp(36px, 5vw, 64px);
+  line-height: .9;
+  text-transform: uppercase;
+  letter-spacing: -.02em;
+}
+.dashboard-status-chip {
+  flex: 0 0 auto;
+  border: 1px solid rgba(105,255,181,.25);
+  background: rgba(105,255,181,.07);
+  color: var(--accent);
+  border-radius: 999px;
+  padding: 8px 12px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+}
+.dashboard-quick-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.dashboard-action {
+  border: 1px solid var(--border);
+  background: var(--bg-elev);
+  color: var(--text);
+  border-radius: 9px;
+  padding: 9px 13px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 750;
+  cursor: pointer;
+}
+.dashboard-action:hover,
+.dashboard-action.active {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Dashboard: selector del torneo más parecido a un workspace que a un formulario */
+#view-torneo-dashboard #admSelectorTorneoCard {
+  margin-bottom: 16px;
+  border-radius: 14px;
+}
+#view-torneo-dashboard #admSelectorTorneoCard h2 {
+  font-family: "Big Shoulders Display", sans-serif;
+  font-size: 28px;
+  text-transform: uppercase;
+  letter-spacing: .02em;
+}
+#view-torneo-dashboard #admSelectTorneoGestion {
+  min-height: 48px;
+  font-size: 14px;
+  font-weight: 700;
+}
+#view-torneo-dashboard #admGestionTorneoWrap > .card:first-child {
+  border-radius: 16px;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(105,255,181,.08), transparent 34%),
+    var(--bg-elev);
+}
+#view-torneo-dashboard #admGestionNombre {
+  font-family: "Big Shoulders Display", sans-serif;
+  font-size: clamp(28px, 4vw, 46px) !important;
+  line-height: .95;
+  text-transform: uppercase;
+}
+#view-torneo-dashboard #admGestionSubnav {
+  position: sticky;
+  top: 8px;
+  z-index: 10;
+  padding: 7px;
+  background: rgba(10,12,12,.86);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+#view-torneo-dashboard #admGestionSubnav .pill {
+  padding: 9px 13px;
+  font-size: 11px;
+  font-weight: 800;
+}
+#view-torneo-dashboard #admSeccionPartidos {
+  border-radius: 16px;
+}
+#view-torneo-dashboard #partidosVistaPills {
+  margin-bottom: 12px;
+}
+#view-torneo-dashboard .calendario-grid-cabecera {
+  min-height: 42px;
+  font-size: 11px;
+}
+#view-torneo-dashboard .calendario-partido {
+  min-height: 112px;
+  border-radius: 11px;
+  box-shadow: 0 7px 20px rgba(0,0,0,.14);
+}
+#view-torneo-dashboard .planilla-bandeja {
+  background: rgba(255,255,255,.02);
+}
+
+@media (max-width: 820px) {
+  .admin-launch-card { align-items: flex-start; flex-direction: column; }
+  .tournament-dashboard-topbar { align-items: flex-start; flex-direction: column; }
+  .dashboard-status-chip { align-self: flex-start; }
+  .destacados-grid:not(.destacados-grid-banner) { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 767px) {
+  .destacados-grid:not(.destacados-grid-banner) .destacado-card {
+    min-height: 300px;
+  }
+  .destacados-grid:not(.destacados-grid-banner) .destacado-info strong {
+    font-size: 24px;
+  }
+  .campeon-card { flex-basis: 245px; }
+  .campeon-avatares .avatar { width: 70px; height: 70px; }
+  #view-torneo-dashboard #admGestionSubnav {
+    position: static;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+  }
+  #view-torneo-dashboard #admGestionSubnav .pill { white-space: nowrap; }
+}
