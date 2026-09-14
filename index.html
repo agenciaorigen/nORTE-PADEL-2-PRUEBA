@@ -91,13 +91,14 @@
       <div class="hero-carousel-track" id="heroCarouselTrack">
         <div class="hero-carousel-slide">
           <div class="hero-club">
+            <div class="hero-live-label"><span class="hero-live-dot"></span> NORTE PADEL · CIRCUITO 2026</div>
             <div class="hero-club-widget" id="heroPosicionCard" style="display:none">
               <span class="hero-club-widget-label">Tu posición</span>
               <strong id="heroPosicionValor">—</strong>
               <span class="hero-club-widget-sub" id="heroPosicionSub"></span>
             </div>
-            <h2 class="hero-club-titulo">Movimiento.<br /><span>Disciplina.</span><br />Resultado.</h2>
-            <p class="hero-club-sub">El circuito de pádel de Norte Padel: ranking en vivo, torneos todo el año.</p>
+            <h2 class="hero-club-titulo">El circuito.<br /><span>Tu juego.</span><br />Tu lugar.</h2>
+            <p class="hero-club-sub">Torneos, ranking, resultados y protagonistas. Todo el circuito Norte Padel en un solo lugar.</p>
             <button class="hero-club-cta" id="btnHeroTorneos" type="button">Ver torneos <span aria-hidden="true">→</span></button>
           </div>
         </div>
@@ -157,7 +158,7 @@
     </div>
 
     <div class="destacados-band">
-      <div class="destacados-overline"><span>⭐ JUGADORES DEL MES</span></div>
+      <div class="destacados-heading"><div class="destacados-overline"><span>FEATURED PLAYERS · 2026</span></div><h2>Jugadores del mes</h2><p>Los protagonistas que están marcando el circuito.</p></div>
       <div class="destacados-grid" id="jugadorDelMesContenido"></div>
     </div>
 
@@ -168,8 +169,8 @@
       </div>
     </div>
 
-    <div class="seccion" id="campeonesCard" style="display:none">
-      <h3>🏆 Campeones</h3>
+    <div class="seccion campeones-section" id="campeonesCard" style="display:none">
+      <div class="section-kicker">PALMARÉS · ÚLTIMOS TORNEOS</div><h2>Campeones</h2><p class="section-lead">Las parejas que llegaron hasta el final.</p>
       <div class="campeones-strip" id="campeonesContenido"></div>
     </div>
 
@@ -208,7 +209,7 @@
     <div class="card">
       <div class="torneo-card-header">
         <h2>Torneos</h2>
-        <button type="button" class="secondary small admin-only" id="btnMostrarCrearTorneo">+ Crear torneo</button>
+        <button type="button" class="secondary small admin-only public-create-hidden" id="btnMostrarCrearTorneo">+ Crear torneo</button>
       </div>
       <div id="listaTorneos"></div>
     </div>
@@ -539,8 +540,10 @@
       <div class="dashboard-quick-actions">
         <button type="button" class="dashboard-action active" id="btnDashboardSeleccionarTorneo">🏆 Seleccionar torneo</button>
         <button type="button" class="dashboard-action" id="btnDashboardIrPlanilla">▦ Abrir planilla</button>
+        <button type="button" class="dashboard-action dashboard-action-primary" id="btnDashboardNuevoTorneo">＋ Nuevo torneo</button>
       </div>
 
+    <div class="dashboard-command-strip"><span>OPERACIONES</span><strong>Elegí un torneo para entrar a su centro de control</strong><small>La configuración del sitio y la operación de cada torneo están separadas.</small></div>
     <div class="card card-accent" id="admSelectorTorneoCard">
       <h2>Torneo en gestión</h2>
       <p class="match-meta" style="margin-bottom:6px">Elegí un torneo para administrar sus inscripciones, parejas, canchas, bloqueos y partidos. La edición de un torneo vive solo acá — la vista pública nunca muestra estas herramientas.</p>

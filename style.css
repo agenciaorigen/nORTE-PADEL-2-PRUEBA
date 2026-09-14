@@ -1894,3 +1894,58 @@ button.secondary { border-radius: 3px; }
   }
   #view-torneo-dashboard #admGestionSubnav .pill { white-space: nowrap; }
 }
+
+/* =========================================================
+   V66 — NORTE PADEL CIRCUIT / PREMIUM SPORTS SYSTEM
+   Capa visual nueva. No reemplaza la lógica existente.
+   ========================================================= */
+:root{
+  --np-bg:#05080a;
+  --np-panel:#0b1012;
+  --np-panel-2:#101719;
+  --np-line:rgba(255,255,255,.09);
+  --np-muted:#8d9a98;
+  --np-white:#f4f7f5;
+  --np-green:#a8ff2a;
+  --np-green-2:#73d30d;
+  --np-gold:#e7c45b;
+  --np-radius:14px;
+}
+body{background:radial-gradient(900px 500px at 80% -10%,rgba(168,255,42,.07),transparent 60%),linear-gradient(180deg,#05080a 0%,#070b0d 48%,#050708 100%);}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.025;background-image:linear-gradient(rgba(255,255,255,.5) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.5) 1px,transparent 1px);background-size:42px 42px;mask-image:linear-gradient(to bottom,black,transparent 80%);z-index:-1}
+.topbar{height:72px;background:rgba(5,8,10,.82)!important;border-bottom:1px solid rgba(255,255,255,.08)!important;backdrop-filter:blur(18px);}
+.topbar h1{letter-spacing:.04em;font-family:'Big Shoulders Display',sans-serif;font-size:25px!important;font-weight:800!important}.topbar h1 span{color:var(--np-green)}
+.logo-ring{border-color:rgba(168,255,42,.55)!important;box-shadow:0 0 24px rgba(168,255,42,.08)}
+.app-body main{max-width:1480px!important;padding-left:22px;padding-right:22px}
+
+/* HERO */
+.hero-carousel{margin:0 -22px 22px;position:relative;overflow:hidden;border-bottom:1px solid var(--np-line)}
+.hero-carousel-slide{min-height:520px!important}
+.hero-club{min-height:520px!important;padding:78px clamp(28px,7vw,110px)!important;position:relative;overflow:hidden;background:radial-gradient(circle at 82% 35%,rgba(168,255,42,.16),transparent 25%),linear-gradient(115deg,#071014 0%,#0b1517 48%,#111b1d 100%)!important}
+.hero-club:after{content:"PADEL";position:absolute;right:-30px;bottom:-75px;font-family:'Big Shoulders Display';font-size:260px;font-weight:900;line-height:1;color:rgba(255,255,255,.025);letter-spacing:-.04em;pointer-events:none}
+.hero-club-torneo{background:radial-gradient(circle at 75% 35%,rgba(168,255,42,.13),transparent 22%),linear-gradient(115deg,#071014,#10191a)!important}
+.hero-club-ranking{background:radial-gradient(circle at 75% 35%,rgba(231,196,91,.10),transparent 22%),linear-gradient(115deg,#071014,#151616)!important}
+.hero-live-label{position:relative;z-index:2;display:flex;align-items:center;gap:9px;font-size:11px;font-weight:800;letter-spacing:.16em;color:#aebbb8;text-transform:uppercase;margin-bottom:28px}.hero-live-dot{width:7px;height:7px;border-radius:50%;background:var(--np-green);box-shadow:0 0 14px var(--np-green)}
+.hero-club-titulo{font-size:clamp(60px,8vw,118px)!important;line-height:.82!important;letter-spacing:-.045em!important;max-width:850px!important;text-transform:uppercase;position:relative;z-index:2}.hero-club-titulo span{color:var(--np-green)!important}
+.hero-club-sub{max-width:610px!important;font-size:17px!important;color:#b7c1bf!important;line-height:1.6!important;position:relative;z-index:2}.hero-club-cta{border-radius:4px!important;text-transform:uppercase;letter-spacing:.09em;font-weight:900!important;padding:15px 22px!important;position:relative;z-index:2}
+
+/* CONTENT RHYTHM */
+.seccion{margin:42px 0!important}.seccion>h2,.seccion>h3{font-family:'Big Shoulders Display',sans-serif!important;text-transform:uppercase;letter-spacing:.02em}.seccion>h2{font-size:38px!important}.seccion>h3{font-size:25px!important}.section-kicker{font-size:10px;letter-spacing:.18em;color:var(--np-green);font-weight:900;text-transform:uppercase;margin-bottom:5px}.section-lead{color:var(--np-muted);margin-top:-18px;margin-bottom:18px}
+
+/* FEATURED PLAYERS */
+.destacados-band{margin:52px 0 58px!important;padding:38px 0 0!important;background:transparent!important;border:0!important;box-shadow:none!important}.destacados-heading{margin-bottom:20px}.destacados-heading .destacados-overline{margin-bottom:6px}.destacados-heading .destacados-overline span{font-size:10px;letter-spacing:.2em;color:var(--np-green);font-weight:900}.destacados-heading h2{font-family:'Big Shoulders Display';font-size:52px;line-height:.9;text-transform:uppercase;margin:0}.destacados-heading p{color:var(--np-muted);margin:8px 0 0}.destacados-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:18px!important;max-width:none!important}.destacado-card{min-height:390px!important;border:1px solid rgba(255,255,255,.10)!important;border-radius:var(--np-radius)!important;background-color:#111719!important;box-shadow:0 20px 55px rgba(0,0,0,.28)!important;transition:transform .25s ease,border-color .25s ease,box-shadow .25s ease!important}.destacado-card:hover{transform:translateY(-4px);border-color:rgba(168,255,42,.35)!important;box-shadow:0 28px 70px rgba(0,0,0,.42)!important}.destacado-tag{letter-spacing:.13em!important;text-transform:uppercase!important;font-size:10px!important}.destacado-info strong{font-size:clamp(30px,3.5vw,52px)!important;line-height:.9!important}.destacado-stat strong{font-size:46px!important}
+
+/* CHAMPIONS */
+.campeones-section{padding:34px 0 6px;border-top:1px solid var(--np-line)}.campeones-strip{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px!important;overflow:visible!important}.campeon-card{width:auto!important;min-height:235px!important;padding:22px!important;border:1px solid rgba(255,255,255,.10)!important;border-radius:var(--np-radius)!important;background:linear-gradient(145deg,#101718,#080c0d)!important;box-shadow:0 18px 45px rgba(0,0,0,.28)}.campeon-avatares{gap:10px!important}.campeon-avatares img{width:76px!important;height:76px!important;border-radius:50%!important;border:2px solid rgba(168,255,42,.25)!important}.campeon-nombres{font-size:17px!important;line-height:1.1!important}.campeon-torneo{font-size:12px!important;color:#aab6b3!important}.campeon-card:before{content:"CHAMPIONS";display:block;font-size:9px;font-weight:900;letter-spacing:.18em;color:var(--np-gold);margin-bottom:14px}
+
+/* ADMIN SEPARATION */
+.public-create-hidden{display:none!important}
+.tournament-dashboard-shell{max-width:1400px;margin:10px auto 60px}.tournament-dashboard-topbar{padding:38px 0 25px;display:flex;justify-content:space-between;gap:25px;align-items:flex-end;border-bottom:1px solid var(--np-line)}.dashboard-kicker{font-size:10px!important;letter-spacing:.18em;text-transform:uppercase;color:var(--np-green)!important;font-weight:900}.tournament-dashboard-topbar h1{font-family:'Big Shoulders Display';font-size:clamp(52px,7vw,86px);line-height:.84;text-transform:uppercase;margin:6px 0 12px}.dashboard-status-chip{border:1px solid rgba(168,255,42,.25);background:rgba(168,255,42,.06);color:var(--np-green);padding:10px 13px;border-radius:99px;font-size:10px;font-weight:900;letter-spacing:.12em;white-space:nowrap}.dashboard-quick-actions{display:flex;gap:8px;flex-wrap:wrap;padding:15px 0}.dashboard-action{border:1px solid var(--np-line)!important;background:#0b1011!important;color:#dce4e1!important;border-radius:6px!important;padding:12px 16px!important;font-weight:800!important}.dashboard-action.active,.dashboard-action:hover{border-color:rgba(168,255,42,.35)!important;color:var(--np-green)!important}.dashboard-action-primary{background:var(--np-green)!important;color:#061006!important;border-color:var(--np-green)!important}.dashboard-command-strip{display:grid;grid-template-columns:auto 1fr auto;gap:15px;align-items:center;padding:14px 17px;margin-bottom:12px;background:#0b1011;border:1px solid var(--np-line);border-radius:8px}.dashboard-command-strip span{font-size:9px;letter-spacing:.18em;color:var(--np-green);font-weight:900}.dashboard-command-strip strong{font-size:13px}.dashboard-command-strip small{color:var(--np-muted)}
+#admSelectorTorneoCard,#admGestionTorneoWrap>.card{border-radius:10px!important;border-color:var(--np-line)!important;background:linear-gradient(145deg,#0d1315,#090d0e)!important;box-shadow:0 18px 50px rgba(0,0,0,.22)}#admGestionNombre{font-family:'Big Shoulders Display';font-size:42px;text-transform:uppercase}.pj-stats{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.pj-stats>*{min-height:92px!important;background:#080d0e!important;border:1px solid var(--np-line)!important;border-radius:8px!important}
+#admGestionSubnav{position:sticky;top:72px;z-index:20;padding:10px 0!important;background:rgba(5,8,10,.92);backdrop-filter:blur(14px);border-bottom:1px solid var(--np-line)}#admGestionSubnav .pill{border-radius:5px!important;text-transform:uppercase;font-size:10px!important;letter-spacing:.08em;font-weight:900}.card-accent{border-radius:10px!important;border-color:var(--np-line)!important;background:linear-gradient(145deg,#0c1214,#080c0d)!important}.card-accent h2{font-family:'Big Shoulders Display';text-transform:uppercase;font-size:31px!important}
+
+/* PUBLIC TORNEOS */
+#view-torneos>.seccion:first-child{padding-top:20px}#view-torneos .torneo-card{border-radius:10px!important;border:1px solid var(--np-line)!important;background:#0c1214!important}.torneo-card-header h2{font-family:'Big Shoulders Display';text-transform:uppercase}
+
+@media(max-width:900px){.hero-carousel-slide,.hero-club{min-height:470px!important}.hero-club{padding:55px 24px!important}.hero-club-titulo{font-size:clamp(52px,14vw,82px)!important}.destacados-grid{grid-template-columns:1fr!important}.campeones-strip{display:flex!important;overflow-x:auto!important;scroll-snap-type:x mandatory;padding-bottom:8px}.campeon-card{min-width:290px!important;scroll-snap-align:start}.tournament-dashboard-topbar{align-items:flex-start;flex-direction:column}.dashboard-command-strip{grid-template-columns:1fr}.pj-stats{grid-template-columns:repeat(2,minmax(0,1fr))!important}#admGestionSubnav{top:64px;overflow-x:auto;flex-wrap:nowrap!important}#admGestionSubnav .pill{white-space:nowrap}.app-body main{padding-left:14px;padding-right:14px}.hero-carousel{margin-left:-14px;margin-right:-14px}}
+@media(max-width:560px){.hero-carousel-slide,.hero-club{min-height:430px!important}.hero-club-titulo{font-size:56px!important}.hero-club-sub{font-size:14px!important}.destacados-heading h2{font-size:42px}.destacado-card{min-height:330px!important}.pj-stats{grid-template-columns:1fr 1fr!important}.pj-stats>*{min-height:80px!important}.dashboard-quick-actions{display:grid;grid-template-columns:1fr 1fr}.dashboard-action-primary{grid-column:1/-1}.campeon-card{min-width:275px!important}}

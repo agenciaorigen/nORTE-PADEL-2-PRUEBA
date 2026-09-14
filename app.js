@@ -3914,6 +3914,13 @@ document.getElementById("btnVolverConfigDesdeDashboard")?.addEventListener("clic
   cambiarVista("admin", "/admin");
 });
 
+document.getElementById("btnDashboardNuevoTorneo")?.addEventListener("click", () => {
+  if (!isAdmin) return;
+  // El formulario de alta sigue siendo único para preservar la lógica existente.
+  cambiarVista("torneos", "/torneos");
+  setTimeout(() => document.getElementById("btnMostrarCrearTorneo")?.click(), 60);
+});
+
 document.getElementById("btnDashboardSeleccionarTorneo")?.addEventListener("click", () => {
   document.getElementById("admSelectorTorneoCard")?.scrollIntoView({ behavior: "smooth", block: "start" });
   document.getElementById("admSelectTorneoGestion")?.focus();
