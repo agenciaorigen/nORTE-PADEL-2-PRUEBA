@@ -1,0 +1,41 @@
+NORTE PADEL — V64 VISUAL POLISH
+
+OBJETIVO
+Convertir la interfaz actual en una plataforma deportiva premium / circuito profesional / broadcast editorial, sin tocar la lógica.
+
+REGLAS ABSOLUTAS
+- No modificar Supabase, schema, RPCs, nombres de campos ni lógica de inscripción, torneos, ranking, resultados, jugadores o fechas.
+- No eliminar funcionalidades ni inventar datos.
+- No reemplazar fotografías reales.
+- No romper navegación existente.
+- Trabajar sobre index.html + style.css; app.js solo se toca si fuera estrictamente necesario para un bug visual, y nunca para reescribir lógica.
+
+CAMBIOS APLICADOS
+1. Cargar Big Shoulders Display en index.html. Antes style.css la referenciaba pero index.html no la importaba.
+2. Fondo más oscuro y sobrio; el verde queda como acento, no como superficie dominante.
+3. Header con efecto vidrio, menor ruido visual y marca tipográfica más fuerte.
+4. Desktop: contenido público más ancho (1280px) y hero mucho más editorial.
+5. Hero: títulos grandes, condensados, alto impacto, CTA más deportivo.
+6. Secciones: títulos grandes en vez de sensación de dashboard.
+7. Marquee: convertirlo en una línea broadcast más elegante.
+8. Partidos: menos apariencia de card genérica, más bloques de orden de juego.
+9. Jugador del mes: banner editorial ancho.
+10. Torneos/flyers: esquinas más limpias y protagonismo del afiche.
+11. Ranking: números de posición grandes y leaderboard más fuerte.
+12. Torneo hero: título grande y lenguaje de competición.
+13. Formularios: superficies más sobrias, inputs menos redondeados y mejor foco.
+14. Calendario/llave: estética más deportiva y menos UI genérica.
+15. Mobile: mantener legibilidad, hero fuerte y evitar tarjetas excesivamente redondeadas.
+16. Respeto por prefers-reduced-motion.
+17. Service worker actualizado de v63 a v64 para evitar que el CSS anterior quede cacheado tras publicar.
+
+ARCHIVOS MODIFICADOS
+- index.html
+- style.css
+- sw.js
+
+ARCHIVO DE RESPALDO
+- style.v63.backup.css
+
+IMPORTANTE AL PUBLICAR
+Subir los tres archivos modificados junto con el resto del proyecto. El cambio de sw.js es necesario para forzar la actualización de caché.
