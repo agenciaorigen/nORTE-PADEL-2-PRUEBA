@@ -2,16 +2,6 @@
 // NORTE PADEL — lógica de la app (vanilla JS, sin frameworks)
 // ============================================================
 
-const __npConfigValida = typeof SUPABASE_URL === "string" && /^https?:\/\//.test(SUPABASE_URL) && !SUPABASE_URL.includes("PEGA_ACA_TU_") && typeof SUPABASE_ANON_KEY === "string" && SUPABASE_ANON_KEY.length > 20 && !SUPABASE_ANON_KEY.includes("PEGA_ACA_TU_");
-if (!__npConfigValida) {
-  document.addEventListener("DOMContentLoaded", () => {
-    const box = document.createElement("div");
-    box.style.cssText = "position:fixed;inset:0;z-index:99999;background:#050708;color:#f4f7f5;display:grid;place-items:center;padding:24px;font-family:system-ui,sans-serif";
-    box.innerHTML = '<div style="max-width:620px;border:1px solid rgba(255,255,255,.16);padding:28px;background:#0b110e"><strong style="display:block;font-size:22px;margin-bottom:10px">Norte Padel no pudo iniciar</strong><p style="color:#aeb9b2;line-height:1.6;margin:0 0 12px">La configuración de Supabase no está cargada. Conservá tu <code>config.js</code> actual con la URL y la anon key reales del proyecto.</p><p style="color:#79f34d;margin:0">No se modificó la base de datos.</p></div>';
-    document.body.appendChild(box);
-  });
-  throw new Error("Configuración de Supabase ausente o inválida. Conservá el config.js real del proyecto.");
-}
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const DIAS = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
@@ -43,56 +33,6 @@ let hayCalendarioTorneoActual = false;
 let ultimasCanchasTorneo = [];
 let partidosCategoriaFiltro = ""; // "" = todas las categorías del torneo
 let configApp = {}; // clave/valor de la tabla "config" (whatsapp_numero, instagram_url)
-
-// ---------- cache liviano de lecturas públicas ----------
-// Evita repetir las mismas consultas en el arranque (Inicio + Torneos +
-// auth callback) y permite que el UI filtre/ordene en memoria sin volver a
-// golpear Supabase. Las mutaciones invalidan explícitamente el cache.
-let torneosCacheLoaded = false;
-let torneosRequest = null;
-let rankingPublicoCache = null;
-let rankingPublicoRequest = null;
-
-function fechaLocalISO(date = new Date()) {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, "0");
-  const d = String(date.getDate()).padStart(2, "0");
-  return `${y}-${m}-${d}`;
-}
-
-async function obtenerTorneosCache(force = false) {
-  if (!force && torneosCacheLoaded) return cacheTorneos;
-  if (!force && torneosRequest) return torneosRequest;
-  torneosRequest = sb.from("torneos")
-    .select("id,nombre,complejo_id,fecha_inicio,fecha_fin,flyer_url,costo,duracion_minutos,dias_semana,hora_desde,hora_hasta,horarios_por_dia,fase_grupos_formato,tamano_grupo,avanzan_por_grupo,estado,complejos(nombre,direccion),torneo_categorias(categoria,estado_fase)")
-    .order("fecha_inicio", { ascending: false })
-    .then(({ data }) => {
-      cacheTorneos = data || [];
-      torneosCacheLoaded = true;
-      return cacheTorneos;
-    })
-    .finally(() => { torneosRequest = null; });
-  return torneosRequest;
-}
-
-function invalidarCacheTorneos() {
-  torneosCacheLoaded = false;
-  torneosRequest = null;
-}
-
-async function obtenerRankingPublico(force = false) {
-  if (!force && rankingPublicoCache) return rankingPublicoCache;
-  if (!force && rankingPublicoRequest) return rankingPublicoRequest;
-  rankingPublicoRequest = sb.rpc("ranking_categoria_publico")
-    .then(({ data }) => {
-      rankingPublicoCache = data || [];
-      return rankingPublicoCache;
-    })
-    .finally(() => { rankingPublicoRequest = null; });
-  return rankingPublicoRequest;
-}
-
-function invalidarCacheRanking() { rankingPublicoCache = null; }
 
 // "Jugar" (reservar cancha) está armado pero pausado hasta cerrar el acuerdo con el club
 // y activar el botón en index.html — mientras tanto no se llama a sus funciones para no
@@ -162,28 +102,13 @@ function cambiarVista(nombre, ruta) {
   // cambiarVista("admin") por su cuenta (ver despacharRuta) — sin este chequeo,
   // ese segundo llamado deshacía el modo enfocado apenas se activaba.
   if (nombre === "admin" && !adminFocoTorneoActivo) {
-    if (adminPanelMode === "config") {
-      document.getElementById("admSelectorTorneoCard").style.display = "none";
-      document.getElementById("admGestionTorneoWrap").style.display = "none";
-      mostrarConfigGeneral(true);
-      document.getElementById("admBtnVolverConfigGeneral").style.display = "none";
-    } else {
-      document.getElementById("admSelectorTorneoCard").style.display = "block";
-      document.getElementById("admGestionTorneoWrap").style.display = "none";
-      mostrarConfigGeneral(false);
-      document.getElementById("admBtnVolverConfigGeneral").style.display = "none";
-    }
+    document.getElementById("admSelectorTorneoCard").style.display = "block";
+    mostrarConfigGeneral(true);
+    document.getElementById("admBtnVolverConfigGeneral").style.display = "none";
   } else if (nombre !== "admin") {
     adminFocoTorneoActivo = false;
   }
   if (!syncingDesdeHash) navegarA(ruta || (nombre === "inicio" ? "/" : "/" + nombre));
-  // Cada vista pública es una pantalla propia: al cambiar de módulo siempre
-  // arrancamos arriba, en lugar de heredar la posición de scroll de la vista anterior.
-  requestAnimationFrame(() => {
-    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
-  });
 }
 
 // Prende/apaga TODA la configuración general del club de una sola vez —
@@ -197,25 +122,6 @@ function mostrarConfigGeneral(visible) {
   document.getElementById("admConfigGeneralWrap2").style.display = visible ? "block" : "none";
   document.getElementById("auspiciantesWrap").style.display = visible ? "block" : "none";
   document.getElementById("btnCerrarAuspiciantesTorneo").style.display = "none";
-}
-
-
-let adminPanelMode = "ops"; // ops | config
-function setAdminPanelMode(mode){
-  adminPanelMode = mode === "config" ? "config" : "ops";
-  const selector = document.getElementById("admSelectorTorneoCard");
-  const gestion = document.getElementById("admGestionTorneoWrap");
-  const modeTitle = document.getElementById("npAdminModeTitle");
-  const modeSub = document.getElementById("npAdminModeSub");
-  const topBtn = document.getElementById("btnConfigTop");
-  const goConfig = document.getElementById("btnAdminIrConfig");
-  if (selector) selector.style.display = adminPanelMode === "ops" && !adminFocoTorneoActivo ? "block" : "none";
-  if (gestion) gestion.style.display = adminPanelMode === "config" ? "none" : (gestion.style.display === "block" || adminFocoTorneoActivo ? "block" : gestion.style.display);
-  mostrarConfigGeneral(adminPanelMode === "config");
-  if (modeTitle) modeTitle.textContent = adminPanelMode === "config" ? "CONFIGURATION" : "TOURNAMENT OPS";
-  if (modeSub) modeSub.textContent = adminPanelMode === "config" ? "Configuración general del club. Todo lo permanente, separado de la operación de un torneo." : "Organizá la competencia, horarios, canchas y resultados desde un solo centro operativo.";
-  if (goConfig) goConfig.textContent = adminPanelMode === "config" ? "VOLVER A TORNEOS" : "CONFIGURACIÓN";
-  if (topBtn) topBtn.classList.toggle("active", adminPanelMode === "config");
 }
 
 function navegarA(ruta) {
@@ -244,16 +150,12 @@ async function despacharRuta() {
     if (raiz === "jugar" && FEATURE_JUGAR_HABILITADA) { cambiarVista("jugar"); return; }
     if (raiz === "admin") {
       if (!isAdmin) { cambiarVista("inicio"); return; }
-      adminFocoTorneoActivo = false;
       cambiarVista("admin");
-      setAdminPanelMode("ops");
       return;
     }
-    if (raiz === "config") {
+    if (raiz === "admin-torneos") {
       if (!isAdmin) { cambiarVista("inicio"); return; }
-      adminFocoTorneoActivo = false;
-      cambiarVista("admin");
-      setAdminPanelMode("config");
+      cambiarVista("torneo-dashboard");
       return;
     }
     if (raiz === "torneo" && a) { await abrirTorneo(a, sub); return; }
@@ -610,8 +512,7 @@ document.getElementById("btnGuardarPerfil").addEventListener("click", async () =
   renderVistaPerfil();
   suscribirseANotificacionesRealtime();
   actualizarContadorNotificaciones();
-  invalidarCacheRanking();
-  cargarRanking(true);
+  cargarRanking();
   cargarJugadorDelMes();
   if (torneoActualId) renderInscribirme();
 });
@@ -665,12 +566,7 @@ async function manejarCambioSesion(session) {
   renderVistaPerfil();
   suscribirseANotificacionesRealtime();
   actualizarContadorNotificaciones();
-  if (isAdmin) {
-    cargarJugadoresAdmin();
-    cargarComplejos();
-    cargarPuntosRonda();
-    if (FEATURE_JUGAR_HABILITADA) cargarReservasPendientesAdmin();
-  }
+  if (isAdmin) { cargarJugadoresAdmin(); if (FEATURE_JUGAR_HABILITADA) cargarReservasPendientesAdmin(); }
   calcularTorneoDestacado();
   cargarHeroPosicion();
   if (torneoActualId) refrescarDetalleTorneo();
@@ -687,11 +583,12 @@ sb.auth.onAuthStateChange((_event, session) => manejarCambioSesion(session));
 // RANKING (segmentado por categoría, vía función pública)
 // ============================================================
 let generoRankingActual = localStorage.getItem("np_genero_ranking") || null;
-async function cargarRanking(force = false) {
+async function cargarRanking() {
   // ranking_categoria_publico() (no jugadores_publicos()): devuelve una fila por cada
   // categoría en la que el jugador tiene puntos, así el mismo jugador puede aparecer
   // en el ranking de más de una categoría a la vez.
-  const todos = await obtenerRankingPublico(force);
+  const { data } = await sb.rpc("ranking_categoria_publico");
+  const todos = data || [];
   const categorias = [...new Set(todos.map((j) => j.categoria).filter(Boolean))]
     .sort((a, b) => a.localeCompare(b, "es", { numeric: true }));
 
@@ -856,10 +753,9 @@ document.getElementById("btnVerMiPerfilPublico").addEventListener("click", () =>
 // INICIO: próximos torneos con flyer + jugador del mes
 // ============================================================
 async function cargarInicio() {
-  const hoy = fechaLocalISO();
-  const data = await obtenerTorneosCache();
-  const proximos = data.filter((t) => t.flyer_url && (!t.fecha_fin || t.fecha_fin >= hoy))
-    .sort((a, b) => a.fecha_inicio.localeCompare(b.fecha_inicio));
+  const hoy = new Date().toISOString().slice(0, 10);
+  const { data } = await sb.from("torneos").select("*").not("flyer_url", "is", null).order("fecha_inicio", { ascending: true });
+  const proximos = (data || []).filter((t) => !t.fecha_fin || t.fecha_fin >= hoy);
 
   const destacado = document.getElementById("flyerDestacado");
   const grid = document.getElementById("flyerMini");
@@ -887,7 +783,7 @@ async function cargarInicio() {
 
   resto.forEach((t) => {
     const div = document.createElement("div");
-    div.innerHTML = `<img src="${t.flyer_url}" alt="${t.nombre}" loading="lazy" decoding="async" style="cursor:pointer" /><div class="match-meta meta-caption">${t.nombre}</div>`;
+    div.innerHTML = `<img src="${t.flyer_url}" alt="${t.nombre}" loading="lazy" style="cursor:pointer" /><div class="match-meta meta-caption">${t.nombre}</div>`;
     div.querySelector("img").addEventListener("click", () => abrirTorneo(t.id));
     grid.appendChild(div);
   });
@@ -899,24 +795,13 @@ async function cargarInicio() {
 // suma una lupa chica superpuesta (pointer-events:none, no interfiere con el click
 // ni con el foco por teclado, que siguen siendo los de la imagen) para que la acción
 // de ampliar sea visible de un vistazo y no dependa solo del cursor al pasar el mouse.
-function avatarFallback(img, size, cls = "") {
-  if (!img || img.dataset.fallbackApplied === "1") return;
-  img.dataset.fallbackApplied = "1";
-  const placeholder = document.createElement("div");
-  placeholder.className = `avatar avatar-placeholder${cls}`;
-  placeholder.style.width = `${size || 44}px`;
-  placeholder.style.height = `${size || 44}px`;
-  placeholder.textContent = "🎾";
-  img.replaceWith(placeholder);
-}
-
 function avatarHtml(fotoUrl, size, extraClass, ampliable) {
   const s = size || 44;
   const clickable = ampliable && fotoUrl;
   const cls = (extraClass ? ` ${extraClass}` : "") + (clickable ? " avatar-clickable" : "");
   const dataAttr = clickable ? ` data-foto-grande="${fotoUrl}" tabindex="0" role="button" aria-label="Ver foto en grande"` : "";
   const img = fotoUrl
-    ? `<img class="avatar${cls}" src="${fotoUrl}" alt="" loading="lazy" decoding="async" style="width:${s}px;height:${s}px" onerror="avatarFallback(this, ${s}, ${JSON.stringify(cls)})"${dataAttr} />`
+    ? `<img class="avatar${cls}" src="${fotoUrl}" alt="" loading="lazy" style="width:${s}px;height:${s}px" onerror="this.style.display='none'"${dataAttr} />`
     : `<div class="avatar avatar-placeholder${cls}" style="width:${s}px;height:${s}px">🎾</div>`;
   if (!clickable) return img;
   const iconoLupa = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><circle cx="10" cy="10" r="6.5"/><path d="M10 7.2v5.6M7.2 10h5.6"/><path d="M15 15l5.5 5.5"/></svg>`;
@@ -951,33 +836,19 @@ function renderJugadorDelMes() {
   const porGenero = cacheJugadorDelMes;
   if (!porGenero) return;
   const contenedor = document.getElementById("jugadorDelMesContenido");
-  // ahora siempre es 1 sola tarjeta que rota (antes esta clase era solo para
-  // el banner ancho de escritorio; en mobile pasaba de grid 2 columnas a 1
-  // con las 2 tarjetas de siempre) -- se agrega siempre, el tamaño grande
-  // de banner sigue siendo solo de escritorio (ver @media min-width:960px)
-  contenedor.classList.add("destacados-grid-banner");
+  if (!contenedor) return;
+  contenedor.classList.remove("destacados-grid-banner");
 
-  const generoRotado = new Date().getDate() % 2 === 0 ? "Caballeros" : "Damas";
-  const generoElegido = porGenero[generoRotado] ? generoRotado : (porGenero.Damas ? "Damas" : "Caballeros");
-  const generos = [generoElegido];
+  // La RPC ya devuelve hasta un destacado por género. En la portada mostramos
+  // ambos protagonistas simultáneamente cuando están disponibles: no hay
+  // rotación artificial ni se pierde visibilidad de uno de los géneros.
+  const generos = ["Damas", "Caballeros"].filter((genero) => porGenero[genero]);
 
   contenedor.innerHTML = generos.map((genero) => {
     const row = porGenero[genero];
-    if (!row) {
-      return `
-        <div class="destacado-card vacio">
-          <div class="destacado-icono">🎾</div>
-          <div class="destacado-info">
-            <strong>${TAG_DESTACADO[genero]}</strong>
-            <span>Aún sin asignar</span>
-          </div>
-        </div>`;
-    }
-    const fondo = row.foto_url ? `style="cursor:pointer"` : `style="cursor:pointer"`;
-    const foto = row.foto_url ? `<img class="np-pom-img" src="${row.foto_url}" alt="${row.nombre} ${row.apellido}" loading="lazy" decoding="async" onerror="this.remove()" />` : "";
+    const fondo = row.foto_url ? `style="background-image:url('${row.foto_url}');cursor:pointer"` : `style="cursor:pointer"`;
     return `
-      <div class="destacado-card" data-jugador-id="${row.jugador_id}" ${fondo}>
-        ${foto}
+      <div class="destacado-card" data-jugador-id="${row.jugador_id}" data-genero="${genero}" ${fondo}>
         <div class="destacado-tag">⭐ ${TAG_DESTACADO[genero]}</div>
         <div class="destacado-stat">
           <strong>${row.puntos_ranking}</strong>
@@ -989,6 +860,17 @@ function renderJugadorDelMes() {
         </div>
       </div>`;
   }).join("");
+
+  if (!generos.length) {
+    contenedor.innerHTML = `
+      <div class="destacado-card vacio">
+        <div class="destacado-icono">🎾</div>
+        <div class="destacado-info">
+          <strong>Jugadores del mes</strong>
+          <span>Aún no hay destacados asignados.</span>
+        </div>
+      </div>`;
+  }
 
   document.querySelectorAll("#jugadorDelMesContenido .destacado-card[data-jugador-id]").forEach((card) => {
     card.addEventListener("click", () => abrirPerfilJugador(card.dataset.jugadorId));
@@ -1038,85 +920,40 @@ async function cargarUltimosProximos() {
   const { data } = await sb.rpc("partidos_publicos", { p_torneo_id: idTorneo });
   const partidos = data || [];
   const ahora = new Date();
+
   const jugados = partidos.filter((p) => p.estado === "jugado" && p.horario)
-    .sort((a, b) => new Date(b.horario) - new Date(a.horario)).slice(0, 4);
+    .sort((a, b) => new Date(b.horario) - new Date(a.horario)).slice(0, 3);
   const proximos = partidos.filter((p) => p.horario && p.estado !== "jugado" && new Date(p.horario) >= ahora)
     .sort((a, b) => new Date(a.horario) - new Date(b.horario)).slice(0, 3);
 
+  // "resultados" y "calendario" ya no son pantallas separadas — las dos tarjetas
+  // llevan a la misma pantalla única de Torneo ("").
   renderInicioPartidosGrid("inicioResultadosWrap", "inicioResultadosGrid", jugados, () => abrirTorneo(idTorneo, ""));
-  renderUpcomingMatchRail("inicioProximosWrap", "inicioProximosGrid", proximos, () => abrirTorneo(idTorneo, ""));
-  const legacy = document.getElementById("inicioProximoDestacadoWrap");
-  if (legacy) legacy.style.display = "none";
+  renderInicioPartidosGrid("inicioProximosWrap", "inicioProximosGrid", proximos, () => abrirTorneo(idTorneo, ""));
+
+  // "Próximo partido destacado" (solo escritorio): el partido más próximo de
+  // este mismo array, reusando matchVsRowHtml (ya arma el VS con la foto de
+  // cada jugador) en vez de un componente nuevo.
+  renderProximoDestacado(proximos[0], idTorneo);
 }
 
-function renderUpcomingMatchRail(wrapId, gridId, items, onClick) {
-  const wrap = document.getElementById(wrapId);
-  const rail = document.getElementById(gridId);
-  if (!wrap || !rail) return;
-  if (!items.length) { wrap.style.display = "none"; rail.innerHTML = ""; return; }
+function renderProximoDestacado(p, idTorneo) {
+  const wrap = document.getElementById("inicioProximoDestacadoWrap");
+  const esDesktop = window.matchMedia("(min-width: 960px)").matches;
+  if (!esDesktop || !p) { wrap.style.display = "none"; return; }
+  const horario = p.horario
+    ? new Date(p.horario).toLocaleString("es-AR", { weekday: "long", day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })
+    : "Horario a definir";
+  const local = p.cancha_nombre ? `${p.complejo_nombre ? p.complejo_nombre + " · " : ""}${p.cancha_nombre}` : (p.complejo_nombre || "A definir");
+  const contenido = document.getElementById("inicioProximoDestacadoContenido");
+  contenido.innerHTML = `
+    <div class="match-pair-destacado" style="cursor:pointer">
+      ${matchVsRowHtml(p)}
+      <p class="match-meta">${p.categoria ? `${p.categoria} · ` : ""}${iconoCalendarioChico()} ${horario} · ${iconoPin()} ${local}</p>
+    </div>`;
+  contenido.querySelector(".match-pair-destacado").addEventListener("click", () => abrirTorneo(idTorneo, ""));
   wrap.style.display = "block";
-  const itemHtml = (p, idx) => {
-    const hora = p.horario ? new Date(p.horario).toLocaleString("es-AR", { weekday:"short", day:"2-digit", month:"short", hour:"2-digit", minute:"2-digit" }) : "Horario a definir";
-    const local = p.cancha_nombre ? `${p.complejo_nombre ? p.complejo_nombre + " · " : ""}${p.cancha_nombre}` : (p.complejo_nombre || "A definir");
-    const player = (n, a, foto) => `<div class="np-rail-player">${avatarHtml(foto, 72, "np-rail-avatar", true)}<span>${[n,a].filter(Boolean).join(" ") || "?"}</span></div>`;
-    return `<article class="np-match-banner" data-index="${idx}" tabindex="0" role="button" aria-label="Ver próximo partido">
-      <div class="np-banner-top"><span>0${idx+1} / NEXT MATCH</span><span>${p.categoria || "PADEL"}</span></div>
-      <div class="np-banner-main">
-        <div class="np-banner-team">${player(p.j1a_nombre,p.j1a_apellido,p.j1a_foto)}${player(p.j1b_nombre,p.j1b_apellido,p.j1b_foto)}</div>
-        <div class="np-banner-vs"><strong>VS</strong><small>${hora}</small><small>${local}</small></div>
-        <div class="np-banner-team right">${player(p.j2a_nombre,p.j2a_apellido,p.j2a_foto)}${player(p.j2b_nombre,p.j2b_apellido,p.j2b_foto)}</div>
-      </div>
-      <span class="np-banner-open">VER PARTIDO ↗</span>
-    </article>`;
-  };
-  rail.innerHTML = items.map(itemHtml).join("");
-  rail.querySelectorAll(".np-match-banner").forEach((el) => { el.addEventListener("click", onClick); el.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onClick(); } }); });
-  const dots = document.getElementById("npMatchRailDots");
-  if (dots) {
-    dots.innerHTML = items.map((_,i)=>`<button type="button" aria-label="Ir al partido ${i+1}" data-i="${i}"></button>`).join("");
-    dots.querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>rail.scrollTo({left:Number(b.dataset.i)*rail.clientWidth,behavior:"smooth"})));
-  }
-  const updateDots = () => { const active=Math.round(rail.scrollLeft/(rail.clientWidth||1)); dots?.querySelectorAll("button").forEach((b,i)=>b.classList.toggle("active",i===active)); };
-  rail.onscroll = () => requestAnimationFrame(updateDots); updateDots();
-  const prev = document.querySelector('.np-match-rail-controls [data-rail="prev"]');
-  const next = document.querySelector('.np-match-rail-controls [data-rail="next"]');
-  prev && (prev.onclick=()=>rail.scrollBy({left:-rail.clientWidth,behavior:'smooth'}));
-  next && (next.onclick=()=>rail.scrollBy({left:rail.clientWidth,behavior:'smooth'}));
-  // El rail se vuelve a renderizar cuando cambia el torneo destacado o el tamaño
-  // de pantalla. El estado del autoplay vive en el propio elemento para evitar
-  // timers huérfanos y, sobre todo, cierres sobre un array viejo de partidos.
-  if (!rail._matchRailState) {
-    rail._matchRailState = { timer: null, itemsLength: 0 };
-    const stop = () => {
-      if (rail._matchRailState?.timer) clearInterval(rail._matchRailState.timer);
-      rail._matchRailState.timer = null;
-    };
-    const start = () => {
-      stop();
-      const state = rail._matchRailState;
-      if (!state || state.itemsLength < 2 || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-      state.timer = setInterval(() => {
-        const count = rail.querySelectorAll('.np-match-banner').length;
-        if (count < 2) return;
-        const current = Math.round(rail.scrollLeft / (rail.clientWidth || 1));
-        const nextIdx = (current + 1) % count;
-        rail.scrollTo({ left: nextIdx * rail.clientWidth, behavior: 'smooth' });
-      }, 5200);
-    };
-    rail.addEventListener('mouseenter', stop);
-    rail.addEventListener('mouseleave', start);
-    wrap.addEventListener('focusin', stop);
-    wrap.addEventListener('focusout', start);
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden) stop(); else start();
-    });
-    rail._matchRailStart = start;
-    rail._matchRailStop = stop;
-  }
-  rail._matchRailState.itemsLength = items.length;
-  rail._matchRailStart?.();
 }
-
 window.matchMedia("(min-width: 960px)").addEventListener("change", () => cargarUltimosProximos());
 
 function renderInicioPartidosGrid(wrapId, gridId, items, onClick) {
@@ -1134,8 +971,8 @@ function renderInicioPartidosGrid(wrapId, gridId, items, onClick) {
 async function cargarHeroPosicion() {
   const card = document.getElementById("heroPosicionCard");
   if (!miJugador) { card.style.display = "none"; return; }
-  const todos = await obtenerRankingPublico();
-  const delGrupo = todos.filter((j) => j.categoria === miJugador.categoria)
+  const { data } = await sb.rpc("ranking_categoria_publico");
+  const delGrupo = (data || []).filter((j) => j.categoria === miJugador.categoria)
     .sort((a, b) => b.puntos_ranking - a.puntos_ranking);
   const pos = delGrupo.findIndex((j) => j.id === miJugador.id);
   if (pos === -1) { card.style.display = "none"; return; }
@@ -1201,14 +1038,11 @@ function matchVsRowHtml(p, ganador) {
 // función). Se mantiene solo para calcular torneoDestacadoId, que es a dónde lleva la
 // banda "Inscribite ya" de Inicio.
 async function calcularTorneoDestacado() {
-  const hoy = fechaLocalISO();
-  const torneos = await obtenerTorneosCache();
-  const enCurso = torneos
-    .filter((t) => t.fecha_inicio <= hoy && (t.fecha_fin || t.fecha_inicio) >= hoy)
-    .sort((a, b) => a.fecha_inicio.localeCompare(b.fecha_inicio))[0];
-  const proximo = torneos.filter((t) => t.fecha_inicio > hoy).sort((a, b) => a.fecha_inicio.localeCompare(b.fecha_inicio))[0];
+  const hoy = new Date().toISOString().slice(0, 10);
+  const { data: torneos } = await sb.from("torneos").select("*, complejos(nombre, direccion)").order("fecha_inicio");
+  const enCurso = (torneos || []).find((t) => t.fecha_inicio <= hoy && (t.fecha_fin || t.fecha_inicio) >= hoy);
+  const proximo = (torneos || []).filter((t) => t.fecha_inicio > hoy).sort((a, b) => a.fecha_inicio.localeCompare(b.fecha_inicio))[0];
   torneoDestacadoId = (enCurso || proximo)?.id || null;
-  return torneoDestacadoId;
 }
 
 document.getElementById("btnDestacarJugador").addEventListener("click", async () => {
@@ -1375,8 +1209,7 @@ async function cargarCategorias() {
         ]);
         toast("Categoría renombrada");
         cargarCategorias();
-        invalidarCacheRanking();
-        cargarRanking(true);
+        cargarRanking();
         if (isAdmin) cargarJugadoresAdmin();
       });
     });
@@ -1660,8 +1493,7 @@ function renderListaJugadoresAdmin() {
           if (error) { toast("Error: " + error.message); return; }
           toast("Puntos actualizados");
           await cargarJugadoresAdmin();
-          invalidarCacheRanking();
-          cargarRanking(true);
+          cargarRanking();
         });
         fila.querySelector(".btnQuitarCategoriaRanking").addEventListener("click", async () => {
           if (!confirm(`¿Sacar a ${j.nombre} ${j.apellido} del ranking de ${categoria}?`)) return;
@@ -1669,8 +1501,7 @@ function renderListaJugadoresAdmin() {
           if (error) { toast("Error: " + error.message); return; }
           toast("Categoría quitada del ranking");
           await cargarJugadoresAdmin();
-          invalidarCacheRanking();
-          cargarRanking(true);
+          cargarRanking();
         });
       });
       div.querySelector(".btnAgregarCategoriaRanking").addEventListener("click", async () => {
@@ -1680,8 +1511,7 @@ function renderListaJugadoresAdmin() {
         if (error) { toast("Error: " + error.message); return; }
         toast(`${j.nombre} ${j.apellido} ahora también rankea en ${categoria}`);
         await cargarJugadoresAdmin();
-        invalidarCacheRanking();
-        cargarRanking(true);
+        cargarRanking();
       });
     };
     renderRankingExtra();
@@ -1717,8 +1547,7 @@ function renderListaJugadoresAdmin() {
       if (error) { toast("Error: " + error.message); return; }
       toast("Jugador actualizado");
       cargarJugadoresAdmin();
-      invalidarCacheRanking();
-      cargarRanking(true);
+      cargarRanking();
     });
     // Blanquear la clave de un jugador (ej: la olvidó, o quedó con la provisoria
     // de una importación vieja). No se puede hacer desde el cliente con la clave
@@ -1744,8 +1573,7 @@ function renderListaJugadoresAdmin() {
       if (error) { toast("Error: " + error.message); return; }
       toast("Perfil eliminado");
       cargarJugadoresAdmin();
-      invalidarCacheRanking();
-      cargarRanking(true);
+      cargarRanking();
     });
     cont.appendChild(div);
   });
@@ -1776,8 +1604,7 @@ function renderSolicitudesCategoria(jugadores) {
       await sb.from("historial_categoria").insert({ jugador_id: j.id, categoria_anterior: j.categoria, categoria_nueva: j.categoria_pendiente });
       toast("Categoría aprobada");
       cargarJugadoresAdmin();
-      invalidarCacheRanking();
-      cargarRanking(true);
+      cargarRanking();
     });
     div.querySelector(".btnRechazarCategoria").addEventListener("click", async () => {
       const { error } = await sb.from("jugadores").update({ categoria_pendiente: null }).eq("id", j.id);
@@ -1793,7 +1620,7 @@ function renderSolicitudesCategoria(jugadores) {
 // TORNEOS
 // ============================================================
 function estaEnVivo(t) {
-  const hoy = fechaLocalISO();
+  const hoy = new Date().toISOString().slice(0, 10);
   return t.fecha_inicio <= hoy && (t.fecha_fin || t.fecha_inicio) >= hoy;
 }
 
@@ -1811,8 +1638,9 @@ function linkMapsComplejo(complejo) {
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
 }
 
-async function cargarTorneos(force = false) {
-  const data = await obtenerTorneosCache(force);
+async function cargarTorneos() {
+  const { data } = await sb.from("torneos").select("*, complejos(nombre, direccion), torneo_categorias(categoria)").order("fecha_inicio", { ascending: false });
+  cacheTorneos = data || [];
   const cont = document.getElementById("listaTorneos");
   cont.innerHTML = "";
 
@@ -1996,10 +1824,8 @@ document.getElementById("btnCrearTorneo").addEventListener("click", async () => 
   document.getElementById("tCosto").value = "";
   document.querySelectorAll(".chkTorneoCategoria:checked").forEach((c) => (c.checked = false));
   document.getElementById("crearTorneoCard").style.display = "none";
-  invalidarCacheTorneos();
-  await cargarTorneos(true);
-  await cargarInicio();
-  await calcularTorneoDestacado();
+  cargarTorneos();
+  cargarInicio();
   abrirTorneo(data.id);
 });
 
@@ -2541,11 +2367,6 @@ async function refrescarDetalleTorneo() {
   // del rediseño): mismo dato, solo se muestra también acá en grande.
   document.getElementById("dtNombreHero").textContent = t.nombre;
   document.getElementById("dtEstadoHero").innerHTML = badgeEstadoTorneo(t);
-  const torneoFlyer = t.flyer_url || "hero-torneos.webp";
-  const torneoArt = document.querySelector(".np-event-art");
-  const torneoInfoArt = document.querySelector(".np-event-inside-art");
-  if (torneoArt) torneoArt.style.backgroundImage = `linear-gradient(90deg, rgba(4,7,5,.16), rgba(4,7,5,.06)), url("${String(torneoFlyer).replace(/\"/g, "%22")}")`;
-  if (torneoInfoArt) torneoInfoArt.style.backgroundImage = `linear-gradient(0deg, rgba(4,7,5,.08), rgba(4,7,5,.02)), url("${String(torneoFlyer).replace(/\"/g, "%22")}")`;
   categoriasTorneoActual = (t.torneo_categorias || []).map((c) => c.categoria);
   const categorias = categoriasTorneoActual.join(", ") || "todas las categorías";
   document.getElementById("dtInfo").textContent = `${t.complejos?.nombre || "sin complejo"} · ${categorias} · ${t.fecha_inicio} a ${t.fecha_fin}`;
@@ -2611,13 +2432,6 @@ async function refrescarDetalleTorneo() {
   renderParejasEn("dtParejas", "dtSinPareja", insc || [], parejas || [], false);
   cargarCategoriasTorneo(parejas || []);
   renderStatsInicioTorneo(parejas || [], tc || [], ultimosPartidos);
-  renderEstadoCompetenciaTorneo(
-    ultimosPartidos,
-    parejas || [],
-    tc || [],
-    categoriasPublicadas,
-    t
-  );
 
   await cargarBloqueosCancha();
   renderResultadosPublico();
@@ -2662,35 +2476,6 @@ function renderStatsInicioTorneo(parejas, canchasTorneo, partidos) {
   ]);
 }
 
-function renderEstadoCompetenciaTorneo(partidos, parejas, canchas, categoriasPublicadas, torneo) {
-  const cont = document.getElementById("dtCompetitionState");
-  if (!cont) return;
-  const publicados = (partidos || []).length;
-  const categorias = categoriasTorneoActual.length;
-  const estado = torneo?.estado || "";
-  const tieneCalendario = categoriasPublicadas?.size > 0;
-  const title = publicados > 0 ? "COMPETENCIA EN MARCHA" : "CUADRO DE COMPETICIÓN";
-  const copy = publicados > 0
-    ? "Partidos publicados por categoría, listos para seguir el circuito."
-    : tieneCalendario
-      ? "El calendario ya está publicado. Los encuentros aparecerán aquí por categoría."
-      : estado === "inscripcion"
-        ? "La inscripción está abierta. El cuadro se publica cuando el club confirma el calendario."
-        : "El club todavía está preparando el cuadro de esta competencia.";
-  cont.innerHTML = `
-    <div class="np-competition-state-head">
-      <div><span class="np-kicker">LIVE COMPETITION</span><h4>${title}</h4></div>
-      <span class="np-competition-state-badge ${publicados ? "is-live" : ""}">${publicados ? "PUBLICADO" : "EN PREPARACIÓN"}</span>
-    </div>
-    <p>${copy}</p>
-    <div class="np-competition-metrics">
-      <div><strong>${parejas?.length || 0}</strong><span>PAREJAS</span></div>
-      <div><strong>${categorias}</strong><span>CATEGORÍAS</span></div>
-      <div><strong>${canchas?.length || 0}</strong><span>CANCHAS</span></div>
-      <div><strong>${publicados}</strong><span>PARTIDOS PUBLICADOS</span></div>
-    </div>`;
-}
-
 // ---------- Bloqueos de cancha (admin) ----------
 // Concepto DISTINTO de la disponibilidad de un jugador: acá la cancha entera
 // queda inutilizable para TODOS en ese horario (lluvia, mantenimiento, otro
@@ -2713,13 +2498,6 @@ function bloqueosPorCanchaMapa() {
 }
 
 async function cargarBloqueosCancha() {
-  // Los bloqueos son una herramienta operativa del administrador; la experiencia
-  // pública no los necesita. Evitamos así una consulta extra cada vez que un
-  // jugador abre un torneo.
-  if (!isAdmin) {
-    cacheBloqueosCancha = [];
-    return;
-  }
   const { data } = await sb.from("canchas_bloqueos").select("*, canchas(nombre)").order("desde");
   cacheBloqueosCancha = data || [];
   renderBloqueosAdmin();
@@ -2960,8 +2738,7 @@ document.getElementById("btnBorrarTorneo").addEventListener("click", async () =>
   document.getElementById("admGestionTorneoWrap").style.display = "none";
   document.getElementById("admSelectTorneoGestion").value = "";
   document.getElementById("admSelectorTorneoCard").style.display = "block";
-  invalidarCacheTorneos();
-  await cargarTorneos(true);
+  await cargarTorneos();
   avisarActualizacionEnVivo();
 });
 
@@ -3054,10 +2831,8 @@ document.getElementById("btnGuardarTorneo").addEventListener("click", async () =
 
   toast("Torneo actualizado");
   document.getElementById("editarTorneoCard").style.display = "none";
-  invalidarCacheTorneos();
-  await cargarTorneos(true);
-  await cargarInicio();
-  await calcularTorneoDestacado();
+  cargarTorneos();
+  cargarInicio();
   refrescarTrasAccionGestion();
 });
 
@@ -3701,8 +3476,7 @@ function calcularSlots(partidos, canchas, torneo, sintetizarVacios) {
     const esMapaPorDia = ventana && typeof ventana === "object" && ventana.desde === undefined;
     fechasDelTorneo(torneo).forEach((fecha) => {
       const baseDia = (esMapaPorDia ? ventana[fecha.getDay()] : ventana) || FRANJA_DEFAULT_DIA;
-      const pasoVisual = 30;
-      for (let m = baseDia.desde; m + duracion <= baseDia.hasta; m += pasoVisual) {
+      for (let m = baseDia.desde; m + duracion <= baseDia.hasta; m += duracion) {
         const d = new Date(fecha);
         d.setHours(0, m, 0, 0);
         if (!filaPorMinuto.has(d.getTime())) filaPorMinuto.set(d.getTime(), d.toISOString());
@@ -3718,13 +3492,6 @@ function calcularSlots(partidos, canchas, torneo, sintetizarVacios) {
     const celdas = canchas.map((c) => {
       const partido = conHorario.find((p) => p.horario === horarioISO && p.cancha_id === c.id);
       if (partido) return { cancha: c, estado: "ocupado", partido };
-      const ocupadoPorOtro = conHorario.find((p) => {
-        if (p.cancha_id !== c.id || p.horario === horarioISO) return false;
-        const inicioP = new Date(p.horario);
-        const finP = new Date(inicioP.getTime() + duracionMin * 60000);
-        return desde < finP && hasta > inicioP;
-      });
-      if (ocupadoPorOtro) return { cancha: c, estado: "ocupado-solapado", partido: ocupadoPorOtro };
       const bloqueo = (bloqueos[c.id] || []).find((b) => desde < b.hasta && hasta > b.desde);
       if (bloqueo) return { cancha: c, estado: "bloqueado", bloqueo };
       return { cancha: c, estado: "disponible" };
@@ -3751,18 +3518,6 @@ window.matchMedia("(max-width:767px)").addEventListener("change", () => {
 // desktop — en mobile cada partido ya tiene sus propios inputs de
 // cancha/horario en la vista Lista, ver renderPartidosLista). El público/
 // jugador ya no ve esta grilla — ve la llave de Torneo (renderPartidosLlave).
-let planillaDiaSeleccionado = null;
-function localDateKey(value){
-  const d = value instanceof Date ? value : new Date(value);
-  if (Number.isNaN(d.getTime())) return "";
-  const pad=n=>String(n).padStart(2,"0");
-  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
-}
-function localDateLabel(key){
-  const [y,m,d]=key.split("-").map(Number);
-  const dt=new Date(y,m-1,d);
-  return dt.toLocaleDateString("es-AR",{weekday:"short",day:"2-digit",month:"short"}).replace(/^./, c=>c.toUpperCase());
-}
 function renderPartidosCalendario(containerId, partidos, canchasTorneo, editable) {
   const cont = document.getElementById(containerId);
   const canchas = canchasTorneo.map((c) => c.canchas).filter(Boolean);
@@ -3779,72 +3534,75 @@ function renderPartidosCalendario(containerId, partidos, canchasTorneo, editable
     return;
   }
 
-  const fechasDisponibles = [...new Set((torneoDeReferencia ? fechasDelTorneo(torneoDeReferencia).map(localDateKey) : []).concat(filas.map(f=>localDateKey(f.horarioISO))))].filter(Boolean).sort();
-  if (!planillaDiaSeleccionado || !fechasDisponibles.includes(planillaDiaSeleccionado)) planillaDiaSeleccionado = fechasDisponibles[0] || localDateKey(horarios[0]);
-  const filasDia = filas.filter(f => localDateKey(f.horarioISO) === planillaDiaSeleccionado);
-
+  // Antes, para cargar un resultado desde la Planilla había que dejarla e ir
+  // a la vista Lista aparte (arrastrar y soltar era lo único que se podía
+  // hacer acá) -- mismo ícono ✏️ y mismo formulario que ya existe en Lista y
+  // en la tarjeta pública (cargaResultadoPanelHtml/wireCargaResultado), para
+  // no duplicar el guardado ni el confirmar en un tercer lugar.
   const puedeCargarResultado = (p) => editable && p.estado !== "jugado";
   const tarjetaHtml = (p, extraClase = "") => `
     <div class="calendario-partido ${p.estado === "jugado" ? "jugado" : ""} ${extraClase}" ${editable ? `draggable="true" data-partido="${p.id}"` : `data-abrir-partido="${p.id}"`}>
       <div class="calendario-equipo">${p.pareja1_nombre}</div>
-      <div class="calendario-vs">VS</div>
+      <div class="calendario-vs">V</div>
       <div class="calendario-equipo">${p.pareja2_nombre}</div>
-      <div class="np-match-mini-meta">${p.categoria || ""}${p.ronda && p.ronda !== "Fase de grupos" ? ` · ${p.ronda}` : p.grupo ? ` · Grupo ${p.grupo}` : ""}</div>
-      ${p.estado === "jugado" && p.sets?.length ? setsGridHtml(p.sets, p.ganador_pareja_id === p.pareja1_id ? 1 : 2) : ""}
-      ${puedeCargarResultado(p) ? `<button type="button" class="btnTogglePartidoAdmin secondary small" draggable="false" data-p="${p.id}" style="margin-top:6px;width:100%">✎ Resultado</button>` : ""}
+      ${p.ronda && p.ronda !== "Fase de grupos" ? `<span class="badge orange" style="margin-top:4px">${p.ronda}</span>` : (p.grupo ? `<span class="badge orange" style="margin-top:4px">Grupo ${p.grupo}</span>` : "")}
+      ${p.categoria ? `<span class="badge" style="margin-top:4px">${p.categoria}</span>` : ""}
+      ${puedeCargarResultado(p) ? `<button type="button" class="btnTogglePartidoAdmin secondary small" draggable="false" data-p="${p.id}" style="margin-top:6px;width:100%" title="Cargar resultado" aria-label="Cargar resultado">✏️ Cargar resultado</button>` : ""}
       ${puedeCargarResultado(p) ? cargaResultadoPanelHtml(p, true) : ""}
     </div>`;
-  const bloqueadaHtml = (celda) => `<div class="calendario-bloqueada" title="${celda.bloqueo.motivo || "Cancha bloqueada"}"><span>BLOCK</span><strong>${celda.bloqueo.motivo || "No disponible"}</strong></div>`;
-  const vaciaHtml = (fila, celda) => `<div class="calendario-vacia" ${editable ? `data-horario="${fila.horarioISO}" data-cancha="${celda.cancha.id}"` : ""}><span>${editable ? "SOLTAR PARTIDO" : "DISPONIBLE"}</span></div>`;
-  const noDisponibleHtml = (c) => `<div class="calendario-vacia np-no-disponible"><span>NO DISP.</span></div>`;
+  const bloqueadaHtml = (celda) => `<div class="calendario-bloqueada" title="${celda.bloqueo.motivo || "Cancha bloqueada"}">🚫 Bloqueada${celda.bloqueo.motivo ? `<br>${celda.bloqueo.motivo}` : ""}</div>`;
+  const vaciaHtml = (fila, celda) => `<div class="calendario-vacia" ${editable ? `data-horario="${fila.horarioISO}" data-cancha="${celda.cancha.id}"` : ""}></div>`;
 
-  let html = '';
-  if (editable) {
-    html += `<div class="np-order-toolbar">
-      <div class="np-order-title"><span class="np-kicker">TOURNAMENT OPS / ORDER OF PLAY</span><h3>${torneoDeReferencia?.nombre || "Torneo"}</h3><small>Organizá el día visualmente: arrastrá los partidos a otra cancha y horario.</small></div>
-      <div class="np-order-summary"><b>${filasDia.length}</b><span>franjas</span><b>${canchas.length}</b><span>canchas</span></div>
-    </div>`;
-    html += `<div class="np-day-tabs" role="tablist">${fechasDisponibles.map(k=>`<button type="button" class="np-day-tab ${k===planillaDiaSeleccionado?'active':''}" data-planilla-day="${k}"><strong>${localDateLabel(k)}</strong><span>${filas.filter(f=>localDateKey(f.horarioISO)===k).reduce((n,f)=>n+f.celdas.filter(c=>c.estado==='ocupado').length,0)} partidos</span></button>`).join('')}</div>`;
-    if (sinHorario.length > 0) {
-      const sinHorarioDia = sinHorario;
-      html += `<div class="np-unassigned"><div><span class="np-kicker">UNSCHEDULED / ${sinHorarioDia.length}</span><strong>Partidos pendientes</strong><small>Arrastralos a una franja disponible.</small></div><div class="planilla-bandeja" id="planillaBandeja">${sinHorarioDia.map((p) => tarjetaHtml(p, "pendiente")).join("")}</div></div>`;
-    }
+  let html = "";
+  if (editable && sinHorario.length > 0) {
+    html += `<p class="match-meta" style="margin-bottom:6px">Arrastrá un partido sin horario a un hueco libre (en el celular, asignalo desde su tarjeta en la vista Lista):</p>
+      <div class="planilla-bandeja" id="planillaBandeja">${sinHorario.map((p) => tarjetaHtml(p, "pendiente")).join("")}</div>`;
   }
 
-  html += `<div class="np-order-board" style="--calendario-cols:${canchas.length}"><div class="np-order-board-head"><div class="np-time-head">HORA</div>${canchas.map(c=>`<div class="np-court-head"><strong>${c.nombre}</strong><span>${(() => { const ref=canchasTorneo.find(x=>x.canchas?.id===c.id); const ds=ref?.dias_semana; const dow=new Date(filasDia[0]?.horarioISO || `${planillaDiaSeleccionado}T12:00:00`).getDay(); return (!ds || !ds.length || ds.includes(dow)) ? 'DISPONIBLE' : 'NO DISPONIBLE'; })()}</span></div>`).join('')}</div>`;
-  html += `<div class="np-order-board-body">`;
-  filasDia.forEach((fila) => {
-    const d=new Date(fila.horarioISO);
-    html += `<div class="np-order-row"><div class="np-time-cell"><strong>${d.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'})}</strong><span>${d.toLocaleDateString('es-AR',{weekday:'short'})}</span></div>`;
-    fila.celdas.forEach((celda) => {
-      const ref=canchasTorneo.find(x=>x.canchas?.id===celda.cancha.id);
-      const dow=d.getDay(); const estaDisponible=!ref?.dias_semana || !ref.dias_semana.length || ref.dias_semana.includes(dow);
-      html += `<div class="np-order-cell ${celda.estado} ${!estaDisponible && celda.estado==='disponible'?'no-disponible':''}>`;
-      if (!estaDisponible && celda.estado==='disponible') html += noDisponibleHtml(celda.cancha);
-      else if (celda.estado==='ocupado') html += tarjetaHtml(celda.partido);
-      else if (celda.estado==='ocupado-solapado') html += `<div class="calendario-vacia np-overlap-slot"><span>OCUPADA</span><strong>hasta ${new Date(new Date(celda.partido.horario).getTime() + (torneoDeReferencia?.duracion_minutos || 90)*60000).toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'})}</strong></div>`;
-      else if (celda.estado==='bloqueado') html += bloqueadaHtml(celda);
-      else html += vaciaHtml(fila,celda);
-      html += `</div>`;
+  const esMobile = window.matchMedia("(max-width:767px)").matches;
+  if (esMobile) {
+    // agenda vertical: fecha -> hora -> cancha — nunca scroll horizontal como solución
+    let fechaAnterior = null;
+    filas.forEach((fila) => {
+      const d = new Date(fila.horarioISO);
+      const fechaTxt = d.toLocaleDateString("es-AR", { weekday: "long", day: "2-digit", month: "2-digit" });
+      if (fechaTxt !== fechaAnterior) { html += `<div class="calendario-agenda-fecha">${fechaTxt}</div>`; fechaAnterior = fechaTxt; }
+      html += `<div class="calendario-agenda-hora">${iconoReloj()} ${d.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" })}</div>`;
+      fila.celdas.forEach((celda) => {
+        if (celda.estado === "disponible" && !editable) return; // en la agenda pública no hace falta mostrar huecos vacíos
+        html += `<div class="calendario-agenda-item"><p class="match-meta meta-caption" style="margin-bottom:2px">${celda.cancha.nombre}</p>`;
+        if (celda.estado === "ocupado") html += tarjetaHtml(celda.partido);
+        else if (celda.estado === "bloqueado") html += bloqueadaHtml(celda);
+        else html += vaciaHtml(fila, celda);
+        html += `</div>`;
+      });
     });
-    html += `</div>`;
-  });
-  html += `</div></div>`;
+  } else {
+    // grilla de escritorio: auto-fit/minmax se reacomoda al ancho disponible, nunca se corta
+    html += `<div class="calendario-grid-scroll"><div class="calendario-grid" style="--calendario-cols:${canchas.length}">`;
+    html += `<div></div>` + canchas.map((c) => `<div class="calendario-grid-cabecera">${c.nombre}</div>`).join("");
+    filas.forEach((fila) => {
+      const fecha = new Date(fila.horarioISO).toLocaleString("es-AR", { dateStyle: "short", timeStyle: "short" });
+      html += `<div class="calendario-hora">${fecha}</div>`;
+      fila.celdas.forEach((celda) => {
+        if (celda.estado === "ocupado") html += tarjetaHtml(celda.partido);
+        else if (celda.estado === "bloqueado") html += bloqueadaHtml(celda);
+        else html += vaciaHtml(fila, celda);
+      });
+    });
+    html += `</div></div>`;
+  }
 
   if (!editable && sinHorario.length > 0) {
-    html += `<p class="match-meta" style="margin-top:10px">Sin horario asignado (${sinHorario.length}): ${sinHorario.map((p) => `${p.pareja1_nombre} vs ${p.pareja2_nombre}`).join(" · ")}</p>`;
+    html += `<p class="match-meta" style="margin-top:10px">Sin horario asignado (${sinHorario.length}): ` +
+      sinHorario.map((p) => `${p.pareja1_nombre} vs ${p.pareja2_nombre}`).join(" · ") + "</p>";
   }
   cont.innerHTML = html;
 
-  if (editable) {
-    cont.querySelectorAll('[data-planilla-day]').forEach(btn=>btn.addEventListener('click',()=>{
-      planillaDiaSeleccionado=btn.dataset.planillaDay;
-      renderPartidosCalendario(containerId, partidos, canchasTorneo, editable);
-    }));
-    wirePlanillaDragAndDrop(containerId);
-    wireCargaResultado(cont);
-  }
-  cont.querySelectorAll('[data-abrir-partido]').forEach(el=>el.addEventListener('click',()=>abrirDetallePartido(el.dataset.abrirPartido)));
+  if (editable) { wirePlanillaDragAndDrop(containerId); wireCargaResultado(cont); }
+  cont.querySelectorAll("[data-abrir-partido]").forEach((el) => {
+    el.addEventListener("click", () => abrirDetallePartido(el.dataset.abrirPartido));
+  });
   registrarRerenderResponsive(containerId, () => renderPartidosCalendario(containerId, partidos, canchasTorneo, editable));
 }
 
@@ -3983,8 +3741,7 @@ function wireCargaResultado(cont) {
       toast("Resultado cargado, ranking actualizado ✅");
       avisarActualizacionEnVivo();
       refrescarTrasAccionGestion();
-      invalidarCacheRanking();
-      cargarRanking(true);
+      cargarRanking();
       if (btn.dataset.ronda === "Final") cargarCampeones();
     });
   });
@@ -4081,14 +3838,9 @@ function renderPartidosLlave(containerId, partidos) {
   // columna con todos sus partidos apilados en vertical (igual que una Zona con varios
   // partidos) — lo horizontal es solo el avance de fase (Zona -> Cuartos -> Semis -> Final).
   const eliminacion = partidos.filter((p) => p.ronda && p.ronda !== "Fase de grupos" && p.grupo == null && !(p.ronda === "Zona" && p.slot_cuadro));
-  const ordenFases = ["Dieciseisavos", "Octavos", "Cuartos", "Semifinal", "Final"];
-  const rondasEncontradas = [...new Set(eliminacion.map((p) => p.ronda).filter(Boolean))];
-  const nombresOrdenados = [
-    ...ordenFases.filter((r) => rondasEncontradas.includes(r)),
-    ...rondasEncontradas
-      .filter((r) => !ordenFases.includes(r))
-      .sort((a, b) => a.localeCompare(b, "es", { numeric: true }))
-  ];
+  const nombresOrdenados = [...new Set(
+    [...eliminacion].sort((a, b) => new Date(a.created_at) - new Date(b.created_at)).map((p) => p.ronda)
+  )];
   nombresOrdenados.forEach((r) => {
     // sin título de columna: ya lo dice el título de la fase (h3) arriba, una
     // sola vez -- repetirlo en el h4 de la columna quedaba redundante ahora
@@ -4141,23 +3893,49 @@ function renderPartidosLlave(containerId, partidos) {
 // llega desde dentro del propio torneo, que es donde tiene sentido "administrar
 // esto" — ver Fase 4 de la reorganización club/torneo).
 document.getElementById("btnAdministrarEsteTorneo").addEventListener("click", async () => {
-  if (!torneoActualId) return;
+  if (!torneoActualId || !isAdmin) return;
   adminFocoTorneoActivo = true;
-  adminPanelMode = "ops";
-  cambiarVista("admin", "/admin");
+  cambiarVista("torneo-dashboard", "/admin-torneos");
   await cargarGestionTorneo(torneoActualId);
-  // pantalla enfocada SOLO en este torneo: se oculta el selector suelto y toda la
-  // configuración general del club (canchas, categorías, jugadores, etc. — eso vive
-  // aparte, en Administración general) para que "Administrar este torneo" no se
-  // sienta como "me manda a la configuración general".
-  document.getElementById("admSelectorTorneoCard").style.display = "none";
-  mostrarConfigGeneral(false);
+  document.getElementById("admSelectorTorneoCard").style.display = "block";
+  document.getElementById("admGestionTorneoWrap").style.display = "block";
   document.getElementById("admBtnVolverConfigGeneral").style.display = "inline-block";
   document.getElementById("admGestionTorneoWrap").scrollIntoView({ behavior: "smooth", block: "start" });
 });
+
+document.getElementById("btnAbrirDashboardTorneos")?.addEventListener("click", () => {
+  if (!isAdmin) return;
+  adminFocoTorneoActivo = false;
+  cambiarVista("torneo-dashboard", "/admin-torneos");
+});
+
+document.getElementById("btnVolverConfigDesdeDashboard")?.addEventListener("click", () => {
+  adminFocoTorneoActivo = false;
+  cambiarVista("admin", "/admin");
+});
+
+document.getElementById("btnDashboardSeleccionarTorneo")?.addEventListener("click", () => {
+  document.getElementById("admSelectorTorneoCard")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  document.getElementById("admSelectTorneoGestion")?.focus();
+});
+
+document.getElementById("btnDashboardIrPlanilla")?.addEventListener("click", () => {
+  if (!torneoGestionId) {
+    toast("Primero elegí un torneo");
+    document.getElementById("admSelectTorneoGestion")?.focus();
+    return;
+  }
+  seccionGestionActiva = "partidos";
+  vistaPartidosAdmin = "planilla";
+  renderAdminGestionSubnav();
+  document.querySelectorAll("#partidosVistaPills .pill").forEach((b) => b.classList.toggle("active", b.dataset.vista === "planilla"));
+  renderPartidosAdmin(ultimosPartidosGestion, ultimasCanchasTorneoGestion, ultimasParejasGestion);
+  document.getElementById("admSeccionPartidos")?.scrollIntoView({ behavior: "smooth", block: "start" });
+});
+
 document.getElementById("admBtnVolverConfigGeneral").addEventListener("click", () => {
   adminFocoTorneoActivo = false;
-  navegarA("/config");
+  cambiarVista("admin", "/admin");
 });
 
 // Atajo pedido por el club: desde "Administrar este torneo" poder cargar/ver
@@ -4442,7 +4220,7 @@ function renderPartidosLista(containerId, partidos, canchasTorneo, editable, par
 // transparente y necesitan la caja blanca para leerse sobre el fondo oscuro.
 function renderSponsorItem(s, caption) {
   const esJpg = /\.jpe?g(\?|#|$)/i.test(s.logo_url || "");
-  const contenido = `<img src="${s.logo_url}" alt="${s.nombre}" loading="lazy" decoding="async" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'sponsor-caption',textContent:'${s.nombre.replace(/'/g, "\\'")}'}))" />` +
+  const contenido = `<img src="${s.logo_url}" alt="${s.nombre}" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'sponsor-caption',textContent:'${s.nombre.replace(/'/g, "\\'")}'}))" />` +
     (caption ? `<span class="sponsor-caption">${caption}</span>` : "");
   const clase = "sponsor-item" + (esJpg ? " sponsor-sin-fondo" : "");
   return s.link_url
@@ -4572,7 +4350,7 @@ document.getElementById("btnSubirSponsor").addEventListener("click", async () =>
 // NOTICIAS (novedades del club en Inicio + botón a Instagram)
 // ============================================================
 function renderNoticiaCard(n) {
-  const imagen = n.imagen_url ? `<img src="${n.imagen_url}" alt="${n.titulo}" loading="lazy" decoding="async" onerror="this.style.display='none'" />` : "";
+  const imagen = n.imagen_url ? `<img src="${n.imagen_url}" alt="${n.titulo}" loading="lazy" onerror="this.style.display='none'" />` : "";
   const contenido = `${imagen}<strong>${n.titulo}</strong>${n.texto ? `<p>${n.texto}</p>` : ""}` +
     (n.link ? `<a href="${n.link}" target="_blank" rel="noopener noreferrer" class="link-btn">Ver más →</a>` : "");
   return `<div class="noticia-card">${contenido}</div>`;
@@ -4752,9 +4530,7 @@ function suscribirseANotificacionesRealtime() {
 const canalEnVivo = sb.channel("norte-padel-en-vivo");
 canalEnVivo
   .on("broadcast", { event: "actualizado" }, () => {
-    invalidarCacheRanking();
-    invalidarCacheTorneos();
-    cargarRanking(true);
+    cargarRanking();
     calcularTorneoDestacado();
     if (torneoActualId) refrescarDetalleTorneo();
   })
@@ -4781,86 +4557,20 @@ if ("serviceWorker" in navigator) {
 // acá — sb.auth.onAuthStateChange() ya se dispara solo, una vez, apenas se suscribe
 // (con la sesión que haya en ese momento), y manejarCambioSesion() ya llama a
 // calcularTorneoDestacado(); pedirla de nuevo acá solo duplicaba esas llamadas en cada carga.
-async function npConTimeout(promiseLike, ms = 12000) {
-  const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error("Tiempo de espera agotado")), ms));
-  return Promise.race([Promise.resolve(promiseLike), timeout]);
-}
-
-async function npIntentar(nombre, fn, ms = 12000) {
-  try {
-    return await npConTimeout(fn(), ms);
-  } catch (e) {
-    console.warn(`[Norte Padel] ${nombre} no pudo completar el arranque:`, e);
-    return null;
-  }
-}
-
 async function init() {
-  // Arranque progresivo: el shell y el router no deben quedar bloqueados porque
-  // una lectura pública de Supabase falle o quede pendiente.
-  await npIntentar("categorías", () => cargarCategorias(), 10000);
-  await npIntentar("torneos", () => cargarTorneos(), 10000);
-
-  await Promise.allSettled([
-    npIntentar("inicio", () => cargarInicio(), 12000),
-    npIntentar("partidos", () => cargarUltimosProximos(), 12000),
-    npIntentar("jugador del mes", () => cargarJugadorDelMes(), 12000),
-    npIntentar("campeones", () => cargarCampeones(), 12000),
-    npIntentar("ascendidos", () => cargarAscendidos(), 12000),
-    npIntentar("sponsors", () => cargarSponsors(), 12000),
-    npIntentar("ranking", () => cargarRanking(), 12000),
-    npIntentar("configuración", () => cargarConfig(), 10000)
+  await Promise.all([cargarCategorias(), cargarTorneos()]);
+  await Promise.all([
+    cargarComplejos(),
+    cargarInicio(),
+    cargarUltimosProximos(),
+    cargarJugadorDelMes(),
+    cargarCampeones(),
+    cargarAscendidos(),
+    cargarSponsors(),
+    cargarRanking(),
+    cargarPuntosRonda(),
+    cargarConfig(),
+    cargarNoticias()
   ]);
-
-  // Las noticias no deben impedir que el usuario entre al producto si Instagram
-  // o la configuración externa están lentos.
-  npIntentar("noticias", () => cargarNoticias(), 8000);
 }
 init();
-
-// ============================================================
-// APP / PWA — instalación contextual
-// ============================================================
-let npInstallPrompt = null;
-function npEsStandalone() {
-  return window.matchMedia?.('(display-mode: standalone)').matches || window.navigator.standalone === true;
-}
-function npEsIOS() {
-  return /iphone|ipad|ipod/i.test(navigator.userAgent);
-}
-function actualizarUIInstalacion() {
-  const section = document.getElementById('npAppSection');
-  const btn = document.getElementById('btnInstallApp');
-  const note = document.getElementById('appInstallNote');
-  if (!section || !btn || !note) return;
-  if (npEsStandalone()) { section.style.display = 'none'; return; }
-  section.style.display = '';
-  if (npInstallPrompt) {
-    btn.style.display = 'inline-flex';
-    note.textContent = 'Instalala en un toque y abrila como una app.';
-  } else if (npEsIOS()) {
-    btn.style.display = 'none';
-    note.textContent = 'En Safari: Compartir → Agregar a pantalla de inicio.';
-  } else {
-    btn.style.display = 'none';
-    note.textContent = 'Desde el menú del navegador buscá “Instalar app” o “Agregar a pantalla de inicio”.';
-  }
-}
-window.addEventListener('beforeinstallprompt', (event) => {
-  event.preventDefault();
-  npInstallPrompt = event;
-  actualizarUIInstalacion();
-});
-window.addEventListener('appinstalled', () => {
-  npInstallPrompt = null;
-  actualizarUIInstalacion();
-  toast('Norte Padel quedó instalada en tu dispositivo.');
-});
-document.getElementById('btnInstallApp')?.addEventListener('click', async () => {
-  if (!npInstallPrompt) return;
-  npInstallPrompt.prompt();
-  try { await npInstallPrompt.userChoice; } catch (_) {}
-  npInstallPrompt = null;
-  actualizarUIInstalacion();
-});
-window.addEventListener('load', actualizarUIInstalacion);
