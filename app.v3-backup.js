@@ -4593,6 +4593,3 @@ async function init() {
   ]);
 }
 init();
-
-// NP30_SCROLL_HANDLER — visual navigation only; no data/RPC logic changed.
-document.addEventListener("click", (e) => { const b=e.target.closest("[data-np30-scroll]"); if(!b)return; const el=document.getElementById(b.dataset.np30Scroll); if(el){el.style.display="block";el.scrollIntoView({behavior:"smooth",block:"start"});} });
