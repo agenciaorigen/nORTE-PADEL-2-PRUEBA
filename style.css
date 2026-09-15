@@ -1394,7 +1394,7 @@ header.topbar button {
 /* ---------- contenido público ---------- */
 @media (min-width: 960px) {
   .app-body {
-    max-width: 1280px;
+    max-width: min(94vw, 1680px);
     padding: 42px 48px 80px;
   }
   .hero-carousel-track { border-radius: 0; }

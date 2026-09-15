@@ -1,0 +1,22 @@
+Norte Padel — actualización de repo
+====================================
+
+Archivo incluido: style.css
+
+Qué cambia: una sola regla, dentro de @media (min-width: 960px), cerca de
+la línea 1396. Antes limitaba todo el contenido de escritorio a un ancho
+fijo de 1280px centrado (por eso se veía "todo muy al medio" en pantallas
+grandes). Ahora se adapta al ancho real de la pantalla, con un tope de
+1680px para que no se estire de más en monitores ultra anchos:
+
+  ANTES:  max-width: 1280px;
+  AHORA:  max-width: min(94vw, 1680px);
+
+Cómo aplicarlo:
+1. Reemplazá el style.css de tu repo por este.
+2. git add style.css && git commit -m "Ensanchar el layout de escritorio" && git push
+3. GitHub Pages se actualiza solo en menos de un minuto.
+
+Probado con capturas reales en mobile (390px), laptop (1440px) y pantalla
+ancha (1920px) contra tu propio repo clonado — no rompe nada del resto del
+sitio ni del mobile (la regla vive dentro del media query de escritorio).
